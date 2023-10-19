@@ -14,6 +14,7 @@ module.exports = function (api) {
           disableExtraction: process.env.NODE_ENV === "development",
         },
       ],
+      ["@babel/plugin-proposal-decorators", { legacy: true }],
       "react-native-reanimated/plugin",
     ],
   };
