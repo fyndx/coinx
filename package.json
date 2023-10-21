@@ -9,10 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/config-plugins": "~7.2.2",
     "@expo/vector-icons": "^13.0.0",
-    "@morrowdigital/watermelondb-expo-plugin": "^2.1.2",
     "@nozbe/watermelondb": "^0.27.1",
     "@nozbe/with-observables": "^1.6.0",
+    "@skam22/watermelondb-expo-plugin": "^49.0.1",
     "@tamagui/babel-plugin": "^1.74.19",
     "@tamagui/config": "^1.74.19",
     "expo": "~49.0.13",

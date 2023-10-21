@@ -1,11 +1,6 @@
+// @ts-nocheck
 import { Model } from "@nozbe/watermelondb";
-import {
-  field,
-  text,
-  date,
-  relation,
-  children,
-} from "@nozbe/watermelondb/decorators";
+import { text, children } from "@nozbe/watermelondb/decorators";
 
 export default class Category extends Model {
   static table = "categories";

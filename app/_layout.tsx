@@ -4,8 +4,7 @@ import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { RootProvider } from "../src/Providers/RootProvider";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import "../src/model/init-watermelon";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export {
   // Catch any errors thrown by the Layout component.
