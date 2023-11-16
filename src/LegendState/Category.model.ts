@@ -34,4 +34,12 @@ export class CategoryModel {
 
     return categories;
   }
+
+  getCategoryByIdAsync = async (id: string) => {
+    const category = await this.database.collections.get("categories").find(id);
+
+    if (category) {
+      return category._raw;
+    }
+  };
 }

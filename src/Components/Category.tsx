@@ -1,13 +1,13 @@
 import { withObservables } from "@nozbe/watermelondb/react";
-import { Text, View } from "tamagui";
+import { Button, Text, View, XStack, ListItem } from "tamagui";
 
-const Category = ({ category }) => {
+const Category = ({ category, onCategoryPressed }) => {
   return (
-    <View>
-      <Text>{category.name}</Text>
-      <Text>{category.icon}</Text>
-      <Text>{category.color}</Text>
-    </View>
+    <ListItem
+      key={category.id}
+      title={category.name}
+      onPress={() => onCategoryPressed(category.id)}
+    />
   );
 };
 

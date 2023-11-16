@@ -1,11 +1,24 @@
 import { ObservableObject, observable } from "@legendapp/state";
+import { Database } from "@nozbe/watermelondb";
+import Transaction from "../model/Transaction";
+import dayjs, { Dayjs } from "dayjs";
+import Category from "../model/Category";
 
 export class TransactionModel {
-  obs: ObservableObject<{ amount: string }>;
+  obs: ObservableObject<{
+    amount: string;
+    date: Dayjs;
+    category?: any;
+    note: string;
+  }>;
 
-  constructor() {
+  constructor(private readonly database: Database) {
+    this.database = database;
     this.obs = observable({
-      amount: "",
+      amount: "0",
+      date: dayjs(),
+      category: undefined,
+      note: "",
     });
   }
 
@@ -14,17 +27,65 @@ export class TransactionModel {
     const amount = this.obs.amount.peek();
 
     if (textString.includes(".")) {
-      if (amount.length === 0) {
-        this.obs.amount.set("0.");
-      } else if (amount.includes(".")) {
+      if (amount.includes(".")) {
         return;
       } else {
         this.obs.amount.set((prev) => prev.concat(textString));
       }
     } else {
-      this.obs.amount.set((prev) => prev.concat(textString));
+      if (amount === "0") {
+        this.obs.amount.set(textString);
+      } else {
+        this.obs.amount.set((prev) => prev.concat(textString));
+      }
     }
   };
 
-  createTransaction = () => {};
+  clear = () => {
+    const amount = this.obs.amount.peek();
+    if (amount.length > 1) {
+      this.obs.amount.set(amount.slice(0, -1));
+    } else {
+      this.obs.amount.set("0");
+    }
+  };
+
+  createTransaction = async () => {
+    const transaction = await this.database.write(async () => {
+      const category = await this.database.collections
+        .get<Category>("categories")
+        .find(this.obs.category.peek().id);
+
+      const newTransaction = await this.database
+        .get<Transaction>("transactions")
+        .create((transactionRecord) => {
+          transactionRecord.transactionTime = this.obs.date.peek().unix();
+          transactionRecord.type = "expense";
+          transactionRecord.amount = Number(this.obs.amount.peek());
+          transactionRecord.note = "";
+          transactionRecord.category.set(category);
+        });
+
+      return newTransaction;
+    });
+
+    console.log({ transaction: transaction._raw });
+
+    return transaction;
+  };
+
+  get transactionsList() {
+    const transactions = this.database.collections.get("transactions").query();
+
+    return transactions;
+  }
+
+  transactionCount = async () => {
+    const transactions = await this.database
+      .get("transactions")
+      .query()
+      .fetchCount();
+    console.log({ transactions });
+    return transactions;
+  };
 }
