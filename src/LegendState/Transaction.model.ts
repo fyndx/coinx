@@ -52,18 +52,25 @@ export class TransactionModel {
 
   createTransaction = async () => {
     const transaction = await this.database.write(async () => {
-      const category = await this.database.collections
-        .get<Category>("categories")
-        .find(this.obs.category.peek().id);
+      // const category = await this.database.collections
+      //   .get<Category>("categories")
+      //   .find(this.obs.category.peek().id);
 
       const newTransaction = await this.database
         .get<Transaction>("transactions")
         .create((transactionRecord) => {
-          transactionRecord.transactionTime = this.obs.date.peek().unix();
+          const rawNote = this.obs.note.peek();
+          const note =
+            rawNote.length > 0 ? rawNote : this.obs.category.name.peek();
+          const transactionTime = this.obs.date.peek().unix();
+          const amount = Number(this.obs.amount.peek());
+
+          transactionRecord.transactionTime = transactionTime;
           transactionRecord.type = "expense";
-          transactionRecord.amount = Number(this.obs.amount.peek());
-          transactionRecord.note = "";
-          transactionRecord.category.set(category);
+          transactionRecord.amount = amount;
+          transactionRecord.note = note;
+          // transactionRecord.category.set(category);
+          transactionRecord.category.id = this.obs.category.peek().id;
         });
 
       return newTransaction;
@@ -87,5 +94,20 @@ export class TransactionModel {
       .fetchCount();
     console.log({ transactions });
     return transactions;
+  };
+
+  deleteAllTransactions = async () => {
+    await this.database.write(async () => {
+      const transactions = await this.database
+        .get("transactions")
+        .query()
+        .fetch();
+
+      transactions.forEach((transaction) => {
+        transaction.prepareDestroyPermanently();
+      });
+
+      await this.database.batch(transactions);
+    });
   };
 }

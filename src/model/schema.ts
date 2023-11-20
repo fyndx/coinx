@@ -10,7 +10,7 @@ export default appSchema({
         { name: "type", type: "string" }, // income or expense
         // TODO: can amount evolve into it's own table?
         { name: "amount", type: "number" },
-        { name: "note", type: "number", isOptional: true },
+        { name: "note", type: "string", isOptional: true },
         // from categories table
         { name: "category_id", type: "string", isIndexed: true },
       ],
