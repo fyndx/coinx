@@ -103,11 +103,11 @@ export class TransactionModel {
         .query()
         .fetch();
 
-      transactions.forEach((transaction) => {
-        transaction.prepareDestroyPermanently();
+      const transactionsToDelete = transactions.map((transaction) => {
+        return transaction.prepareDestroyPermanently();
       });
 
-      await this.database.batch(transactions);
+      await this.database.batch(transactionsToDelete);
     });
   };
 }

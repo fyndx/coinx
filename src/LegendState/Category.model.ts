@@ -42,4 +42,16 @@ export class CategoryModel {
       return category._raw;
     }
   };
+
+  deleteAllCategories = async () => {
+    await this.database.write(async () => {
+      const categories = await this.database.get("categories").query().fetch();
+
+      const categoriesToDelete = categories.map((category) => {
+        return category.prepareDestroyPermanently();
+      });
+
+      await this.database.batch(categoriesToDelete);
+    });
+  };
 }

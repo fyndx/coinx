@@ -21,6 +21,7 @@ export default appSchema({
         { name: "name", type: "string" },
         { name: "icon", type: "string" },
         { name: "color", type: "string" },
+        { name: "type", type: "string" }, // income or expense
       ],
     }),
   ],

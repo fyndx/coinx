@@ -11,6 +11,12 @@ export default class Category extends Model {
   @text("name") name;
   @text("icon") icon;
   @text("color") color;
+  @text("type") type; // income or expense
 
   @children("transactions") transactions;
+
+  async markAsDeleted(): Promise<void> {
+    await this.transactions.destroyAllPermanently();
+    await super.markAsDeleted();
+  }
 }
