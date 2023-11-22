@@ -1,13 +1,19 @@
 import { withObservables } from "@nozbe/watermelondb/react";
-import { Button, Text, View, XStack, ListItem } from "tamagui";
+import { Button, Text, View, XStack, ListItem, Square } from "tamagui";
 
 const Category = ({ category, onCategoryPressed }) => {
   return (
     <ListItem
       key={category.id}
-      title={category.name}
       onPress={() => onCategoryPressed(category.id)}
-    />
+      alignItems="center"
+    >
+      <XStack gap={"$4"}>
+        <Text fontSize={"$6"}>{category.icon}</Text>
+        <Text fontSize={"$6"}>{category.name}</Text>
+      </XStack>
+      <Square size={"$1"} backgroundColor={category.color} />
+    </ListItem>
   );
 };
 

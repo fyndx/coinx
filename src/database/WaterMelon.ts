@@ -27,3 +27,7 @@ export const database = new Database({
   adapter,
   modelClasses: [Transaction, Category],
 });
+
+// database.write(async () => {
+//   database.unsafeResetDatabase();
+// });

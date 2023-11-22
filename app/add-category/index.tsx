@@ -1,38 +1,33 @@
 import BottomSheet from "@gorhom/bottom-sheet";
-import { observer, useObservable } from "@legendapp/state/react";
-import { widths } from "@tamagui/config";
-import { Smile } from "@tamagui/lucide-icons";
+import { observer } from "@legendapp/state/react";
+import { PlusSquare, Smile } from "@tamagui/lucide-icons";
 import { useMemo, useRef } from "react";
 import { StyleSheet } from "react-native";
 import ColorPicker, {
   BlueSlider,
   GreenSlider,
-  HueSlider,
   OpacitySlider,
-  Panel1,
   Panel4,
   Panel5,
-  Preview,
-  PreviewText,
   RedSlider,
   Swatches,
-  colorKit,
   returnedResults,
 } from "reanimated-color-picker";
 import EmojiPicker, { EmojiType } from "rn-emoji-keyboard";
 import {
   Button,
+  Input,
   Separator,
   SizableText,
   Square,
-  Stack,
   Tabs,
   Text,
   ToggleGroup,
   XStack,
   YStack,
-  ZStack,
+  styled,
 } from "tamagui";
+import { rootStore } from "../../src/LegendState";
 
 const CategoryType = observer(({ state$ }) => {
   const onCategoryChanged = (value) => {
@@ -41,7 +36,7 @@ const CategoryType = observer(({ state$ }) => {
   };
 
   return (
-    <XStack justifyContent="center" py={"$2"}>
+    <XStack justifyContent="center" py={"$2"} my={"$6"}>
       <ToggleGroup
         type="single"
         defaultValue={"Expense"}
@@ -61,56 +56,63 @@ const CategoryType = observer(({ state$ }) => {
 
 const Emoji = observer(({ state$ }) => {
   const handlePickedEmoji = (val: EmojiType) => {
-    console.log({ val });
-    state$.emoji.set(val.emoji);
-    // state$.isOpen.set(false);
+    state$.icon.set(val.emoji);
   };
 
   return (
     <>
       <Square
         size={"$6"}
-        backgroundColor={"$gray10Light"}
-        onPress={state$.isOpen.toggle}
+        backgroundColor={"$blue10Light"}
+        onPress={state$.isEmojiPickerOpen.toggle}
       >
-        {state$.emoji.get().length === 0 ? (
+        {state$.icon.get().length === 0 ? (
           <Smile size={"$4"} />
         ) : (
-          <Text fontSize={"$10"}>{state$.emoji.get()}</Text>
+          <Text fontSize={"$10"}>{state$.icon.get()}</Text>
         )}
       </Square>
       <EmojiPicker
         onEmojiSelected={handlePickedEmoji}
-        open={state$.isOpen.get()}
+        open={state$.isEmojiPickerOpen.get()}
         onClose={() => {
-          state$.isOpen.set(false);
+          state$.isEmojiPickerOpen.set(false);
         }}
       />
     </>
   );
 });
 
-const CategoryNameRow = observer(({ state$, colorSheetRef }) => {
+const CategoryNameRow = observer(({ state$, colorSheetRef, addCategory }) => {
   const openColorPicker = () => {
     colorSheetRef.current.snapToIndex(0);
   };
+
+  const handleTextChange = (text: string) => {
+    state$.name.set(text);
+  };
+
   return (
-    <XStack p={"$2"} alignSelf={"stretch"}>
+    <XStack p={"$2"} alignSelf={"stretch"} space={"$2"} my={"$6"}>
       <Square
         size={"$4"}
         backgroundColor={state$.color.get()}
         onPress={openColorPicker}
       />
+      <Input
+        flex={1}
+        placeholder={"Category name"}
+        onChangeText={handleTextChange}
+      />
+      <Square justifyContent="center" onPress={addCategory}>
+        <PlusSquare size={"$4"} />
+      </Square>
     </XStack>
   );
 });
 
-const ColorPickerSheet = observer(({ state$, colorSheetRef }) => {
+const ColorPickerSheet = observer(({ state$, colorSheetRef, colors }) => {
   const snapPoints = useMemo(() => ["75%"], []);
-  const customSwatches = useMemo(
-    () => new Array(6).fill("#fff").map(() => colorKit.randomRgbColor().hex()),
-    []
-  );
 
   const handleConfirm = () => {
     colorSheetRef.current?.close?.();
@@ -181,7 +183,7 @@ const ColorPickerSheet = observer(({ state$, colorSheetRef }) => {
               <Swatches
                 style={styles.swatchesContainer}
                 swatchStyle={styles.swatchStyle}
-                colors={customSwatches}
+                colors={colors}
               />
             </Tabs.Content>
           </Tabs>
@@ -196,20 +198,22 @@ const ColorPickerSheet = observer(({ state$, colorSheetRef }) => {
 
 const AddCategory = () => {
   const colorSheetRef = useRef<BottomSheet>(null);
-  const state$ = useObservable({
-    type: "Expense",
-    isOpen: false,
-    emoji: "",
-    color: colorKit.randomRgbColor().hex(),
-  });
+  const state$ = rootStore.categoryModel.obs;
 
   return (
     <YStack flex={1} px={"$2"} alignItems="center">
-      <Text>Add Category</Text>
       <CategoryType state$={state$} />
       <Emoji state$={state$} />
-      <CategoryNameRow state$={state$} colorSheetRef={colorSheetRef} />
-      <ColorPickerSheet colorSheetRef={colorSheetRef} state$={state$} />
+      <CategoryNameRow
+        state$={state$}
+        colorSheetRef={colorSheetRef}
+        addCategory={rootStore.categoryModel.create}
+      />
+      <ColorPickerSheet
+        colorSheetRef={colorSheetRef}
+        state$={state$}
+        colors={rootStore.categoryModel.colors}
+      />
     </YStack>
   );
 };

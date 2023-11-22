@@ -52,6 +52,10 @@ function RootLayoutNav() {
             name="add-category/index"
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="categories/index"
+            options={{ headerShown: false }}
+          />
         </Stack>
       </RootProvider>
     </SafeAreaView>

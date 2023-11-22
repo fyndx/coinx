@@ -8,9 +8,6 @@ const Transactions = () => {
   return (
     <Stack flex={1}>
       <Text>Transactions</Text>
-      {/* <EnhancedCategoriesList
-        categories={rootStore.categoryModel.categoriesList}
-      /> */}
       <EnhancedTransactionsList
         transactions={rootStore.transactionModel.transactionsList}
       />

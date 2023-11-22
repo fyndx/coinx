@@ -17,8 +17,8 @@ const Settings = () => {
       <Text>Settings</Text>
       <Button onPress={clearTransactions}>{"Clear All Transactions"}</Button>
       <Button onPress={clearCategories}>{"Clear All Categories"}</Button>
-      <Link href={"add-category"} asChild>
-        <Button>{"Add Category"}</Button>
+      <Link href={"categories"} asChild>
+        <Button>{"Categories"}</Button>
       </Link>
     </View>
   );
