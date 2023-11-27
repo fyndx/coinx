@@ -1,4 +1,4 @@
-import { Database } from "@nozbe/watermelondb";
+import { Database, Q } from "@nozbe/watermelondb";
 import Category from "../model/Category";
 import { ObservableObject, observable } from "@legendapp/state";
 import { colorKit } from "reanimated-color-picker";
@@ -65,6 +65,28 @@ export class CategoryModel {
       });
 
       await this.database.batch(categoriesToDelete);
+    });
+  };
+
+  deleteCategoryById = async (id) => {
+    const category = await this.database.collections.get("categories").find(id);
+
+    // Delete all transactions related to category before deleting category
+    await this.database.write(async () => {
+      const transactions = await this.database
+        .get("transactions")
+        .query(Q.where("category_id", Q.eq(id)))
+        .fetch();
+
+      const transactionsToDelete = transactions.map((transaction) => {
+        return transaction.prepareDestroyPermanently();
+      });
+
+      await this.database.batch(transactionsToDelete);
+    });
+
+    await this.database.write(async () => {
+      await category.destroyPermanently();
     });
   };
 }

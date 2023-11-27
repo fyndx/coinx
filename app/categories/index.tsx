@@ -1,16 +1,22 @@
 import { StyleSheet } from "react-native";
 import React from "react";
-import { Circle, Stack, YStack, ZStack } from "tamagui";
+import { Circle, YStack } from "tamagui";
 import { EnhancedCategoriesList } from "../../src/Components/CategoriesList";
 import { rootStore } from "../../src/LegendState";
 import { PlusCircle } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
 
 const Categories = () => {
+  const handleCagtegoryDelete = (id) => {
+    rootStore.categoryModel.deleteCategoryById(id);
+  };
+
   return (
     <YStack flex={1} padding={"$2"}>
       <EnhancedCategoriesList
         categories={rootStore.categoryModel.categoriesList}
+        onCategoryPressed={() => null}
+        onCategoryDelete={handleCagtegoryDelete}
       />
       <Circle
         position="absolute"

@@ -4,6 +4,9 @@ import { field, text, date, relation } from "@nozbe/watermelondb/decorators";
 
 export default class Transaction extends Model {
   static table = "transactions";
+  static associations = {
+    categories: { type: "belongs_to", key: "category_id" },
+  };
 
   @date("transaction_time") transactionTime;
   @text("type") type;

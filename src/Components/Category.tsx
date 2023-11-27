@@ -1,19 +1,25 @@
 import { withObservables } from "@nozbe/watermelondb/react";
-import { Button, Text, View, XStack, ListItem, Square } from "tamagui";
+import { Text, XStack, ListItem, Square } from "tamagui";
+import { SwipeableRow } from "./SwipeableRow";
+import { rootStore } from "../LegendState";
 
-const Category = ({ category, onCategoryPressed }) => {
+const Category = ({ category, onCategoryPressed, onCategoryDelete }) => {
   return (
-    <ListItem
+    <SwipeableRow
       key={category.id}
-      onPress={() => onCategoryPressed(category.id)}
-      alignItems="center"
+      onDelete={() => onCategoryDelete(category.id)}
     >
-      <XStack gap={"$4"}>
-        <Text fontSize={"$6"}>{category.icon}</Text>
-        <Text fontSize={"$6"}>{category.name}</Text>
-      </XStack>
-      <Square size={"$1"} backgroundColor={category.color} />
-    </ListItem>
+      <ListItem
+        onPress={() => onCategoryPressed(category.id)}
+        alignItems="center"
+      >
+        <XStack gap={"$4"}>
+          <Text fontSize={"$6"}>{category.icon}</Text>
+          <Text fontSize={"$6"}>{category.name}</Text>
+        </XStack>
+        <Square size={"$1"} backgroundColor={category.color} />
+      </ListItem>
+    </SwipeableRow>
   );
 };
 
