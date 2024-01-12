@@ -32,7 +32,7 @@ export class TransactionsScreenModel {
       .get("transactions")
       .query(
         Q.unsafeSqlQuery(
-          `select strftime('%d-%m-%Y', transaction_time, 'unixepoch') as transaction_day, json_group_array(json_object('amount', amount, 'note', note, 'type', type, 'transaction_time', transaction_time, 'category', category_id)) as transactions_list from transactions group by strftime('%d-%m-%Y', transaction_time, 'unixepoch') order by transaction_time desc`
+          `select strftime('%d-%m-%Y', transaction_time, 'unixepoch') as transaction_day, json_group_array(json_object('amount', amount, 'note', note, 'transaction_time', transaction_time, 'category_id', category_id, 'category_name', categories.name, 'category_icon', categories.icon, 'category_color', categories.color)) as transactions_list from transactions inner join categories on transactions.category_id = categories.id group by strftime('%d-%m-%Y', transaction_time, 'unixepoch') order by transaction_time desc`
         )
       )
       .unsafeFetchRaw();
