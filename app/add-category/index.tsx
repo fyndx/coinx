@@ -11,9 +11,9 @@ import ColorPicker, {
   Panel5,
   RedSlider,
   Swatches,
-  returnedResults,
+  type returnedResults,
 } from "reanimated-color-picker";
-import EmojiPicker, { EmojiType } from "rn-emoji-keyboard";
+import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
 import {
   Button,
   Input,
@@ -198,7 +198,7 @@ const ColorPickerSheet = observer(({ state$, colorSheetRef, colors }) => {
 
 const AddCategory = () => {
   const colorSheetRef = useRef<BottomSheet>(null);
-  const state$ = rootStore.categoryModel.obs;
+  const state$ = rootStore.categoryModel.category;
 
   return (
     <YStack flex={1} px={"$2"} alignItems="center">

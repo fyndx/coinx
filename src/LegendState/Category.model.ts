@@ -1,51 +1,51 @@
-import { Database, Q } from "@nozbe/watermelondb";
-import Category from "../model/Category";
-import { ObservableObject, observable } from "@legendapp/state";
+import { db as database } from "@/db/client";
+import { type ObservableObject, observable, type ObservableArray } from "@legendapp/state";
 import { colorKit } from "reanimated-color-picker";
+import { categories } from "@/db/schema";
+import * as Crypto from 'expo-crypto';
+
+export interface ICategory {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  type: string;
+}
+
+interface CategoryDraft extends Partial<ICategory> {
+  isEmojiPickerOpen: boolean;
+}
+
+export type CategoriesListObservable = ObservableArray<Array<ICategory>>;
 
 export class CategoryModel {
-  obs: ObservableObject<{
-    name: string;
-    color: string;
-    icon: string;
-    type: string;
-    isEmojiPickerOpen: boolean;
-  }>;
+  category: ObservableObject<CategoryDraft>;
+  categories: CategoriesListObservable;
 
   colors = new Array(6).fill("#fff").map(() => colorKit.randomRgbColor().hex());
 
-  constructor(private readonly database: Database) {
-    this.database = database;
-    this.obs = observable({
+  constructor() {
+    this.category = observable({
       name: "",
       color: colorKit.randomRgbColor().hex(),
       icon: "",
       type: "Expense",
       isEmojiPickerOpen: false,
     });
+
+    this.categories = observable([])
   }
 
   create = async () => {
-    const { name, color, icon, type } = this.obs.peek();
-    const category = await this.database.write(async () => {
-      const newCategory = await this.database
-        .get<Category>("categories")
-        .create((categoryRecord) => {
-          categoryRecord.name = name;
-          categoryRecord.color = color;
-          categoryRecord.icon = icon;
-          categoryRecord.type = type;
-        });
-      return newCategory;
-    });
-
-    return category;
+    const { name, color, icon, type } = this.category.peek();
+    const newCategory = await database.insert(categories).values({id: `${Crypto.randomUUID()}`, name, color, icon, type}).returning();
+    this.categories.push(newCategory[0])
+    return newCategory;
   };
 
-  get categoriesList() {
-    const categories = this.database.collections.get("categories").query();
-
-    return categories;
+  async getCategoriesList() {
+    const result = await database.select().from(categories);
+    this.categories.set(result)
   }
 
   getCategoryByIdAsync = async (id: string) => {
@@ -73,16 +73,14 @@ export class CategoryModel {
 
     // Delete all transactions related to category before deleting category
     await this.database.write(async () => {
-      const transactions = await this.database
-        .get("transactions")
-        .query(Q.where("category_id", Q.eq(id)))
-        .fetch();
-
-      const transactionsToDelete = transactions.map((transaction) => {
-        return transaction.prepareDestroyPermanently();
-      });
-
-      await this.database.batch(transactionsToDelete);
+      // const transactions = await this.database
+      //   .get("transactions")
+      //   .query(Q.where("category_id", Q.eq(id)))
+      //   .fetch();
+      // const transactionsToDelete = transactions.map((transaction) => {
+      //   return transaction.prepareDestroyPermanently();
+      // });
+      // await this.database.batch(transactionsToDelete);
     });
 
     await this.database.write(async () => {

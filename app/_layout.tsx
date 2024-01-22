@@ -3,8 +3,12 @@ import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { RootProvider } from "../src/Providers/RootProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { db } from "@/db/client";
+import migrations from "@/drizzle/migrations";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -19,23 +23,29 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
+  const [hasLoadedFonts, loadingFontsError] = useFonts({
     LatoRegular: require("../assets/fonts/Lato/Lato-Regular.ttf"),
     ...MaterialCommunityIcons.font,
   });
 
+  const { success: hasRunMigrations, error: migrationsError } = useMigrations(
+    db,
+    migrations
+  );
+
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+    if (loadingFontsError) throw loadingFontsError;
+    if (migrationsError) throw migrationsError;
+  }, [loadingFontsError, migrationsError]);
 
   useEffect(() => {
-    if (loaded) {
+    if (hasLoadedFonts && hasRunMigrations) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [hasLoadedFonts, hasRunMigrations]);
 
-  if (!loaded) {
+  if (!hasLoadedFonts || !hasRunMigrations) {
     return null;
   }
 
@@ -44,20 +54,22 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <RootProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="add-category/index"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="categories/index"
-            options={{ headerShown: false }}
-          />
-        </Stack>
-      </RootProvider>
-    </SafeAreaView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <RootProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="add-category/index"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="categories/index"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+        </RootProvider>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }

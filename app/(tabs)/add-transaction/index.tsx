@@ -11,16 +11,15 @@ import {
 } from "tamagui";
 import { observer } from "@legendapp/state/react";
 import { CheckSquare, Delete } from "@tamagui/lucide-icons";
-import DateTimePicker, { DateType } from "react-native-ui-datepicker";
+import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
 import dayjs from "dayjs";
 import { TransactionModel } from "../../../src/LegendState/Transaction.model";
-import { database } from "../../../src/database/WaterMelon";
 import BottomSheet, {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import { EnhancedCategoriesList } from "../../../src/Components/CategoriesList";
+import { CategoriesList } from "../../../src/Components/CategoriesList";
 import { rootStore } from "../../../src/LegendState";
 
 const NumberButton = ({ text, onPress }) => {
@@ -155,9 +154,11 @@ const CategoryPicker = observer(
     return (
       <BottomSheet ref={categorySheetRef} snapPoints={["50%"]} index={-1}>
         <BottomSheetScrollView>
-          <EnhancedCategoriesList
-            categories={rootStore.categoryModel.categoriesList}
+          <CategoriesList
+            // categories={rootStore.categoryModel.categoriesList}
+            categories={[]}
             onCategoryPressed={onCategoryPressed}
+            onCategoryDelete={() => {}}
           />
         </BottomSheetScrollView>
       </BottomSheet>

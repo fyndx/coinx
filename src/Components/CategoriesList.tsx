@@ -1,25 +1,30 @@
-import { withObservables } from "@nozbe/watermelondb/react";
-import { EnhancedCategory } from "./Category";
+import React from 'react'
+import { Category } from "./Category";
+import { observer, useMount } from '@legendapp/state/react';
+import type { CategoriesListObservable } from '../LegendState/Category.model';
 
-const CategoriesList = ({
+interface CategoriesListProps {
+  categories: CategoriesListObservable
+  onCategoryPressed: (id: string) => void;
+  onCategoryDelete: (id: string) => void;
+}
+
+export const CategoriesList = observer(({
   categories,
   onCategoryPressed,
   onCategoryDelete,
-}) => {
+}: CategoriesListProps) => {
+
+  console.log({categories: categories.peek()})
+
   return categories.map((category) => {
     return (
-      <EnhancedCategory
-        key={category.id}
+      <Category
+        key={category.id.peek()}
         category={category}
         onCategoryPressed={onCategoryPressed}
         onCategoryDelete={onCategoryDelete}
       />
     );
   });
-};
-
-const enhance = withObservables(["categories"], ({ categories }) => ({
-  categories,
-}));
-
-export const EnhancedCategoriesList = enhance(CategoriesList);
+});

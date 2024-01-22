@@ -26,33 +26,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "kotlinVersion": "1.8.10",
-            "compileSdkVersion": 33,
-            "targetSdkVersion": 33,
-            "packagingOptions": {
-              "pickFirst": ["**/libc++_shared.so"]
-            }
-          },
-          "ios": {
-            "extraPods": [
-              {
-                "name": "simdjson",
-                "configurations": ["Debug", "Release"],
-                "path": "path_to/node_modules/@nozbe/simdjson",
-                "modular_headers": true
-              }
-            ]
-          }
-        }
-      ],
-      "@skam22/watermelondb-expo-plugin"
-    ],
-    "scheme": "coinx"
+    "plugins": ["expo-router", "expo-font"],
+    "scheme": "coinx",
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

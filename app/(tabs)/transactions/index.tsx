@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from "react-native";
 import { rootStore } from "../../../src/LegendState";
-import { EnhancedTransactionsList } from "../../../src/Components/TransactionsList";
+import { TransactionsList } from "../../../src/Components/TransactionsList";
 import { Button, Stack, XStack, YStack } from "tamagui";
 import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
 import { useRef } from "react";
@@ -70,8 +70,9 @@ const Transactions = () => {
         <ChevronDownSquare />
       </XStack>
       <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} />
-      <EnhancedTransactionsList
-        transactions={rootStore.transactionModel.transactionsList}
+      <TransactionsList
+        // transactions={rootStore.transactionModel.transactionsList}
+        transactions={[]}
       />
       <Button onPress={getTransactionsGrouped}>
         <Text>Get Transactions</Text>
