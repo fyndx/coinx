@@ -1,14 +1,11 @@
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
-import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { RootProvider } from "../src/Providers/RootProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { db } from "@/db/client";
-import migrations from "@/drizzle/migrations";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { observer, useMount } from "@legendapp/state/react";
+import { rootStore } from "@/src/LegendState";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,37 +19,7 @@ export const unstable_settings = {
   initialRouteName: "index",
 };
 
-export default function RootLayout() {
-  const [hasLoadedFonts, loadingFontsError] = useFonts({
-    LatoRegular: require("../assets/fonts/Lato/Lato-Regular.ttf"),
-    ...MaterialCommunityIcons.font,
-  });
-
-  const { success: hasRunMigrations, error: migrationsError } = useMigrations(
-    db,
-    migrations
-  );
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (loadingFontsError) throw loadingFontsError;
-    if (migrationsError) throw migrationsError;
-  }, [loadingFontsError, migrationsError]);
-
-  useEffect(() => {
-    if (hasLoadedFonts && hasRunMigrations) {
-      SplashScreen.hideAsync();
-    }
-  }, [hasLoadedFonts, hasRunMigrations]);
-
-  if (!hasLoadedFonts || !hasRunMigrations) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
+const RootLayoutNav = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -72,4 +39,26 @@ function RootLayoutNav() {
       </SafeAreaView>
     </GestureHandlerRootView>
   );
-}
+};
+
+const RootLayout = observer(() => {
+  const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
+
+  useMount(() => {
+    rootStore.actions.startServices();
+  });
+
+  useEffect(() => {
+    if (isAppLoaded === true) {
+      SplashScreen.hideAsync();
+    }
+  }, [isAppLoaded]);
+
+  if (isAppLoaded === false) {
+    return null;
+  }
+
+  return <RootLayoutNav />;
+});
+
+export default RootLayout;

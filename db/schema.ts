@@ -23,10 +23,10 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 }));
 
 export const categories = sqliteTable("category", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  icon: text("icon").notNull(),
-  color: text("color").notNull(),
+  id: integer('id', {mode: 'number'}).primaryKey({autoIncrement: true}),
+  name: text("name").notNull().unique(),
+  icon: text("icon").notNull().unique(),
+  color: text("color").notNull().unique(),
   type: text("type").notNull(),
 
   createdAt: text("created_at")

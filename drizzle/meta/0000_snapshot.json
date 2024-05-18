@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "951dec4e-18be-4320-97ba-0be9b650ed79",
+  "id": "7828ce70-2c85-44ae-8390-94a18a7ce0a9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "category": {
@@ -9,10 +9,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "name": {
           "name": "name",
@@ -58,7 +58,29 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "category_name_unique": {
+          "name": "category_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        },
+        "category_icon_unique": {
+          "name": "category_icon_unique",
+          "columns": [
+            "icon"
+          ],
+          "isUnique": true
+        },
+        "category_color_unique": {
+          "name": "category_color_unique",
+          "columns": [
+            "color"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}

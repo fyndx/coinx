@@ -1,18 +1,99 @@
 import { db as database } from "@/db/client";
-import { type ObservableObject, observable, type ObservableArray } from "@legendapp/state";
+import {
+  type ObservableObject,
+  observable,
+  type ObservableArray,
+  computed,
+} from "@legendapp/state";
 import { colorKit } from "reanimated-color-picker";
-import { categories } from "@/db/schema";
-import * as Crypto from 'expo-crypto';
+import { categories as categoriesRepo } from "@/db/schema";
+import * as Crypto from "expo-crypto";
+import { eq } from "drizzle-orm";
+
+const DEFAULT_CATEGORIES = [
+  {
+    name: "Food",
+    color: "#FFC542",
+    icon: "🍔",
+    type: "Expense",
+  },
+  {
+    name: "Transport",
+    color: "#FF565E",
+    icon: "🚕",
+    type: "Expense",
+  },
+  {
+    name: "Shopping",
+    color: "#3CD3AD",
+    icon: "🛍️",
+    type: "Expense",
+  },
+  {
+    name: "Groceries",
+    color: "#4CDA64",
+    icon: "🛒",
+    type: "Expense",
+  },
+  {
+    name: "Rent",
+    color: "#279AF4",
+    icon: "🏠",
+    type: "Expense",
+  },
+  {
+    name: "Subscriptions",
+    color: "#EC7A58",
+    icon: "🔒",
+    type: "Expense",
+  },
+  {
+    name: "Family",
+    color: "#A6678A",
+    icon: "👨‍👩‍👧",
+    type: "Expense",
+  },
+  {
+    name: "Healthcare",
+    color: "#C56AF7",
+    icon: "🏥",
+    type: "Expense",
+  },
+  {
+    name: "Entertainment",
+    color: "#6E7BF1",
+    icon: "🎬",
+    type: "Expense",
+  },
+  {
+    name: "Salary",
+    color: "#F3BF56",
+    icon: "💵",
+    type: "Income",
+  },
+  {
+    name: "Investment",
+    color: "#ED80A2",
+    icon: "💰",
+    type: "Income",
+  },
+  {
+    name: "Gifts",
+    color: "#F6D24A",
+    icon: "🎁",
+    type: "Income",
+  },
+];
 
 export interface ICategory {
-  id: string;
+  id: number;
   name: string;
   color: string;
   icon: string;
   type: string;
 }
 
-interface CategoryDraft extends Partial<ICategory> {
+interface CategoryDraft extends Omit<ICategory, "id"> {
   isEmojiPickerOpen: boolean;
 }
 
@@ -33,58 +114,53 @@ export class CategoryModel {
       isEmojiPickerOpen: false,
     });
 
-    this.categories = observable([])
+    this.categories = observable([]);
   }
 
+  // Views
+  getCategoriesByType = computed(() => {
+    const categories = this.categories.get()
+    const incomeCategories = categories.filter((category) => category.type === "Income");
+    const expenseCategories = categories.filter((category) => category.type === "Expense");
+    return { incomeCategories, expenseCategories };
+  });
+
+  // Actions
   create = async () => {
     const { name, color, icon, type } = this.category.peek();
-    const newCategory = await database.insert(categories).values({id: `${Crypto.randomUUID()}`, name, color, icon, type}).returning();
-    this.categories.push(newCategory[0])
+    const newCategory = await database
+      .insert(categoriesRepo)
+      .values({ name, color, icon, type })
+      .returning();
+    await this.getCategoriesList();
     return newCategory;
   };
 
-  async getCategoriesList() {
-    const result = await database.select().from(categories);
-    this.categories.set(result)
-  }
+  getCategoriesList = async () => {
+    const result = await database.select().from(categoriesRepo);
+    this.categories.set(result);
+  };
 
-  getCategoryByIdAsync = async (id: string) => {
-    const category = await this.database.collections.get("categories").find(id);
+  getCategoryByIdAsync = async (id: number) => {
+    const category = await database
+      .select()
+      .from(categoriesRepo)
+      .where(eq(categoriesRepo.id, id));
 
-    if (category) {
-      return category._raw;
+    if (category?.length > 0) {
+      return category[0];
     }
   };
 
   deleteAllCategories = async () => {
-    await this.database.write(async () => {
-      const categories = await this.database.get("categories").query().fetch();
-
-      const categoriesToDelete = categories.map((category) => {
-        return category.prepareDestroyPermanently();
-      });
-
-      await this.database.batch(categoriesToDelete);
-    });
+    await database.delete(categoriesRepo);
   };
 
-  deleteCategoryById = async (id) => {
-    const category = await this.database.collections.get("categories").find(id);
+  deleteCategoryById = async (id: number) => {
+    await database.delete(categoriesRepo).where(eq(categoriesRepo.id, id));
+  };
 
-    // Delete all transactions related to category before deleting category
-    await this.database.write(async () => {
-      // const transactions = await this.database
-      //   .get("transactions")
-      //   .query(Q.where("category_id", Q.eq(id)))
-      //   .fetch();
-      // const transactionsToDelete = transactions.map((transaction) => {
-      //   return transaction.prepareDestroyPermanently();
-      // });
-      // await this.database.batch(transactionsToDelete);
-    });
-
-    await this.database.write(async () => {
-      await category.destroyPermanently();
-    });
+  createDefaultCategories = async () => {
+    await database.insert(categoriesRepo).values(DEFAULT_CATEGORIES).onConflictDoNothing({target: categoriesRepo.name}).returning();
   };
 }
