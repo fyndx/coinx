@@ -1,10 +1,11 @@
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { RootProvider } from "../src/Providers/RootProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { observer, useMount } from "@legendapp/state/react";
+import { rootStore } from "@/src/LegendState";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -18,46 +19,46 @@ export const unstable_settings = {
   initialRouteName: "index",
 };
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    LatoRegular: require("../assets/fonts/Lato/Lato-Regular.ttf"),
-    ...MaterialCommunityIcons.font,
+const RootLayoutNav = () => {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <RootProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="add-category/index"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="categories/index"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+        </RootProvider>
+      </SafeAreaView>
+    </GestureHandlerRootView>
+  );
+};
+
+const RootLayout = observer(() => {
+  const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
+
+  useMount(() => {
+    rootStore.actions.startServices();
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
+    if (isAppLoaded === true) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [isAppLoaded]);
 
-  if (!loaded) {
+  if (isAppLoaded === false) {
     return null;
   }
 
   return <RootLayoutNav />;
-}
+});
 
-function RootLayoutNav() {
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <RootProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="add-category/index"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="categories/index"
-            options={{ headerShown: false }}
-          />
-        </Stack>
-      </RootProvider>
-    </SafeAreaView>
-  );
-}
+export default RootLayout;

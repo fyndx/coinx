@@ -1,12 +1,37 @@
-import { database } from "../database/WaterMelon";
+import { AppModel } from "./App.model";
 import { CategoryModel } from "./Category.model";
 import { TransactionModel } from "./Transaction.model";
 import { TransactionsScreenModel } from "./TransactionsScreen.model";
 
-export const rootStore = {
+class RootStore {
+  // App State
+  appModel: AppModel;
   // Database
-  categoryModel: new CategoryModel(database),
-  transactionModel: new TransactionModel(database),
+  categoryModel: CategoryModel;
+  transactionModel: TransactionModel;
   // Screens
-  transactionsScreenModel: new TransactionsScreenModel(database),
-};
+  transactionsScreenModel: TransactionsScreenModel;
+
+  constructor() {
+    this.appModel = new AppModel();
+    this.categoryModel = new CategoryModel();
+    this.transactionModel = new TransactionModel();
+    this.transactionsScreenModel = new TransactionsScreenModel();
+  }
+
+  private startServices = async () => {
+    await this.appModel.actions.startServices();
+    const isFirstLaunch = await this.appModel.checkFirstLaunch();
+    if (isFirstLaunch) {
+      await this.categoryModel.createDefaultCategories();
+    }
+  }
+
+  actions = {
+    startServices: this.startServices,
+  }
+}
+
+export const rootStore = new RootStore();
+
+

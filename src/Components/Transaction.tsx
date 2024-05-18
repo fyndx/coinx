@@ -1,7 +1,6 @@
-import { withObservables } from "@nozbe/watermelondb/react";
 import { ListItem } from "tamagui";
 
-const Transaction = ({ transaction }) => {
+export const Transaction = ({ transaction }) => {
   return (
     <ListItem
       key={transaction.id}
@@ -10,9 +9,3 @@ const Transaction = ({ transaction }) => {
     />
   );
 };
-
-const enhance = withObservables(["transaction"], ({ transaction }) => ({
-  transaction,
-}));
-
-export const EnhancedTransaction = enhance(Transaction);

@@ -4,7 +4,6 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
     plugins: [
       "@legendapp/state/babel",
-      "expo-router/babel",
       [
         "@tamagui/babel-plugin",
         {
@@ -15,7 +14,7 @@ module.exports = function (api) {
           disableExtraction: process.env.NODE_ENV === "development",
         },
       ],
-      ["@babel/plugin-proposal-decorators", { legacy: true }],
+      ["inline-import", { extensions: [".sql"] }],
       "react-native-reanimated/plugin",
     ],
   };
