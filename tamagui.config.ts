@@ -3,8 +3,12 @@
 // for react-native only: @tamagui/config/v2-native
 import { config } from "@tamagui/config/v2-reanimated";
 import { createTamagui } from "tamagui";
+// import { createAnimations} from "@tamagui/animations-moti"
 
-const tamaguiConfig = createTamagui(config);
+const tamaguiConfig = createTamagui({
+  ...config,
+  // animations: createAnimations({})
+});
 
 // this makes typescript properly type everything based on the config
 type Conf = typeof tamaguiConfig;
