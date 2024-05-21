@@ -7,8 +7,8 @@ import { observer } from "@legendapp/state/react";
 
 interface CategoryProps {
   category: ObservableObject<ICategory>;
-  onCategoryPressed: (id: string) => void;
-  onCategoryDelete: (id: string) => void;
+  onCategoryPressed: (id: number) => void;
+  onCategoryDelete: (id: number) => void;
 }
 
 export const Category = observer(({ category, onCategoryPressed, onCategoryDelete }: CategoryProps) => {

@@ -3,17 +3,19 @@
 // for react-native only: @tamagui/config/v2-native
 import { config } from "@tamagui/config/v2-reanimated";
 import { createTamagui } from "tamagui";
+import { themes } from "./themes";
 // import { createAnimations} from "@tamagui/animations-moti"
 
 const tamaguiConfig = createTamagui({
-  ...config,
-  // animations: createAnimations({})
+	...config,
+	themes: themes,
+	// animations: createAnimations({})
 });
 
 // this makes typescript properly type everything based on the config
 type Conf = typeof tamaguiConfig;
 declare module "tamagui" {
-  interface TamaguiCustomConfig extends Conf {}
+	interface TamaguiCustomConfig extends Conf {}
 }
 
 export default tamaguiConfig;

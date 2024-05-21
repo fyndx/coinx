@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.fyndx.coinx"
+      "bundleIdentifier": "io.fyndx.coinx",
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": "YES"
+      }
     },
     "android": {
       "adaptiveIcon": {

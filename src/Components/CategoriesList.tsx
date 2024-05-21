@@ -5,8 +5,8 @@ import type { CategoriesListObservable } from "../LegendState/Category.model";
 
 interface CategoriesListProps {
   categories: CategoriesListObservable;
-  onCategoryPressed: (id: string) => void;
-  onCategoryDelete: (id: string) => void;
+  onCategoryPressed: (id: number) => void;
+  onCategoryDelete: (id: number) => void;
 }
 
 export const CategoriesList = observer(

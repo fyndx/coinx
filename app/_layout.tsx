@@ -1,64 +1,67 @@
 import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
-import { RootProvider } from "../src/Providers/RootProvider";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { RootProvider } from "@/src/Providers/RootProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { observer, useMount } from "@legendapp/state/react";
 import { rootStore } from "@/src/LegendState";
 
 export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+	// Catch any errors thrown by the Layout component.
+	ErrorBoundary,
 } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "index",
+	// Ensure that reloading on `/modal` keeps a back button present.
+	initialRouteName: "index",
 };
 
 const RootLayoutNav = () => {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <RootProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="add-category/index"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="categories/index"
-              options={{ headerShown: false }}
-            />
-          </Stack>
-        </RootProvider>
-      </SafeAreaView>
-    </GestureHandlerRootView>
-  );
+	return (
+		<>
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<RootProvider>
+					<Stack screenOptions={{ statusBarStyle: "dark" }}>
+						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+						<Stack.Screen
+							name="add-category/index"
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="categories/index"
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="test/index"
+							options={{ headerTitle: "Test", headerTitleAlign: "center" }}
+						/>
+					</Stack>
+				</RootProvider>
+			</GestureHandlerRootView>
+		</>
+	);
 };
 
 const RootLayout = observer(() => {
-  const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
+	const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
 
-  useMount(() => {
-    rootStore.actions.startServices();
-  });
+	useMount(() => {
+		rootStore.actions.startServices();
+	});
 
-  useEffect(() => {
-    if (isAppLoaded === true) {
-      SplashScreen.hideAsync();
-    }
-  }, [isAppLoaded]);
+	useEffect(() => {
+		if (isAppLoaded === true) {
+			SplashScreen.hideAsync();
+		}
+	}, [isAppLoaded]);
 
-  if (isAppLoaded === false) {
-    return null;
-  }
+	if (isAppLoaded === false) {
+		return null;
+	}
 
-  return <RootLayoutNav />;
+	return <RootLayoutNav />;
 });
 
 export default RootLayout;

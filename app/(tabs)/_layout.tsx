@@ -62,8 +62,10 @@ export default function RootLayout() {
       />
       <Tabs.Screen
         name={"settings/index"}
-        options={{
-          header: () => null,
+        options={{          
+          headerTitle: "Settings",
+          headerTitleAlign: "center",
+          headerStatusBarHeight: 0,
           tabBarLabel: () => null,
           tabBarIcon: () => (
             <Image

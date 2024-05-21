@@ -8,7 +8,7 @@ import { Link } from "expo-router";
 import { useMount } from "@legendapp/state/react";
 
 const Categories = () => {
-  const handleCagtegoryDelete = (id) => {
+  const handleCagtegoryDelete = (id: number) => {
     rootStore.categoryModel.deleteCategoryById(id);
   };
 
