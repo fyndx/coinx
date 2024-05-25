@@ -58,6 +58,7 @@
     "@types/react": "~18.2.79",
     "@types/react-dom": "~18.2.25",
     "drizzle-kit": "^0.20.9",
+    "expo-drizzle-studio-plugin": "^0.0.2",
     "sharp-cli": "4.2.0",
     "typescript": "~5.3.3"
   },

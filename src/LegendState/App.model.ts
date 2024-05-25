@@ -9,58 +9,58 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { rootStore } from ".";
 
 export class AppModel {
-  obs;
-  constructor() {
-    this.obs = observable({
-      isAppLoaded: false,
-      isFirstLaunch: "unknown",
-    });
-  }
+	obs;
+	constructor() {
+		this.obs = observable({
+			isAppLoaded: false,
+			isFirstLaunch: "unknown",
+		});
+	}
 
-  runDatabaseMigrations = async () => {
-    try {
-      await migrate(db, migrations);
-    } catch (error) {
-      throw error;
-    }
-  };
+	runDatabaseMigrations = async () => {
+		try {
+			await migrate(db, migrations);
+		} catch (error) {
+			throw error;
+		}
+	};
 
-  loadFonts = async () => {
-    try {
-      await loadAsync({
-        LatoRegular: LatoRegular,
-        ...MaterialCommunityIcons.font,
-      });
-    } catch (error) {
-      throw error;
-    }
-  };
+	loadFonts = async () => {
+		try {
+			await loadAsync({
+				LatoRegular: LatoRegular,
+				...MaterialCommunityIcons.font,
+			});
+		} catch (error) {
+			throw error;
+		}
+	};
 
-  checkFirstLaunch = async () => {
-    const isFirstLaunch = await AsyncStorage.getItem("isFirstLaunch");
-    if (isFirstLaunch === null) {
-      // Save the current date as the first launch date
-      const firstLaunchDate = new Date().toISOString();
-      await AsyncStorage.setItem("isFirstLaunch", firstLaunchDate);
-      this.obs.isFirstLaunch.set(firstLaunchDate);
-      return true;
-    }
+	checkFirstLaunch = async () => {
+		const isFirstLaunch = await AsyncStorage.getItem("isFirstLaunch");
+		if (isFirstLaunch === null) {
+			// Save the current date as the first launch date
+			const firstLaunchDate = new Date().toISOString();
+			await AsyncStorage.setItem("isFirstLaunch", firstLaunchDate);
+			this.obs.isFirstLaunch.set(firstLaunchDate);
+			return true;
+		}
 
-    this.obs.isFirstLaunch.set(isFirstLaunch);
-    return false;
-  };
+		this.obs.isFirstLaunch.set(isFirstLaunch);
+		return false;
+	};
 
-  private startServices = async () => {
-    try {
-      await Promise.all([this.runDatabaseMigrations(), this.loadFonts()]);
-    } catch (error) {
-      console.log("Error starting services:", error);
-    } finally {
-      this.obs.isAppLoaded.set(true);
-    }
-  };
+	private startServices = async () => {
+		try {
+			await Promise.all([this.runDatabaseMigrations(), this.loadFonts()]);
+		} catch (error) {
+			console.log("Error starting services:", error);
+		} finally {
+			this.obs.isAppLoaded.set(true);
+		}
+	};
 
-  actions = {
-    startServices: this.startServices,
-  };
+	actions = {
+		startServices: this.startServices,
+	};
 }

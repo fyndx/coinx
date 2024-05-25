@@ -5,6 +5,8 @@ import { RootProvider } from "@/src/Providers/RootProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { observer, useMount } from "@legendapp/state/react";
 import { rootStore } from "@/src/LegendState";
+import { expoDb } from "@/db/client";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -46,6 +48,7 @@ const RootLayoutNav = () => {
 
 const RootLayout = observer(() => {
 	const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
+	useDrizzleStudio(expoDb);
 
 	useMount(() => {
 		rootStore.actions.startServices();
