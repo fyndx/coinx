@@ -9,12 +9,11 @@ CREATE TABLE `category` (
 );
 --> statement-breakpoint
 CREATE TABLE `transaction` (
-	`id` text PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`transaction_time` integer NOT NULL,
 	`amount` real NOT NULL,
-	`type` text NOT NULL,
 	`note` text,
-	`category_id` text NOT NULL,
+	`category_id` integer NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text
 );

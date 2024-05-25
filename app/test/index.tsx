@@ -1,4 +1,5 @@
 import { rootStore } from "@/src/LegendState";
+import { generateRandomTransactions } from "@/src/database/TransactionSeeds";
 import { Link } from "expo-router";
 import { Button, Separator, Text, H2, YStack } from "tamagui";
 
@@ -15,9 +16,17 @@ const TestScreen = () => {
 		rootStore.categoryModel.createDefaultCategories();
 	};
 
+	const createRandomTransactions = () => {
+		const transactions = generateRandomTransactions(100);
+		// rootStore.transactionModel.createTransactions(transactions);
+	};
+
 	return (
-		<YStack alignItems={"center"}>
+		<YStack alignItems={"center"} gap={"$2"}>
 			<H2>{"Creation"}</H2>
+			<Button onPress={createDefaultCategories}>
+				{"Create Default Categories"}
+			</Button>
 			<Button onPress={createDefaultCategories}>
 				{"Create Default Categories"}
 			</Button>
