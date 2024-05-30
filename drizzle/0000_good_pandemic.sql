@@ -13,6 +13,7 @@ CREATE TABLE `transaction` (
 	`transaction_time` integer NOT NULL,
 	`amount` real NOT NULL,
 	`note` text,
+	`transaction_type` text NOT NULL,
 	`category_id` integer NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text

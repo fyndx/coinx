@@ -6,6 +6,9 @@ export const transactions = sqliteTable("transaction", {
 	transactionTime: integer("transaction_time", { mode: "timestamp" }).notNull(),
 	amount: real("amount").notNull(),
 	note: text("note"),
+	transactionType: text("transaction_type", {
+		enum: ["Income", "Expense"],
+	}).notNull(),
 	categoryId: integer("category_id").notNull(),
 
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -24,7 +27,7 @@ export const categories = sqliteTable("category", {
 	name: text("name").notNull().unique(),
 	icon: text("icon").notNull().unique(),
 	color: text("color").notNull().unique(),
-	type: text("type").notNull(),
+	type: text("type", { enum: ["Income", "Expense"] }).notNull(),
 
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: text("updated_at"),

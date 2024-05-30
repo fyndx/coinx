@@ -7,6 +7,16 @@ import { observer, useMount } from "@legendapp/state/react";
 import { rootStore } from "@/src/LegendState";
 import { expoDb } from "@/db/client";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import dayjs from "dayjs";
+import isToday from "dayjs/plugin/isToday";
+import isYesterday from "dayjs/plugin/isYesterday";
+import isTomorrow from "dayjs/plugin/isTomorrow";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(isToday);
+dayjs.extend(isYesterday);
+dayjs.extend(isTomorrow);
+dayjs.extend(customParseFormat);
 
 export {
 	// Catch any errors thrown by the Layout component.

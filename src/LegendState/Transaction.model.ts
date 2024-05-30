@@ -2,12 +2,14 @@ import { observable } from "@legendapp/state";
 import dayjs, { type Dayjs } from "dayjs";
 import { db as database } from "@/db/client";
 import { transactions as transactionsRepo } from "@/db/schema";
+import { generateRandomTransactions } from "../database/TransactionSeeds";
 
 export interface ITransactionDraft {
 	amount: string;
 	date: Dayjs;
 	categoryId?: number;
 	note?: string;
+	transactionType: string;
 }
 
 export class TransactionModel {
@@ -19,6 +21,7 @@ export class TransactionModel {
 			date: dayjs(),
 			categoryId: undefined,
 			note: "",
+			transactionType: "",
 		});
 	}
 
@@ -51,34 +54,44 @@ export class TransactionModel {
 		}
 	};
 
-	createTransaction = async () => {
-		const { amount, date, categoryId, note } = this.transaction.peek();
-		const amountInNumber = Number.parseFloat(amount);
-		const newTransaction = await database
+	private async createNewTransaction({
+		amount,
+		categoryId,
+		note,
+		transactionTime,
+		transactionType,
+	}: {
+		amount: number;
+		categoryId: number | undefined;
+		note?: string | null;
+		transactionTime: number;
+		transactionType: string;
+	}) {
+		return await database
 			.insert(transactionsRepo)
 			.values({
 				// @ts-ignore
-				amount: amountInNumber,
+				amount: amount,
 				categoryId,
 				note,
-				transactionTime: date.unix(),
+				transactionTime,
+				transactionType,
 			})
 			.returning();
-		return newTransaction;
-	};
-
-	get transactionsList() {
-		// const transactions = this.database.collections.get("transactions").query();
-		// return transactions;
 	}
 
-	transactionCount = async () => {
-		// const transactions = await this.database
-		// 	.get("transactions")
-		// 	.query()
-		// 	.fetchCount();
-		// console.log({ transactions });
-		// return transactions;
+	createTransaction = async () => {
+		const { amount, date, categoryId, note, transactionType } =
+			this.transaction.peek();
+		const amountInNumber = Number.parseFloat(amount);
+		const newTransaction = await this.createNewTransaction({
+			amount: amountInNumber,
+			categoryId,
+			note,
+			transactionTime: date.unix(),
+			transactionType: transactionType,
+		});
+		return newTransaction;
 	};
 
 	deleteAllTransactions = async () => {
@@ -92,5 +105,16 @@ export class TransactionModel {
 		// 	});
 		// 	await this.database.batch(transactionsToDelete);
 		// });
+	};
+
+	createRandomTransactions = () => {
+		const transactions = generateRandomTransactions(100);
+		for (const transaction of transactions) {
+			this.createNewTransaction({
+				...transaction,
+				// @ts-ignore
+				transactionTime: transaction.transactionTime,
+			});
+		}
 	};
 }

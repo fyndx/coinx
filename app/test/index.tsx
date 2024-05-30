@@ -17,8 +17,7 @@ const TestScreen = () => {
 	};
 
 	const createRandomTransactions = () => {
-		const transactions = generateRandomTransactions(100);
-		// rootStore.transactionModel.createTransactions(transactions);
+		rootStore.transactionModel.createRandomTransactions();
 	};
 
 	return (
@@ -27,8 +26,8 @@ const TestScreen = () => {
 			<Button onPress={createDefaultCategories}>
 				{"Create Default Categories"}
 			</Button>
-			<Button onPress={createDefaultCategories}>
-				{"Create Default Categories"}
+			<Button onPress={createRandomTransactions}>
+				{"Create Random Transactions"}
 			</Button>
 			<Separator />
 			<H2>{"Deletion"}</H2>

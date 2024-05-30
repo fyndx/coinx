@@ -6,7 +6,7 @@ import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
 import { MenuView } from "@react-native-menu/menu";
 import type { NativeActionEvent } from "@react-native-menu/menu";
 import type { TransactionsScreenModel } from "../../../src/LegendState/TransactionsScreen.model";
-import { observer } from "@legendapp/state/react";
+import { observer, useMount } from "@legendapp/state/react";
 
 const ACTIONS = [
 	{
@@ -59,24 +59,20 @@ const SpentMenuComponent = observer(
 const Transactions = () => {
 	const transactionsScreenModel$ = rootStore.transactionsScreenModel;
 
-	const getTransactionsGrouped = () => {
+	useMount(() => {
 		transactionsScreenModel$.transactionsList();
-	};
+	});
 
 	return (
-		<Stack flex={1} paddingHorizontal={"$2"}>
+		<Stack flex={1} paddingHorizontal={"$6"}>
 			<XStack justifyContent="space-between" paddingVertical={"$2"}>
 				<Search />
 				<ChevronDownSquare />
 			</XStack>
 			<SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} />
 			<TransactionsList
-				// transactions={rootStore.transactionModel.transactionsList}
-				transactions={[]}
+				transactions={rootStore.transactionsScreenModel.groupedTransactions}
 			/>
-			<Button onPress={getTransactionsGrouped}>
-				<Text>Get Transactions</Text>
-			</Button>
 		</Stack>
 	);
 };
