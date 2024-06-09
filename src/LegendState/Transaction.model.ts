@@ -94,17 +94,12 @@ export class TransactionModel {
 		return newTransaction;
 	};
 
+	/**
+	 * Deletes all transactions from the database.
+	 * @returns A promise that resolves when all transactions have been deleted.
+	 */
 	deleteAllTransactions = async () => {
-		// await this.database.write(async () => {
-		// 	const transactions = await this.database
-		// 		.get("transactions")
-		// 		.query()
-		// 		.fetch();
-		// 	const transactionsToDelete = transactions.map((transaction) => {
-		// 		return transaction.prepareDestroyPermanently();
-		// 	});
-		// 	await this.database.batch(transactionsToDelete);
-		// });
+		return await database.delete(transactionsRepo).returning();
 	};
 
 	createRandomTransactions = () => {

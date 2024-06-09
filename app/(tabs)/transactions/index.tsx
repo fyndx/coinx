@@ -1,7 +1,7 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 import { rootStore } from "../../../src/LegendState";
 import { TransactionsList } from "../../../src/Components/TransactionsList";
-import { Button, Stack, XStack, YStack } from "tamagui";
+import { Button, Stack, XStack, YStack, Text } from "tamagui";
 import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
 import { MenuView } from "@react-native-menu/menu";
 import type { NativeActionEvent } from "@react-native-menu/menu";
@@ -31,6 +31,12 @@ const ACTIONS = [
 	},
 ];
 
+/**
+ * A React component that renders a menu for selecting the duration of transactions to display.
+ * The component uses the `transactionsScreenModel$` prop to access the `duration` and `insights.totalExpense` observables from the `TransactionsScreenModel`.
+ * The menu options are defined in the `ACTIONS` constant, and the `handleOptionChange` function is called when an option is selected, updating the `duration` observable.
+ * The component also displays the total expense amount based on the selected duration.
+ */
 const SpentMenuComponent = observer(
 	({
 		transactionsScreenModel$,
@@ -51,16 +57,27 @@ const SpentMenuComponent = observer(
 						</Button>
 					</MenuView>
 				</XStack>
+				<XStack alignItems="center" justifyContent="center">
+					<Text fontSize={"$8"}>
+						{/* TODO: Add Selected Currency */}
+						{transactionsScreenModel$.obs.insights.totalExpense.get()}
+					</Text>
+				</XStack>
 			</YStack>
 		);
 	},
 );
 
+/**
+ * A React component that renders the main transactions screen, including a search bar, a menu for selecting the duration of transactions to display, and a list of transactions.
+ * The component uses the `transactionsScreenModel` from the root store to access the necessary data and observables for the transactions screen.
+ * The component is responsible for setting up the necessary lifecycle hooks and rendering the child components that make up the transactions screen.
+ */
 const Transactions = () => {
 	const transactionsScreenModel$ = rootStore.transactionsScreenModel;
 
 	useMount(() => {
-		transactionsScreenModel$.transactionsList();
+		transactionsScreenModel$.onMount();
 	});
 
 	return (
