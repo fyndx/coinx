@@ -1,9 +1,9 @@
 import type { ObservableComputed } from "@legendapp/state";
-import { Transaction } from "./Transaction";
+import { Transaction } from "@/src/Containers/Transactions/Components/Transaction";
 import { observer } from "@legendapp/state/react";
 import { FlashList } from "@shopify/flash-list";
-import type { FlashListTransactionsList } from "../LegendState/TransactionsScreen.model";
-import { TransactionSummary } from "./TransactionSummary";
+import type { FlashListTransactionsList } from "@/src/LegendState/TransactionsScreen.model";
+import { TransactionSummary } from "@/src/Containers/Transactions/Components/TransactionSummary";
 
 export const TransactionsList = observer(
 	({

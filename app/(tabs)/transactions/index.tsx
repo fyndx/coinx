@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { rootStore } from "../../../src/LegendState";
-import { TransactionsList } from "../../../src/Components/TransactionsList";
+import { TransactionsList } from "../../../src/Containers/Transactions/TransactionsList";
 import { Button, Stack, XStack, YStack, Text } from "tamagui";
 import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
 import { MenuView } from "@react-native-menu/menu";

@@ -1,5 +1,5 @@
 import { Text, XStack, YStack } from "tamagui";
-import type { TransactionItem } from "../LegendState/TransactionsScreen.model";
+import type { TransactionItem } from "@/src/LegendState/TransactionsScreen.model";
 import dayjs from "dayjs";
 
 export const Transaction = ({
