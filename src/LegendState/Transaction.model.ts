@@ -2,7 +2,7 @@ import { observable } from "@legendapp/state";
 import dayjs, { type Dayjs } from "dayjs";
 import { db as database } from "@/db/client";
 import { transactions as transactionsRepo } from "@/db/schema";
-import { generateRandomTransactions } from "../database/TransactionSeeds";
+import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 
 export interface ITransactionDraft {
 	amount: string;

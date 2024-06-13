@@ -1,5 +1,5 @@
 import { rootStore } from "@/src/LegendState";
-import { generateRandomTransactions } from "@/src/database/TransactionSeeds";
+import { generateRandomTransactions } from "@/src/database/seeds/TransactionSeeds";
 import { Link } from "expo-router";
 import { Button, Separator, Text, H2, YStack } from "tamagui";
 

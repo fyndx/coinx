@@ -7,6 +7,8 @@ import {
 import { computed, observable } from "@legendapp/state";
 import dayjs from "dayjs";
 import { and, between, eq, sql, sum } from "drizzle-orm";
+import { getTransactions } from "@/src/database/Transactions/TransactionsRepo";
+import { Effect } from "effect";
 
 export interface TransactionItem extends SelectTransaction {
 	category_name: string;
@@ -15,7 +17,7 @@ export interface TransactionItem extends SelectTransaction {
 	category_type: string;
 }
 
-interface TransactionGroup {
+export interface TransactionGroup {
 	transaction_time: string;
 	transactions: TransactionItem[];
 	total: number;
@@ -162,38 +164,7 @@ export class TransactionsScreenModel {
 	 * - `total`: The total balance for the transactions on the given date.
 	 */
 	transactionsList = async () => {
-		const groupedTransactions = await database
-			.select({
-				/**
-				 * Formats the `transaction_time` from UNIX epoch to a string in the format 'DD-MM-YYYY'.
-				 * This formatted date is aliased as `transaction_day` in the resulting SQL query.
-				 */
-				transaction_time: sql<string>`strftime('%d-%m-%Y', transaction_time, 'unixepoch') as transaction_day`,
-				transactions: sql<string>`json_group_array(json_object('amount', amount, 'note', note, 'transactionTime', transaction_time, 'transactionType', transaction_type, 'category_id', category_id, 'category_name', category.name, 'category_icon', category.icon, 'category_color', category.color, 'category_type', category.type)) as transactions_list`,
-				/**
-				 * This SQL query calculates the total balance for each grouped transaction date.
-				 * It sums up all amounts, treating 'Income' type transactions as positive and
-				 * 'Expense' type transactions as negative.
-				 */
-				total: sql<string>`sum(case when transaction_type = 'Income' then amount else -amount end) as total`,
-			})
-			.from(transactionsRepo)
-			/**
-			 * Performs an inner join on the `categoriesRepo` table using the `categoryId` from the `transactionsRepo`.
-			 * This join is essential to combine and access category details related to each transaction.
-			 */
-			.innerJoin(
-				categoriesRepo,
-				eq(transactionsRepo.categoryId, categoriesRepo.id),
-			)
-			/**
-			 * Groups the transactions by the transaction date.
-			 */
-			.groupBy(sql<string>`strftime('%d-%m-%Y', transaction_time, 'unixepoch')`)
-			/**
-			 * Orders the transactions by the transaction date in descending order.
-			 */
-			.orderBy(sql<string>`transaction_time desc`);
+		const groupedTransactions = await Effect.runPromise(getTransactions({}));
 
 		/**
 		 * Maps the grouped transactions to an array of objects with the following properties:
