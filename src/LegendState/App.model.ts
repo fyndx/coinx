@@ -6,7 +6,6 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { observable } from "@legendapp/state";
 import { LatoRegular } from "@/assets/fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { rootStore } from ".";
 
 export class AppModel {
 	obs;

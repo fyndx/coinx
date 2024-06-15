@@ -34,11 +34,25 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-build-properties"
+      "expo-build-properties",
+      [
+        "expo-dev-launcher",
+        {
+          "launchMode": "most-recent"
+        }
+      ]
     ],
     "scheme": "coinx",
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "53bbeb96-179b-4605-8e69-a5639caa179f"
+      }
     }
   }
 }
