@@ -12,11 +12,13 @@ import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
 import isTomorrow from "dayjs/plugin/isTomorrow";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import localeData from "dayjs/plugin/localeData";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(isTomorrow);
 dayjs.extend(customParseFormat);
+dayjs.extend(localeData);
 
 export {
 	// Catch any errors thrown by the Layout component.

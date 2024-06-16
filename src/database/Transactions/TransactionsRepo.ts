@@ -1,5 +1,5 @@
 import { db as database } from "@/db/client";
-import { between, eq, sql } from "drizzle-orm";
+import { and, between, eq, sql, sum } from "drizzle-orm";
 import { Effect } from "effect";
 import {
 	transactions as transactionsRepo,
@@ -9,7 +9,12 @@ import {
 export const getTransactions = ({
 	startDate,
 	endDate,
-}: { startDate?: string; endDate?: string }) =>
+	transactionType,
+}: {
+	startDate?: string;
+	endDate?: string;
+	transactionType?: "Income" | "Expense";
+}) =>
 	Effect.promise(() => {
 		const query = database
 			.select({
@@ -43,8 +48,10 @@ export const getTransactions = ({
 			 */
 			.orderBy(sql<string>`transaction_time desc`);
 
+		const whereQueries = [];
+
 		if (startDate && endDate) {
-			query.where(
+			whereQueries.push(
 				between(
 					transactionsRepo.transactionTime,
 					new Date(startDate),
@@ -53,6 +60,47 @@ export const getTransactions = ({
 			);
 		}
 
+		if (transactionType) {
+			whereQueries.push(eq(transactionsRepo.transactionType, transactionType));
+		}
+
+		if (whereQueries.length > 0) {
+			query.where(and(...whereQueries));
+		}
+
 		const groupedTransactions = query.execute();
 		return groupedTransactions;
+	});
+
+export const getInsights = ({
+	startDate,
+	endDate,
+	transactionType,
+}: {
+	startDate?: string;
+	endDate?: string;
+	transactionType: "Income" | "Expense";
+}) =>
+	Effect.promise(() => {
+		const totalQuery = database
+			.select({
+				total: sum(transactionsRepo.amount),
+			})
+			.from(transactionsRepo)
+			.where(
+				and(
+					startDate && endDate
+						? between(
+								transactionsRepo.transactionTime,
+								new Date(startDate),
+								new Date(endDate),
+							)
+						: undefined,
+					eq(transactionsRepo.transactionType, transactionType),
+				),
+			);
+
+		const totalQueryPromise = totalQuery.execute();
+
+		return totalQueryPromise;
 	});
