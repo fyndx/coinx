@@ -253,7 +253,7 @@ export class InsightsModel {
 			});
 
 			return {
-				day: day,
+				day: date.format("D"),
 				total: Math.abs(transactionsForTheDay?.total ?? 0),
 			};
 		});
