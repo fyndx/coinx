@@ -11,7 +11,7 @@ export const InsightsView = observer(
 						<Text>{insightsModel$.insightsData.durationText.get()}</Text>
 						<Text>{insightsModel$.insightsData.netTotal.get()}</Text>
 					</YStack>
-					<YStack>
+					<YStack alignItems={"flex-end"}>
 						<Text>
 							{insightsModel$.insightsData.spentDurationHeading.get()}
 						</Text>
