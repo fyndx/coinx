@@ -6,6 +6,7 @@ import { useMount } from "@legendapp/state/react";
 import { StyleSheet } from "react-native";
 import { Stack } from "tamagui";
 import { BarGraphView } from "@/src/Containers/Insights/Components/BarGraphView";
+import { InsightsGraph } from "@/src/Containers/Insights/Containers/InsightsGraph";
 
 const Insights = () => {
 	useMount(() => {
@@ -15,8 +16,7 @@ const Insights = () => {
 	return (
 		<Stack flex={1} paddingVertical={"$4"} paddingHorizontal={"$6"}>
 			<InsightsHeader insightsModel$={rootStore.insightsModel} />
-			<InsightsView insightsModel$={rootStore.insightsModel} />
-			<BarGraphView insightsModel$={rootStore.insightsModel} />
+			<InsightsGraph insightsModel$={rootStore.insightsModel} />
 			<TransactionsList
 				transactions={rootStore.insightsModel.groupedTransactions}
 			/>

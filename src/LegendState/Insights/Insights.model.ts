@@ -129,6 +129,29 @@ export class InsightsModel {
 		});
 	};
 
+	onSwipe = (direction: "left" | "right") => {
+		const durationType = this.obs.durationType.peek();
+		const startDate = this.obs.duration.startTime.peek();
+		const endDate = this.obs.duration.endTime.peek();
+
+		if (direction === "left") {
+			this.obs.duration.startTime.set(
+				dayjs(startDate).subtract(1, durationType).format(),
+			);
+			this.obs.duration.endTime.set(
+				dayjs(endDate).subtract(1, durationType).format(),
+			);
+		}
+		if (direction === "right") {
+			this.obs.duration.startTime.set(
+				dayjs(startDate).add(1, durationType).format(),
+			);
+			this.obs.duration.endTime.set(
+				dayjs(endDate).add(1, durationType).format(),
+			);
+		}
+	};
+
 	groupedTransactions = computed(() => {
 		const transactionsGroup = this.obs.transactions.get();
 
@@ -259,5 +282,48 @@ export class InsightsModel {
 		});
 
 		return finalTransactionsList;
+	});
+
+	swipeData = computed(() => {
+		const durationType = this.obs.durationType.get();
+		const startDate = this.obs.duration.startTime.get();
+		const endDate = this.obs.duration.endTime.get();
+
+		const prevStartDate = dayjs(startDate).subtract(1, durationType);
+		const prevEndDate = dayjs(endDate).subtract(1, durationType);
+
+		const nextStartDate = dayjs(startDate).add(1, durationType);
+		const nextEndDate = dayjs(endDate).add(1, durationType);
+
+		return {
+			prevStartDate: prevStartDate.format(
+				durationType === "week"
+					? "DD MMM"
+					: durationType === "month"
+						? "MMM YY"
+						: "YYYY",
+			),
+			prevEndDate: prevEndDate.format(
+				durationType === "week"
+					? "DD MMM"
+					: durationType === "month"
+						? "MMM YY"
+						: "YYYY",
+			),
+			nextStartDate: nextStartDate.format(
+				durationType === "week"
+					? "DD MMM"
+					: durationType === "month"
+						? "MMM YY"
+						: "YYYY",
+			),
+			nextEndDate: nextEndDate.format(
+				durationType === "week"
+					? "DD MMM"
+					: durationType === "month"
+						? "MMM YY"
+						: "YYYY",
+			),
+		};
 	});
 }
