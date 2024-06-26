@@ -21,7 +21,9 @@ const ACTIONS = [
 export const InsightsHeader = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
 		const handleOptionChange = ({ nativeEvent }: NativeActionEvent) => {
-			insightsModel$.onDurationChange({ durationType: nativeEvent.event });
+			insightsModel$.actions.setDurationType({
+				durationType: nativeEvent.event,
+			});
 		};
 		return (
 			<XStack justifyContent={"space-between"} alignItems={"center"}>

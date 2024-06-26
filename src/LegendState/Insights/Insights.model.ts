@@ -2,14 +2,22 @@ import {
 	getInsights,
 	getTransactions,
 } from "@/src/database/Transactions/TransactionsRepo";
-import { computed, observable } from "@legendapp/state";
-import dayjs, { Dayjs } from "dayjs";
+import {
+	computed,
+	observable,
+	beginBatch,
+	endBatch,
+	type ObservableListenerDispose,
+} from "@legendapp/state";
+import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 import { Effect } from "effect";
 import type {
 	FlashListTransactionsList,
 	TransactionGroup,
 } from "@/src/LegendState/TransactionsScreen.model";
 import { dayjsRange } from "@/src/utils/date";
+import { getCategories } from "@/src/database/Categories/CategoriesRepo";
 
 type InsightsDurationType = "week" | "month" | "year";
 
@@ -25,10 +33,20 @@ interface InsightsObservable {
 		totalExpense: number;
 		netTotal: number;
 	};
+	categories: {
+		id: number;
+		name: string;
+		icon: string;
+		type: "Income" | "Expense";
+		total: number;
+		color: string;
+	}[];
+	categoryId?: number;
 }
 
 export class InsightsModel {
 	obs;
+	listeners: ObservableListenerDispose[] = [];
 	constructor() {
 		this.obs = observable<InsightsObservable>({
 			durationType: "month",
@@ -37,20 +55,22 @@ export class InsightsModel {
 				endTime: dayjs().endOf("month").format(),
 			},
 			transactions: [],
+			categories: [],
 			insights: {
 				totalIncome: 0,
 				totalExpense: 0,
 				netTotal: 0,
 			},
+			categoryId: undefined,
 		});
 	}
 
-	onDurationChange = ({
-		durationType,
-	}: { durationType: InsightsDurationType }) => {
-		this.obs.durationType.set(durationType);
+	private onDurationTypeChange = () => {
+		const durationType = this.obs.durationType.peek();
+
 		let startTime: string;
 		let endTime: string;
+
 		switch (durationType) {
 			case "month":
 				startTime = dayjs().startOf("month").format();
@@ -67,21 +87,54 @@ export class InsightsModel {
 				endTime = dayjs().endOf("year").format();
 				break;
 		}
+
 		this.obs.duration.set({
 			startTime,
 			endTime,
 		});
-		this.getTransactonsList();
+	};
+
+	private onDurationChange = () => {
+		this.getTransactionsList();
+		this.getCategoriesList();
 		this.getTransactionInsights();
 	};
 
 	onMount = () => {
-		this.getTransactonsList();
+		// Load the transactions and insights on mount
+		this.getTransactionsList();
+		this.getCategoriesList();
 		this.getTransactionInsights();
+
+		this.startListeners();
 	};
 
-	getTransactonsList = async () => {
+	onUnmount = () => {
+		this.stopListeners();
+	};
+
+	startListeners = () => {
+		const durationTypeChangeListener = this.obs.durationType.onChange(
+			this.onDurationTypeChange,
+		);
+
+		const durationChangeListener = this.obs.duration.onChange(
+			this.onDurationChange,
+		);
+
+		this.listeners.push(durationTypeChangeListener, durationChangeListener);
+	};
+
+	stopListeners = () => {
+		while (this.listeners.length > 0) {
+			const disposer = this.listeners.pop();
+			disposer?.();
+		}
+	};
+
+	private getTransactionsList = async () => {
 		const { startTime, endTime } = this.obs.duration.peek();
+		console.log({ startTime, endTime }, "getTransactionsList");
 		const groupedTransactions = await Effect.runPromise(
 			getTransactions({
 				startDate: startTime,
@@ -101,8 +154,22 @@ export class InsightsModel {
 		this.obs.transactions.set(parsedTransactions);
 	};
 
-	getTransactionInsights = async () => {
+	private getCategoriesList = async () => {
 		const { startTime, endTime } = this.obs.duration.peek();
+
+		const categories = await Effect.runPromise(
+			getCategories({
+				startDate: startTime,
+				endDate: endTime,
+			}),
+		);
+		this.obs.categories.set(categories);
+		console.log({ categories });
+	};
+
+	private getTransactionInsights = async () => {
+		const { startTime, endTime } = this.obs.duration.peek();
+		console.log({ startTime, endTime }, "getTransactionInsights");
 
 		const totalExpenseResult = await Effect.runPromise(
 			getInsights({
@@ -129,31 +196,27 @@ export class InsightsModel {
 		});
 	};
 
-	onSwipe = (direction: "left" | "right") => {
+	private onSwipe = (direction: "left" | "right") => {
 		const durationType = this.obs.durationType.peek();
 		const startDate = this.obs.duration.startTime.peek();
 		const endDate = this.obs.duration.endTime.peek();
 
 		if (direction === "left") {
-			this.obs.duration.startTime.set(
-				dayjs(startDate).subtract(1, durationType).format(),
-			);
-			this.obs.duration.endTime.set(
-				dayjs(endDate).subtract(1, durationType).format(),
-			);
+			this.obs.duration.set({
+				startTime: dayjs(startDate).subtract(1, durationType).format(),
+				endTime: dayjs(endDate).subtract(1, durationType).format(),
+			});
 		}
 		if (direction === "right") {
-			this.obs.duration.startTime.set(
-				dayjs(startDate).add(1, durationType).format(),
-			);
-			this.obs.duration.endTime.set(
-				dayjs(endDate).add(1, durationType).format(),
-			);
+			this.obs.duration.set({
+				startTime: dayjs(startDate).add(1, durationType).format(),
+				endTime: dayjs(endDate).add(1, durationType).format(),
+			});
 		}
 	};
 
 	groupedTransactions = computed(() => {
-		const transactionsGroup = this.obs.transactions.get();
+		const transactionsGroup = this.obs.transactions.get(true);
 
 		// Get Transaction Date and Transactions as item in array
 		const transactionsResult: FlashListTransactionsList[] = [];
@@ -198,7 +261,7 @@ export class InsightsModel {
 		const startDate = this.obs.duration.startTime.get();
 		const endDate = this.obs.duration.endTime.get();
 		const totalExpense = this.obs.insights.totalExpense.get();
-		const durationType = this.obs.durationType.peek();
+		const durationType = this.obs.durationType.get();
 
 		let durationText: string;
 		let spentPerDuration: number;
@@ -208,7 +271,7 @@ export class InsightsModel {
 			case "week":
 				durationText = `${dayjs(startDate).format("D MMM")} - ${dayjs(
 					endDate,
-				).format("d MMM")}`;
+				).format("D MMM")}`;
 				spentPerDuration = totalExpense / 7;
 				spentDurationHeading = "SPENT/DAY";
 				break;
@@ -227,13 +290,13 @@ export class InsightsModel {
 
 		return {
 			durationText,
-			spentPerDuration,
+			spentPerDuration: spentPerDuration.toFixed(2),
 			spentDurationHeading,
 			netTotal: this.obs.insights.netTotal.get(),
 		};
 	});
 
-	graphData = computed(() => {
+	durationGraphData = computed(() => {
 		const durationType = this.obs.durationType.get();
 		const startDate = this.obs.duration.startTime.get();
 		const endDate = this.obs.duration.endTime.get();
@@ -276,12 +339,31 @@ export class InsightsModel {
 			});
 
 			return {
-				day: date.format("D"),
+				day: date.format(durationType === "year" ? "MMM" : "D"),
 				total: Math.abs(transactionsForTheDay?.total ?? 0),
 			};
 		});
 
 		return finalTransactionsList;
+	});
+
+	categoriesGraphData = computed(() => {
+		const categories = this.obs.categories.get(true);
+
+		const totalAmount = categories.reduce(
+			(sum, category) => sum + category.total,
+			0,
+		);
+
+		const categoriesWithPercentage = categories.map((category) => {
+			const percentage = (category.total / totalAmount) * 100;
+			return {
+				...category,
+				percentage: Number.parseFloat(percentage.toFixed(2)),
+			};
+		});
+
+		return categoriesWithPercentage;
 	});
 
 	swipeData = computed(() => {
@@ -326,4 +408,13 @@ export class InsightsModel {
 			),
 		};
 	});
+
+	actions = {
+		setDurationType: ({
+			durationType,
+		}: { durationType: InsightsDurationType }) => {
+			this.obs.durationType.set(durationType);
+		},
+		onSwipe: this.onSwipe,
+	};
 }

@@ -10,10 +10,12 @@ export const getTransactions = ({
 	startDate,
 	endDate,
 	transactionType,
+	categoryId,
 }: {
 	startDate?: string;
 	endDate?: string;
 	transactionType?: "Income" | "Expense";
+	categoryId?: number;
 }) =>
 	Effect.promise(() => {
 		const query = database
@@ -62,6 +64,10 @@ export const getTransactions = ({
 
 		if (transactionType) {
 			whereQueries.push(eq(transactionsRepo.transactionType, transactionType));
+		}
+
+		if (categoryId) {
+			whereQueries.push(eq(transactionsRepo.categoryId, categoryId));
 		}
 
 		if (whereQueries.length > 0) {

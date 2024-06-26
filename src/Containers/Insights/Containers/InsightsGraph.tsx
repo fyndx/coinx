@@ -6,8 +6,9 @@ import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Animated from "react-native-reanimated";
 import { RectButton } from "react-native-gesture-handler";
-import { YStack } from "tamagui";
+import { Stack, YStack } from "tamagui";
 import type { Animated as RNAnimated } from "react-native";
+import { LineGraphView } from "../Components/LineGraphView";
 
 interface InsightsGraphProps {
 	swipeData: ReturnType<InsightsModel["swipeData"]["get"]>;
@@ -54,9 +55,6 @@ export class SwipeableGraph extends Component<InsightsGraphProps> {
 				ref={this.updateRef}
 				renderLeftActions={this.renderLeftActions}
 				renderRightActions={this.renderRightActions}
-				containerStyle={{
-					flex: 1,
-				}}
 				onSwipeableOpen={(direction) => {
 					this.props.onSwipe(direction);
 					this.close();
@@ -72,10 +70,17 @@ export const InsightsGraph = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
 		const swipeData = insightsModel$.swipeData.get(true);
 		return (
-			<SwipeableGraph swipeData={swipeData} onSwipe={insightsModel$.onSwipe}>
-				<InsightsView insightsModel$={insightsModel$} />
-				<BarGraphView insightsModel$={insightsModel$} />
-			</SwipeableGraph>
+			<>
+				<SwipeableGraph
+					swipeData={swipeData}
+					onSwipe={insightsModel$.actions.onSwipe}
+				>
+					<InsightsView insightsModel$={insightsModel$} />
+					<BarGraphView insightsModel$={insightsModel$} />
+				</SwipeableGraph>
+
+				<LineGraphView insightsModel$={insightsModel$} />
+			</>
 		);
 	},
 );

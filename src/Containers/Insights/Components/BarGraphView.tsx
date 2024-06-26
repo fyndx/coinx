@@ -8,7 +8,7 @@ import { Bar, CartesianChart } from "victory-native";
 export const BarGraphView = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
 		const font = useFont(LatoRegular, 12);
-		const graphData = insightsModel$.graphData.get();
+		const graphData = insightsModel$.durationGraphData.get();
 		return (
 			<YStack height={275}>
 				<CartesianChart

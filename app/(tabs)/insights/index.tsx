@@ -11,6 +11,10 @@ import { InsightsGraph } from "@/src/Containers/Insights/Containers/InsightsGrap
 const Insights = () => {
 	useMount(() => {
 		rootStore.insightsModel.onMount();
+
+		return () => {
+			rootStore.insightsModel.onUnmount();
+		};
 	});
 
 	return (
