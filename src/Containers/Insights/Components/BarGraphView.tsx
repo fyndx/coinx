@@ -15,11 +15,11 @@ export const BarGraphView = observer(
 					data={graphData}
 					xKey={"day"}
 					yKeys={["total"]}
-					domainPadding={{ left: 10, right: 10, top: 50 }}
+					domainPadding={{ left: 10, right: 10, top: 30, bottom: 0 }}
 					axisOptions={{
 						font,
 						tickCount: { x: 5, y: 6 },
-						lineColor: "transparent",
+						// lineColor: "transparent",
 					}}
 				>
 					{({ points, chartBounds }) => (
@@ -31,6 +31,7 @@ export const BarGraphView = observer(
 									topLeft: 5,
 									topRight: 5,
 								}}
+								barCount={points.total.length}
 								animate={{ type: "timing" }}
 							>
 								<LinearGradient

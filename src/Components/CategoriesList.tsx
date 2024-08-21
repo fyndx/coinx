@@ -1,12 +1,15 @@
+import type {
+	CategoriesListObservable,
+	ICategory,
+} from "@/src/LegendState/Category.model";
+import { observer, useMount } from "@legendapp/state/react";
 import React from "react";
 import { Category } from "./Category";
-import { observer, useMount } from "@legendapp/state/react";
-import type { CategoriesListObservable } from "../LegendState/Category.model";
 
 interface CategoriesListProps {
 	categories: CategoriesListObservable;
-	onCategoryPressed: (id: number) => void;
-	onCategoryDelete: (id: number) => void;
+	onCategoryPressed: (category: ICategory) => void;
+	onCategoryDelete: (category: ICategory) => void;
 }
 
 export const CategoriesList = observer(

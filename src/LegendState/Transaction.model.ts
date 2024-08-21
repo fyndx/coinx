@@ -1,13 +1,14 @@
-import { observable } from "@legendapp/state";
-import dayjs, { type Dayjs } from "dayjs";
 import { db as database } from "@/db/client";
 import { transactions as transactionsRepo } from "@/db/schema";
+import { observable } from "@legendapp/state";
+import dayjs, { type Dayjs } from "dayjs";
 import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 
 export interface ITransactionDraft {
 	amount: string;
 	date: Dayjs;
 	categoryId?: number;
+	categoryName?: string;
 	note?: string;
 	transactionType: string;
 }
@@ -20,6 +21,7 @@ export class TransactionModel {
 			amount: "0",
 			date: dayjs(),
 			categoryId: undefined,
+			categoryName: "",
 			note: "",
 			transactionType: "",
 		});
@@ -64,7 +66,7 @@ export class TransactionModel {
 		amount: number;
 		categoryId: number | undefined;
 		note?: string | null;
-		transactionTime: number;
+		transactionTime: Date;
 		transactionType: string;
 	}) {
 		return await database
@@ -81,14 +83,14 @@ export class TransactionModel {
 	}
 
 	createTransaction = async () => {
-		const { amount, date, categoryId, note, transactionType } =
+		const { amount, date, categoryId, note, transactionType, categoryName } =
 			this.transaction.peek();
 		const amountInNumber = Number.parseFloat(amount);
 		const newTransaction = await this.createNewTransaction({
 			amount: amountInNumber,
 			categoryId,
-			note,
-			transactionTime: date.unix(),
+			note: note?.length ? note : categoryName,
+			transactionTime: date.toDate(),
 			transactionType: transactionType,
 		});
 		return newTransaction;
@@ -107,7 +109,6 @@ export class TransactionModel {
 		for (const transaction of transactions) {
 			this.createNewTransaction({
 				...transaction,
-				// @ts-ignore
 				transactionTime: transaction.transactionTime,
 			});
 		}

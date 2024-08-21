@@ -1,4 +1,22 @@
+import { CategoriesList } from "@/src/Components/CategoriesList";
+import { rootStore } from "@/src/LegendState";
+import type {
+	CategoryModel,
+	ICategory,
+} from "@/src/LegendState/Category.model";
+import type { TransactionModel } from "@/src/LegendState/Transaction.model";
+import BottomSheet, {
+	BottomSheetModal,
+	BottomSheetModalProvider,
+	BottomSheetScrollView,
+	BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { observer, useMount } from "@legendapp/state/react";
+import { CheckSquare, Delete } from "@tamagui/lucide-icons";
+import dayjs from "dayjs";
 import { useMemo, useRef } from "react";
+import type { GestureResponderEvent } from "react-native";
+import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
 import {
 	Button,
 	Popover,
@@ -9,20 +27,14 @@ import {
 	XStack,
 	YStack,
 } from "tamagui";
-import { observer } from "@legendapp/state/react";
-import { CheckSquare, Delete } from "@tamagui/lucide-icons";
-import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
-import dayjs from "dayjs";
-import { TransactionModel } from "../../../src/LegendState/Transaction.model";
-import BottomSheet, {
-	BottomSheetModal,
-	BottomSheetModalProvider,
-	BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-import { CategoriesList } from "../../../src/Components/CategoriesList";
-import { rootStore } from "../../../src/LegendState";
 
-const NumberButton = ({ text, onPress }) => {
+const NumberButton = ({
+	text,
+	onPress,
+}: {
+	text: number | string;
+	onPress: (event: GestureResponderEvent, text: number | string) => void;
+}) => {
 	return (
 		<Button
 			size={"$6"}
@@ -36,7 +48,7 @@ const NumberButton = ({ text, onPress }) => {
 	);
 };
 
-const SubmitButton = ({ onPress }) => {
+const SubmitButton = ({ onPress }: { onPress: () => void }) => {
 	return (
 		<Button
 			size={"$6"}
@@ -50,8 +62,14 @@ const SubmitButton = ({ onPress }) => {
 	);
 };
 
-const NumberKeypad = ({ onKeyPressed, onSubmit }) => {
-	const handleKeyPressed = (_event, text) => {
+const NumberKeypad = ({
+	onKeyPressed,
+	onSubmit,
+}: { onKeyPressed: (text: number | string) => void; onSubmit: () => void }) => {
+	const handleKeyPressed = (
+		_event: GestureResponderEvent,
+		text: number | string,
+	) => {
 		onKeyPressed(text);
 	};
 
@@ -82,7 +100,15 @@ const NumberKeypad = ({ onKeyPressed, onSubmit }) => {
 };
 
 const CategoryAndDateButtons = observer(
-	({ transactionModel$, dateSheetRef, categorySheetRef }) => {
+	({
+		transactionModel$,
+		dateSheetRef,
+		categorySheetRef,
+	}: {
+		transactionModel$: TransactionModel;
+		dateSheetRef: any;
+		categorySheetRef: any;
+	}) => {
 		const openDatepicker = () => {
 			dateSheetRef.current.snapToIndex(0);
 		};
@@ -91,12 +117,12 @@ const CategoryAndDateButtons = observer(
 			categorySheetRef.current.snapToIndex(0);
 		};
 
-		const rawCategory = transactionModel$.obs.category.get();
+		const rawCategory = transactionModel$.transaction.categoryName.get();
 
-		const category = rawCategory ? rawCategory.name : "Category";
+		const category = rawCategory ? rawCategory : "Category";
 
 		return (
-			<XStack space>
+			<XStack gap="$3">
 				<Button
 					flex={3}
 					variant="outlined"
@@ -105,7 +131,7 @@ const CategoryAndDateButtons = observer(
 					onPress={openDatepicker}
 				>
 					<SizableText color={"white"}>
-						{transactionModel$.obs.date.get().format("ddd D MMM HH:MM")}
+						{transactionModel$.transaction.date.get().format("ddd D MMM")}
 					</SizableText>
 				</Button>
 				<Button
@@ -122,41 +148,67 @@ const CategoryAndDateButtons = observer(
 	},
 );
 
-const DatePicker = observer(({ transactionModel$, dateSheetRef }) => {
-	const snapPoints = useMemo(() => ["50%"], []);
+const DatePicker = observer(
+	({
+		transactionModel$,
+		dateSheetRef,
+	}: { transactionModel$: TransactionModel; dateSheetRef: any }) => {
+		const snapPoints = useMemo(() => ["50%"], []);
 
-	const handleValueChange = (value: DateType) => {
-		transactionModel$.obs.date.set(dayjs(value));
-		dateSheetRef.current.close();
-	};
+		const handleValueChange = (value: { date: DateType }) => {
+			console.log("Value changed", value);
+			transactionModel$.transaction.date.set(dayjs(value.date));
+			dateSheetRef.current.close();
+		};
 
-	return (
-		<BottomSheet ref={dateSheetRef} snapPoints={snapPoints} index={-1}>
-			<Stack>
-				<DateTimePicker
-					value={transactionModel$.obs.date.get()}
-					onValueChange={handleValueChange}
-				/>
-			</Stack>
-		</BottomSheet>
-	);
-});
+		return (
+			<BottomSheet ref={dateSheetRef} snapPoints={snapPoints} index={-1}>
+				<BottomSheetView>
+					<Stack>
+						<DateTimePicker
+							mode={"single"}
+							date={transactionModel$.transaction.date.get()}
+							onChange={handleValueChange}
+						/>
+					</Stack>
+				</BottomSheetView>
+			</BottomSheet>
+		);
+	},
+);
 
 const CategoryPicker = observer(
-	({ transactionModel$, categoryModel$, categorySheetRef }) => {
-		const onCategoryPressed = async (id) => {
-			console.log("Pressed category", id);
-			const category = await categoryModel$.getCategoryByIdAsync(id);
-			transactionModel$.obs.category.set(category);
+	({
+		transactionModel$,
+		categoryModel$,
+		categorySheetRef,
+	}: {
+		transactionModel$: TransactionModel;
+		categoryModel$: CategoryModel;
+		categorySheetRef: any;
+	}) => {
+		useMount(() => {
+			rootStore.categoryModel.getCategoriesList();
+		});
+		const onCategoryPressed = async (category: ICategory) => {
+			// console.log("Pressed category", id);
+			// const category = await categoryModel$.getCategoryByIdAsync(id);
+			// transactionModel$.transaction.category.set(category);
+			transactionModel$.transaction.categoryId.set(category.id);
+			transactionModel$.transaction.categoryName.set(category.name);
 			categorySheetRef.current.close();
 		};
 
 		return (
-			<BottomSheet ref={categorySheetRef} snapPoints={["50%"]} index={-1}>
+			<BottomSheet
+				ref={categorySheetRef}
+				snapPoints={["80%"]}
+				index={-1}
+				enablePanDownToClose
+			>
 				<BottomSheetScrollView>
 					<CategoriesList
-						// categories={rootStore.categoryModel.categoriesList}
-						categories={[]}
+						categories={rootStore.categoryModel.categories}
 						onCategoryPressed={onCategoryPressed}
 						onCategoryDelete={() => {}}
 					/>
@@ -166,22 +218,27 @@ const CategoryPicker = observer(
 	},
 );
 
-const TransactionInput = observer(({ transactionModel$ }) => {
-	return (
-		<XStack>
-			<Spacer size={"$5"} />
-			<XStack flex={1} alignItems="center" justifyContent="center" space="$2">
-				<SizableText theme="alt1" size={"$4"}>
-					$
-				</SizableText>
-				<SizableText size={"$8"}>
-					{transactionModel$.obs.amount.get()}
-				</SizableText>
+const TransactionInput = observer(
+	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
+		return (
+			<XStack>
+				<Spacer size={"$5"} />
+				<XStack flex={1} alignItems="center" justifyContent="center" space="$2">
+					<SizableText theme="alt1" size={"$4"}>
+						$
+					</SizableText>
+					<SizableText size={"$8"}>
+						{transactionModel$.transaction.amount.get()}
+					</SizableText>
+				</XStack>
+				<Button
+					icon={<Delete size={"$1"} />}
+					onPress={transactionModel$.clear}
+				/>
 			</XStack>
-			<Button icon={<Delete size={"$1"} />} onPress={transactionModel$.clear} />
-		</XStack>
-	);
-});
+		);
+	},
+);
 
 const AddTransaction = () => {
 	const dateSheetRef = useRef<BottomSheet>(null);
@@ -194,6 +251,9 @@ const AddTransaction = () => {
 	};
 
 	const handleSubmit = async () => {
+		if (transactionModel$.transaction.amount.peek() === "0") {
+			//
+		}
 		await transactionModel$.createTransaction();
 	};
 
