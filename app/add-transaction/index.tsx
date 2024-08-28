@@ -6,27 +6,56 @@ import type {
 } from "@/src/LegendState/Category.model";
 import type { TransactionModel } from "@/src/LegendState/Transaction.model";
 import BottomSheet, {
-	BottomSheetModal,
-	BottomSheetModalProvider,
 	BottomSheetScrollView,
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { observer, useMount } from "@legendapp/state/react";
+import { observer, useMount, useUnmount } from "@legendapp/state/react";
 import { CheckSquare, Delete } from "@tamagui/lucide-icons";
+import { Toast, useToastController } from "@tamagui/toast";
 import dayjs from "dayjs";
 import { useMemo, useRef } from "react";
-import type { GestureResponderEvent } from "react-native";
+import {
+	Dimensions,
+	type GestureResponderEvent,
+	KeyboardAvoidingView,
+} from "react-native";
 import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
 import {
 	Button,
+	Input,
 	Popover,
 	SizableText,
 	Spacer,
 	Stack,
 	Text,
+	ToggleGroup,
 	XStack,
 	YStack,
 } from "tamagui";
+
+const TransactionType = observer(
+	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
+		return (
+			<XStack justifyContent="center" py={"$6"}>
+				<ToggleGroup
+					type="single"
+					defaultValue={transactionModel$.transaction.selectedTransactionType.get()}
+					onValueChange={(value) => {
+						transactionModel$.transaction.selectedTransactionType.set(value);
+					}}
+					disableDeactivation
+				>
+					<ToggleGroup.Item value="Expense">
+						<Text>{"Expense"}</Text>
+					</ToggleGroup.Item>
+					<ToggleGroup.Item value="Income">
+						<Text>{"Income"}</Text>
+					</ToggleGroup.Item>
+				</ToggleGroup>
+			</XStack>
+		);
+	},
+);
 
 const NumberButton = ({
 	text,
@@ -187,9 +216,6 @@ const CategoryPicker = observer(
 		categoryModel$: CategoryModel;
 		categorySheetRef: any;
 	}) => {
-		useMount(() => {
-			rootStore.categoryModel.getCategoriesList();
-		});
 		const onCategoryPressed = async (category: ICategory) => {
 			// console.log("Pressed category", id);
 			// const category = await categoryModel$.getCategoryByIdAsync(id);
@@ -240,27 +266,80 @@ const TransactionInput = observer(
 	},
 );
 
+const Note = observer(
+	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
+		return (
+			<Input
+				size={"$6"}
+				placeholder={"Note"}
+				width={"$16"}
+				textAlign="center"
+				onChangeText={transactionModel$.transaction.note.set}
+			/>
+		);
+	},
+);
+
 const AddTransaction = () => {
 	const dateSheetRef = useRef<BottomSheet>(null);
 	const categorySheetRef = useRef<BottomSheet>(null);
 	const transactionModel$ = rootStore.transactionModel;
 	const categoryModel$ = rootStore.categoryModel;
 
+	const toast = useToastController();
+
+	useMount(() => {
+		categoryModel$.getCategoriesList({
+			type: transactionModel$.transaction.selectedTransactionType.peek(),
+		});
+		transactionModel$.onMount({ categoryModel$ });
+	});
+
+	useUnmount(() => {
+		transactionModel$.onUnmount();
+	});
+
 	const handleKeyPressed = (text) => {
 		transactionModel$.setAmount(text);
 	};
 
 	const handleSubmit = async () => {
-		if (transactionModel$.transaction.amount.peek() === "0") {
-			//
+		try {
+			if (transactionModel$.transaction.amount.peek() === "0") {
+				toast.show("Please enter an amount", {
+					native: true,
+				});
+				return;
+			}
+			if (!transactionModel$.transaction.categoryId.peek()) {
+				toast.show("Please select a category", {
+					native: true,
+				});
+				return;
+			}
+
+			await transactionModel$.createTransaction();
+			toast.show("Transaction created", {
+				native: true,
+			});
+		} catch (error) {
+			console.log("Error", error);
 		}
-		await transactionModel$.createTransaction();
 	};
 
 	return (
-		<YStack paddingHorizontal="$4" flex={1} justifyContent="space-between">
-			<Stack flex={1} justifyContent="center">
+		<YStack
+			paddingHorizontal="$4"
+			flex={1}
+			justifyContent="space-between"
+			// The below is a workaround for the keyboard moving views up when the keyboard is open
+			// https://github.com/expo/expo/issues/7589#issuecomment-629863678
+			minHeight={Math.round(Dimensions.get("window").height)}
+		>
+			<TransactionType transactionModel$={transactionModel$} />
+			<Stack flex={1} justifyContent="center" gap="$4" alignItems="center">
 				<TransactionInput transactionModel$={transactionModel$} />
+				<Note transactionModel$={transactionModel$} />
 			</Stack>
 			<CategoryAndDateButtons
 				transactionModel$={transactionModel$}

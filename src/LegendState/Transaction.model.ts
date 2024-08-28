@@ -1,8 +1,9 @@
 import { db as database } from "@/db/client";
 import { transactions as transactionsRepo } from "@/db/schema";
-import { observable } from "@legendapp/state";
+import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import dayjs, { type Dayjs } from "dayjs";
 import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
+import type { CategoryModel } from "./Category.model";
 
 export interface ITransactionDraft {
 	amount: string;
@@ -11,13 +12,16 @@ export interface ITransactionDraft {
 	categoryName?: string;
 	note?: string;
 	transactionType: string;
+	selectedTransactionType: "Expense" | "Income";
 }
 
 export class TransactionModel {
 	transaction;
+	listeners: ObservableListenerDispose[] = [];
 
 	constructor() {
 		this.transaction = observable<ITransactionDraft>({
+			selectedTransactionType: "Expense",
 			amount: "0",
 			date: dayjs(),
 			categoryId: undefined,
@@ -26,6 +30,24 @@ export class TransactionModel {
 			transactionType: "",
 		});
 	}
+
+	onMount = ({ categoryModel$ }: { categoryModel$: CategoryModel }) => {
+		const transactionTypeListener =
+			this.transaction.selectedTransactionType.onChange(({ value }) => {
+				categoryModel$.getCategoriesList({
+					type: value,
+				});
+			});
+
+		this.listeners.push(transactionTypeListener);
+	};
+
+	onUnmount = () => {
+		while (this.listeners.length > 0) {
+			const disposer = this.listeners.pop();
+			disposer?.();
+		}
+	};
 
 	setAmount = (text: string) => {
 		const textString = text.toString();
@@ -92,6 +114,16 @@ export class TransactionModel {
 			note: note?.length ? note : categoryName,
 			transactionTime: date.toDate(),
 			transactionType: transactionType,
+		});
+		// Reset the transaction
+		this.transaction.set({
+			amount: "0",
+			date: dayjs(),
+			categoryId: undefined,
+			categoryName: "",
+			note: "",
+			transactionType: "",
+			selectedTransactionType: this.transaction.selectedTransactionType.peek(),
 		});
 		return newTransaction;
 	};

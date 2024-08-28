@@ -1,13 +1,13 @@
 import { db as database } from "@/db/client";
-import {
-	type ObservableObject,
-	observable,
-	type ObservableArray,
-	computed,
-} from "@legendapp/state";
-import { colorKit } from "reanimated-color-picker";
 import { categories as categoriesRepo } from "@/db/schema";
+import {
+	type ObservableArray,
+	type ObservableObject,
+	computed,
+	observable,
+} from "@legendapp/state";
 import { eq } from "drizzle-orm";
+import { colorKit } from "reanimated-color-picker";
 
 const DEFAULT_CATEGORIES = [
 	{
@@ -135,12 +135,17 @@ export class CategoryModel {
 			.insert(categoriesRepo)
 			.values({ name, color, icon, type })
 			.returning();
-		await this.getCategoriesList();
+		await this.getCategoriesList({});
 		return newCategory;
 	};
 
-	getCategoriesList = async () => {
-		const result = await database.select().from(categoriesRepo);
+	getCategoriesList = async ({ type }: { type?: "Income" | "Expense" }) => {
+		const query = database.select().from(categoriesRepo);
+		if (type) {
+			query.where(eq(categoriesRepo.type, type));
+		}
+
+		const result = await query;
 		this.categories.set(result);
 	};
 
