@@ -1,4 +1,5 @@
 import { Tabs } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "tamagui";
 
 export default function RootLayout() {

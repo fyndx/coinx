@@ -1,4 +1,8 @@
 import type { Dayjs, ManipulateType } from "dayjs";
+import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+
+dayjs.extend(localeData);
 
 /**
  * Create a range of Day.js dates between a start and end date.
@@ -21,3 +25,5 @@ export function dayjsRange({
 	}
 	return range;
 }
+
+export const dayjsLocaleDataInstance = dayjs().localeData();

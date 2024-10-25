@@ -6,7 +6,7 @@ import {
 import { ToastProvider, ToastViewport } from "@tamagui/toast";
 import { useColorScheme } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { TamaguiProvider } from "tamagui";
+import { PortalProvider, TamaguiProvider } from "tamagui";
 import config from "../../tamagui.config";
 
 export const RootProvider = ({ children }: { children: React.ReactNode }) => {
@@ -21,10 +21,12 @@ export const RootProvider = ({ children }: { children: React.ReactNode }) => {
 				<NavigationThemeProvider
 					value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
 				>
-					<ToastProvider>
-						{children}
-						<ToastViewport />
-					</ToastProvider>
+					<PortalProvider>
+						<ToastProvider>
+							{children}
+							<ToastViewport />
+						</ToastProvider>
+					</PortalProvider>
 				</NavigationThemeProvider>
 			</TamaguiProvider>
 		</SafeAreaProvider>
