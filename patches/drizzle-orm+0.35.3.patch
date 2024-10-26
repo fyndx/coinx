@@ -1,0 +1,50 @@
+diff --git a/node_modules/drizzle-orm/expo-sqlite/driver.d.cts b/node_modules/drizzle-orm/expo-sqlite/driver.d.cts
+index fc9a98f..8e52afe 100644
+--- a/node_modules/drizzle-orm/expo-sqlite/driver.d.cts
++++ b/node_modules/drizzle-orm/expo-sqlite/driver.d.cts
+@@ -1,4 +1,4 @@
+-import type { SQLiteDatabase, SQLiteRunResult } from 'expo-sqlite/next';
++import type { SQLiteDatabase, SQLiteRunResult } from 'expo-sqlite';
+ import { entityKind } from "../entity.cjs";
+ import { BaseSQLiteDatabase } from "../sqlite-core/db.cjs";
+ import type { DrizzleConfig } from "../utils.cjs";
+diff --git a/node_modules/drizzle-orm/expo-sqlite/driver.d.ts b/node_modules/drizzle-orm/expo-sqlite/driver.d.ts
+index abddcba..f5a2e45 100644
+--- a/node_modules/drizzle-orm/expo-sqlite/driver.d.ts
++++ b/node_modules/drizzle-orm/expo-sqlite/driver.d.ts
+@@ -1,4 +1,4 @@
+-import type { SQLiteDatabase, SQLiteRunResult } from 'expo-sqlite/next';
++import type { SQLiteDatabase, SQLiteRunResult } from 'expo-sqlite';
+ import { entityKind } from "../entity.js";
+ import { BaseSQLiteDatabase } from "../sqlite-core/db.js";
+ import type { DrizzleConfig } from "../utils.js";
+diff --git a/node_modules/drizzle-orm/expo-sqlite/query.js b/node_modules/drizzle-orm/expo-sqlite/query.js
+index 70f7267..0c18a42 100644
+--- a/node_modules/drizzle-orm/expo-sqlite/query.js
++++ b/node_modules/drizzle-orm/expo-sqlite/query.js
+@@ -1,4 +1,4 @@
+-import { addDatabaseChangeListener } from "expo-sqlite/next";
++import { addDatabaseChangeListener } from "expo-sqlite";
+ import { useEffect, useState } from "react";
+ import { is } from "../entity.js";
+ import { SQL } from "../sql/sql.js";
+diff --git a/node_modules/drizzle-orm/expo-sqlite/session.d.cts b/node_modules/drizzle-orm/expo-sqlite/session.d.cts
+index d1f1eed..800145d 100644
+--- a/node_modules/drizzle-orm/expo-sqlite/session.d.cts
++++ b/node_modules/drizzle-orm/expo-sqlite/session.d.cts
+@@ -1,4 +1,4 @@
+-import type { SQLiteDatabase, SQLiteRunResult, SQLiteStatement } from 'expo-sqlite/next';
++import type { SQLiteDatabase, SQLiteRunResult, SQLiteStatement } from 'expo-sqlite';
+ import { entityKind } from "../entity.cjs";
+ import type { Logger } from "../logger.cjs";
+ import type { RelationalSchemaConfig, TablesRelationalConfig } from "../relations.cjs";
+diff --git a/node_modules/drizzle-orm/expo-sqlite/session.d.ts b/node_modules/drizzle-orm/expo-sqlite/session.d.ts
+index f125c50..830f45c 100644
+--- a/node_modules/drizzle-orm/expo-sqlite/session.d.ts
++++ b/node_modules/drizzle-orm/expo-sqlite/session.d.ts
+@@ -1,4 +1,4 @@
+-import type { SQLiteDatabase, SQLiteRunResult, SQLiteStatement } from 'expo-sqlite/next';
++import type { SQLiteDatabase, SQLiteRunResult, SQLiteStatement } from 'expo-sqlite';
+ import { entityKind } from "../entity.js";
+ import type { Logger } from "../logger.js";
+ import type { RelationalSchemaConfig, TablesRelationalConfig } from "../relations.js";
