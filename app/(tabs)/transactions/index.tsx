@@ -6,9 +6,9 @@ import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, H1, H3, Header, Stack, Text, XStack, YStack } from "tamagui";
-import { TransactionsList } from "../../../src/Containers/Transactions/TransactionsList";
-import { rootStore } from "../../../src/LegendState";
-import type { TransactionsScreenModel } from "../../../src/LegendState/TransactionsScreen.model";
+import { TransactionsList } from "@/src/Containers/Transactions/TransactionsList";
+import { rootStore } from "@/src/LegendState";
+import type { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
 
 const ACTIONS = [
 	{
@@ -82,10 +82,6 @@ const Transactions = () => {
 		transactionsScreenModel$.onMount();
 	});
 
-	const handleMonthYearChange = () => {
-		// TODO: Handle month year change
-	};
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<Stack flex={1} paddingHorizontal={"$6"}>
@@ -97,7 +93,7 @@ const Transactions = () => {
 				<XStack justifyContent={"center"} py={"$2"}>
 					<H3>{"Transactions"}</H3>
 				</XStack>
-				<MonthYearPicker onChange={handleMonthYearChange} />
+				<MonthYearPicker transactionsScreenModel$={rootStore.transactionsScreenModel} />
 				<TransactionsList
 					transactions={rootStore.transactionsScreenModel.groupedTransactions}
 				/>

@@ -1,13 +1,13 @@
 import { db as database } from "@/db/client";
 import {
-	transactions as transactionsRepo,
-	categories as categoriesRepo,
 	type SelectTransaction,
+	categories as categoriesRepo,
+	transactions as transactionsRepo,
 } from "@/db/schema";
+import { getTransactions } from "@/src/database/Transactions/TransactionsRepo";
 import { computed, observable } from "@legendapp/state";
 import dayjs from "dayjs";
 import { and, between, eq, sql, sum } from "drizzle-orm";
-import { getTransactions } from "@/src/database/Transactions/TransactionsRepo";
 import { Effect } from "effect";
 
 export interface TransactionItem extends SelectTransaction {
@@ -39,6 +39,21 @@ export type DurationOptions =
 	| "this year"
 	| "all time";
 
+export type TimeRangeType =
+	| "day"
+	| "week"
+	| "month"
+	| "quarter"
+	| "year"
+	| "all"
+	| "custom";
+
+export interface TimeRangeOptions {
+	type: TimeRangeType;
+	startDate: string;
+	endDate: string;
+}
+
 interface InsightOptions {
 	timeFrame: DurationOptions;
 	// insightsType: "totalIncome" | "totalExpense" | "netTotal";
@@ -50,6 +65,7 @@ export class TransactionsScreenModel {
 	constructor() {
 		this.obs = observable<{
 			duration: DurationOptions;
+			timeRange: TimeRangeOptions;
 			insights: {
 				totalIncome: number;
 				totalExpense: number;
@@ -57,6 +73,11 @@ export class TransactionsScreenModel {
 			};
 		}>({
 			duration: "this month",
+			timeRange: {
+				type: "month",
+				startDate: dayjs().startOf("month").format(),
+				endDate: dayjs().endOf("month").format(),
+			},
 			insights: {
 				totalIncome: 0,
 				totalExpense: 0,
@@ -164,7 +185,12 @@ export class TransactionsScreenModel {
 	 * - `total`: The total balance for the transactions on the given date.
 	 */
 	transactionsList = async () => {
-		const groupedTransactions = await Effect.runPromise(getTransactions({}));
+		const groupedTransactions = await Effect.runPromise(
+			getTransactions({
+				startDate: this.obs.timeRange.peek().startDate,
+				endDate: this.obs.timeRange.peek().endDate,
+			}),
+		);
 
 		/**
 		 * Maps the grouped transactions to an array of objects with the following properties:
@@ -258,8 +284,34 @@ export class TransactionsScreenModel {
 		return transactionsResult;
 	});
 
+	selectedTimeRange = computed(() => {
+		const timeRange = this.obs.timeRange.get();
+		switch (timeRange.type) {
+			case "day":
+				return `${dayjs(timeRange.startDate).format("DD MMMM YYYY")}`;
+			case "week":
+				return `${dayjs(timeRange.startDate).format("DD MMMM YYYY")} - ${dayjs(timeRange.endDate).format("DD MMMM YYYY")}`;
+			case "month":
+				return `${dayjs(timeRange.startDate).format("MMM YYYY")}`;
+			case "quarter":
+				return `${dayjs(timeRange.startDate).format("MMMM YYYY")} - ${dayjs(timeRange.endDate).format("MMMM YYYY")}`;
+			case "year":
+				return `${dayjs(timeRange.startDate).format("YYYY")}`;
+			case "all":
+				return "All Time";
+			case "custom":
+				return `${dayjs(timeRange.startDate).format("DD MMMM YYYY")} - ${dayjs(timeRange.endDate).format("DD MMMM YYYY")}`;
+		}
+	});
+
 	onDurationChange = (duration: DurationOptions) => {
 		this.obs.duration.set(duration);
 		this.calculateInsights({ timeFrame: duration });
+	};
+
+	onTimeRangeChange = (timeRange: TimeRangeOptions) => {
+		this.obs.timeRange.set(timeRange);
+		// this.calculateInsights({ timeFrame: this.obs.duration.peek() });
+		// this.transactionsList();
 	};
 }

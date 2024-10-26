@@ -64,7 +64,9 @@ const RootLayoutNav = () => {
 
 const RootLayout = observer(() => {
 	const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
-	useDrizzleStudio(expoDb);
+	if (!process.env.EXPO_PUBLIC_DISABLE_FEATURE) {
+		useDrizzleStudio(expoDb);
+	}
 
 	useMount(() => {
 		rootStore.actions.startServices();
