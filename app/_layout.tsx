@@ -45,12 +45,20 @@ const RootLayoutNav = () => {
 						/>
 						<Stack.Screen
 							name="categories/index"
-							options={{ headerShown: false }}
+							options={{
+								headerTitle: "Categories",
+								headerTitleAlign: "center",
+							}}
 						/>
-						<Stack.Screen
-							name="test/index"
-							options={{ headerTitle: "Test", headerTitleAlign: "center" }}
-						/>
+						{__DEV__ && (
+							<Stack.Screen
+								name="playground/index"
+								options={{
+									headerTitle: "PlayGround",
+									headerTitleAlign: "center",
+								}}
+							/>
+						)}
 						<Stack.Screen
 							name="add-transaction/index"
 							options={{ headerShown: false, presentation: "modal" }}

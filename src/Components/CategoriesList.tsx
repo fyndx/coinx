@@ -3,7 +3,8 @@ import type {
 	ICategory,
 } from "@/src/LegendState/Category.model";
 import { observer, useMount } from "@legendapp/state/react";
-import React from "react";
+import React, { Fragment } from "react";
+import { Separator, YGroup } from "tamagui";
 import { Category } from "./Category";
 
 interface CategoriesListProps {
@@ -18,15 +19,21 @@ export const CategoriesList = observer(
 		onCategoryPressed,
 		onCategoryDelete,
 	}: CategoriesListProps) => {
-		return categories?.map((category) => {
-			return (
-				<Category
-					key={category.id.peek()}
-					category={category}
-					onCategoryPressed={onCategoryPressed}
-					onCategoryDelete={onCategoryDelete}
-				/>
-			);
-		});
+		return (
+			<YGroup padding={"$3"}>
+				{categories?.map((category) => {
+					return (
+						<Fragment key={category.id.peek()}>
+							<Category
+								category={category}
+								onCategoryPressed={onCategoryPressed}
+								onCategoryDelete={onCategoryDelete}
+							/>
+							<Separator />
+						</Fragment>
+					);
+				})}
+			</YGroup>
+		);
 	},
 );

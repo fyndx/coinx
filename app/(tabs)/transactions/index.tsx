@@ -1,14 +1,16 @@
 import { MonthYearPicker } from "@/src/Components/MonthYearPicker";
+import { TransactionsList } from "@/src/Containers/Transactions/TransactionsList";
+import { rootStore } from "@/src/LegendState";
+import type { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
 import { observer, useMount } from "@legendapp/state/react";
 import { MenuView } from "@react-native-menu/menu";
 import type { NativeActionEvent } from "@react-native-menu/menu";
 import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, H1, H3, Header, Stack, Text, XStack, YStack } from "tamagui";
-import { TransactionsList } from "@/src/Containers/Transactions/TransactionsList";
-import { rootStore } from "@/src/LegendState";
-import type { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
 
 const ACTIONS = [
 	{
@@ -82,6 +84,12 @@ const Transactions = () => {
 		transactionsScreenModel$.onMount();
 	});
 
+	useFocusEffect(
+		useCallback(() => {
+			transactionsScreenModel$.transactionsList();
+		}, []),
+	);
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Stack flex={1} paddingHorizontal={"$6"}>
@@ -93,9 +101,9 @@ const Transactions = () => {
 				<XStack justifyContent={"center"} py={"$2"}>
 					<H3>{"Transactions"}</H3>
 				</XStack>
-				<MonthYearPicker transactionsScreenModel$={rootStore.transactionsScreenModel} />
+				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
 				<TransactionsList
-					transactions={rootStore.transactionsScreenModel.groupedTransactions}
+					transactions={transactionsScreenModel$.groupedTransactions}
 				/>
 			</Stack>
 		</SafeAreaView>
