@@ -13,6 +13,7 @@ import { observer, useMount, useUnmount } from "@legendapp/state/react";
 import { CheckSquare, Delete } from "@tamagui/lucide-icons";
 import { Toast, useToastController } from "@tamagui/toast";
 import dayjs from "dayjs";
+import { useNavigation } from "expo-router";
 import { useMemo, useRef } from "react";
 import {
 	Dimensions,
@@ -270,7 +271,7 @@ const Note = observer(
 	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
 		return (
 			<Input
-				size={"$6"}
+				size={"$5"}
 				placeholder={"Note"}
 				width={"$16"}
 				textAlign="center"
@@ -285,6 +286,7 @@ const AddTransaction = () => {
 	const categorySheetRef = useRef<BottomSheet>(null);
 	const transactionModel$ = rootStore.transactionModel;
 	const categoryModel$ = rootStore.categoryModel;
+	const navigation = useNavigation();
 
 	const toast = useToastController();
 
@@ -322,6 +324,7 @@ const AddTransaction = () => {
 			toast.show("Transaction created", {
 				native: true,
 			});
+			navigation.goBack();
 		} catch (error) {
 			console.log("Error", error);
 		}

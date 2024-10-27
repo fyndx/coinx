@@ -1,7 +1,16 @@
 import { rootStore } from "@/src/LegendState";
 import { generateRandomTransactions } from "@/src/database/seeds/TransactionSeeds";
 import { Link } from "expo-router";
-import { Button, Separator, Text, H2, YStack } from "tamagui";
+import {
+	Button,
+	H2,
+	H3,
+	ListItem,
+	Separator,
+	Text,
+	YGroup,
+	YStack,
+} from "tamagui";
 
 const TestScreen = () => {
 	const clearTransactions = () => {
@@ -21,21 +30,34 @@ const TestScreen = () => {
 	};
 
 	return (
-		<YStack alignItems={"center"} gap={"$2"}>
-			<H2>{"Creation"}</H2>
-			<Button onPress={createDefaultCategories}>
-				{"Create Default Categories"}
-			</Button>
-			<Button onPress={createRandomTransactions}>
-				{"Create Random Transactions"}
-			</Button>
-			<Separator />
-			<H2>{"Deletion"}</H2>
-			<Button onPress={clearTransactions}>{"Clear All Transactions"}</Button>
-			<Button onPress={clearCategories}>{"Clear All Categories"}</Button>
-			<Link href={"categories"} asChild>
-				<Button>{"Categories"}</Button>
-			</Link>
+		<YStack padding={"$2"}>
+			<H3>{"Creation"}</H3>
+			<YGroup paddingVertical={"$2"}>
+				<YGroup.Item>
+					<ListItem
+						title={"Create Default Categories"}
+						onPress={createDefaultCategories}
+					/>
+				</YGroup.Item>
+				<Separator />
+				<YGroup.Item>
+					<ListItem
+						title={"Create Random Transactions"}
+						onPress={createRandomTransactions}
+					/>
+				</YGroup.Item>
+				<H3>{"Deletion"}</H3>
+				<YGroup.Item>
+					<ListItem
+						title={"Clear All Transactions"}
+						onPress={clearTransactions}
+					/>
+				</YGroup.Item>
+				<Separator />
+				<YGroup.Item>
+					<ListItem title={"Clear All Categories"} onPress={clearCategories} />
+				</YGroup.Item>
+			</YGroup>
 		</YStack>
 	);
 };

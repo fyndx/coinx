@@ -18,7 +18,7 @@ const Categories = () => {
 	});
 
 	return (
-		<YStack flex={1} padding={"$2"}>
+		<YStack flex={1}>
 			<Suspense fallback={<Text>Loading...</Text>}>
 				<CategoriesList
 					categories={rootStore.categoryModel.categories}

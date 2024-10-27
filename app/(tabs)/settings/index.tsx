@@ -1,7 +1,17 @@
-import { StyleSheet } from "react-native";
-import { Button, YStack } from "tamagui";
-import { rootStore } from "../../../src/LegendState";
+import { ChevronRight } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
+import { StyleSheet } from "react-native";
+import {
+	Button,
+	H2,
+	H3,
+	H4,
+	ListItem,
+	Separator,
+	YGroup,
+	YStack,
+} from "tamagui";
+import { rootStore } from "../../../src/LegendState";
 
 const Settings = () => {
 	const clearTransactions = () => {
@@ -13,15 +23,25 @@ const Settings = () => {
 	};
 
 	return (
-		<YStack>
-			<Link href={"categories"} asChild>
-				<Button>{"Categories"}</Button>
-			</Link>
-			{__DEV__ && (
-				<Link href={"test"} asChild>
-					<Button>{"Go To Test"}</Button>
-				</Link>
-			)}
+		<YStack padding={"$2"}>
+			<H3 textAlign={"center"}>{"Settings"}</H3>
+			<YGroup paddingVertical={"$2"}>
+				<YGroup.Item>
+					<Link href={"/categories"} asChild>
+						<ListItem title={"Categories"} iconAfter={ChevronRight} />
+					</Link>
+				</YGroup.Item>
+				{__DEV__ && (
+					<>
+						<Separator />
+						<YGroup.Item>
+							<Link href={"/test"} asChild>
+								<ListItem title={"Play Ground"} iconAfter={ChevronRight} />
+							</Link>
+						</YGroup.Item>
+					</>
+				)}
+			</YGroup>
 		</YStack>
 	);
 };
