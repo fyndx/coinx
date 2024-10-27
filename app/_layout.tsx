@@ -50,13 +50,15 @@ const RootLayoutNav = () => {
 								headerTitleAlign: "center",
 							}}
 						/>
-						<Stack.Screen
-							name="playground/index"
-							options={{
-								headerTitle: "PlayGround",
-								headerTitleAlign: "center",
-							}}
-						/>
+						{__DEV__ && (
+							<Stack.Screen
+								name="playground/index"
+								options={{
+									headerTitle: "PlayGround",
+									headerTitleAlign: "center",
+								}}
+							/>
+						)}
 						<Stack.Screen
 							name="add-transaction/index"
 							options={{ headerShown: false, presentation: "modal" }}

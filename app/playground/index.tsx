@@ -1,5 +1,6 @@
 import { rootStore } from "@/src/LegendState";
 import { generateRandomTransactions } from "@/src/database/seeds/TransactionSeeds";
+import { Delete } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
 import {
 	Button,
@@ -50,12 +51,21 @@ const PlaygroundScreen = () => {
 				<YGroup.Item>
 					<ListItem
 						title={"Clear All Transactions"}
+						icon={Delete}
+						theme={"red"}
+						subTitle={"This action cannot be undone"}
 						onPress={clearTransactions}
 					/>
 				</YGroup.Item>
-				<Separator />
+				<Separator borderColor={"$color.gray8Light"} />
 				<YGroup.Item>
-					<ListItem title={"Clear All Categories"} onPress={clearCategories} />
+					<ListItem
+						title={"Clear All Categories"}
+						icon={Delete}
+						theme={"red"}
+						subTitle={"This action cannot be undone"}
+						onPress={clearCategories}
+					/>
 				</YGroup.Item>
 			</YGroup>
 		</YStack>

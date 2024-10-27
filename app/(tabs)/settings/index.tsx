@@ -35,7 +35,7 @@ const Settings = () => {
 					<>
 						<Separator />
 						<YGroup.Item>
-							<Link href={"/test"} asChild>
+							<Link href={"/playground"} asChild>
 								<ListItem title={"Play Ground"} iconAfter={ChevronRight} />
 							</Link>
 						</YGroup.Item>
