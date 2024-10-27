@@ -1,5 +1,6 @@
 import { Trash2 } from "@tamagui/lucide-icons";
 import { Component, type PropsWithChildren } from "react";
+import { StyleSheet } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable, {
 	type SwipeableRef,
@@ -14,6 +15,12 @@ import Reanimated, {
 interface SwipeableRowProps {
 	onDelete?: () => void;
 }
+
+const SWIPE_THRESHOLD = 40;
+const SCALE_RANGE = {
+	INPUT: [-SWIPE_THRESHOLD, 0],
+	OUTPUT: [1, 0],
+};
 
 export class SwipeableRow extends Component<
 	PropsWithChildren<SwipeableRowProps>
@@ -39,21 +46,29 @@ export class SwipeableRow extends Component<
 					{
 						scale: interpolate(
 							dragX.value,
-							[-40, 0],
-							[1, 0],
+							SCALE_RANGE.INPUT,
+							SCALE_RANGE.OUTPUT,
 							Extrapolation.CLAMP,
 						),
 					},
 				],
+				opacity: interpolate(
+					dragX.value,
+					SCALE_RANGE.INPUT,
+					[1, 0.7],
+					Extrapolation.CLAMP,
+				),
 			};
 		});
 
 		return (
-			<RectButton
-				style={{ backgroundColor: "red", justifyContent: "center" }}
-				onPress={this.close}
-			>
-				<Reanimated.View style={styleAnimation}>
+			<RectButton style={styles.deleteButton} onPress={this.close}>
+				<Reanimated.View
+					accessibilityLabel="Delete item"
+					accessibilityRole="button"
+					accessibilityHint="Double tap to delete this item"
+					style={styleAnimation}
+				>
 					<Trash2 size={"$3"} />
 				</Reanimated.View>
 			</RectButton>
@@ -74,3 +89,12 @@ export class SwipeableRow extends Component<
 		);
 	}
 }
+
+const styles = StyleSheet.create({
+	deleteButton: {
+		backgroundColor: "red",
+		justifyContent: "center",
+		minWidth: SWIPE_THRESHOLD,
+		padding: 8,
+	},
+});

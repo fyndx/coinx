@@ -25,7 +25,6 @@ export const CategoriesList = observer(
 					return (
 						<Fragment key={category.id.peek()}>
 							<Category
-								key={category.id.peek()}
 								category={category}
 								onCategoryPressed={onCategoryPressed}
 								onCategoryDelete={onCategoryDelete}

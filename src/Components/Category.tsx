@@ -13,21 +13,22 @@ interface CategoryProps {
 
 export const Category = observer(
 	({ category, onCategoryPressed, onCategoryDelete }: CategoryProps) => {
+		const categoryData = category.peek();
 		return (
 			<YGroup.Item>
 				<SwipeableRow
-					key={category.id.peek()}
-					onDelete={() => onCategoryDelete(category.peek())}
+					key={categoryData.id}
+					onDelete={() => onCategoryDelete(categoryData)}
 				>
 					<ListItem
-						onPress={() => onCategoryPressed(category.peek())}
+						onPress={() => onCategoryPressed(categoryData)}
 						alignItems="center"
 					>
 						<XStack gap={"$4"}>
 							<Text fontSize={"$6"}>{category.icon}</Text>
 							<Text fontSize={"$6"}>{category.name}</Text>
 						</XStack>
-						<Square size={"$1"} backgroundColor={category.color.get()} />
+						<Square size={"$1"} backgroundColor={categoryData.color} />
 					</ListItem>
 				</SwipeableRow>
 			</YGroup.Item>

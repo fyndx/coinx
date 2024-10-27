@@ -51,7 +51,7 @@ const RootLayoutNav = () => {
 							}}
 						/>
 						<Stack.Screen
-							name="test/index"
+							name="playground/index"
 							options={{
 								headerTitle: "PlayGround",
 								headerTitleAlign: "center",

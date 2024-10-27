@@ -327,6 +327,11 @@ const AddTransaction = () => {
 			navigation.goBack();
 		} catch (error) {
 			console.log("Error", error);
+			toast.show("Failed to create transaction", {
+				native: true,
+			});
+			// Optionally handle navigation error
+			navigation.goBack();
 		}
 	};
 

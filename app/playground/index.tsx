@@ -12,7 +12,7 @@ import {
 	YStack,
 } from "tamagui";
 
-const TestScreen = () => {
+const PlaygroundScreen = () => {
 	const clearTransactions = () => {
 		rootStore.transactionModel.deleteAllTransactions();
 	};
@@ -62,4 +62,4 @@ const TestScreen = () => {
 	);
 };
 
-export default TestScreen;
+export default PlaygroundScreen;

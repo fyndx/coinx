@@ -101,11 +101,9 @@ const Transactions = () => {
 				<XStack justifyContent={"center"} py={"$2"}>
 					<H3>{"Transactions"}</H3>
 				</XStack>
-				<MonthYearPicker
-					transactionsScreenModel$={rootStore.transactionsScreenModel}
-				/>
+				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
 				<TransactionsList
-					transactions={rootStore.transactionsScreenModel.groupedTransactions}
+					transactions={transactionsScreenModel$.groupedTransactions}
 				/>
 			</Stack>
 		</SafeAreaView>
