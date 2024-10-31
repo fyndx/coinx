@@ -37,6 +37,45 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
 	transactions: many(transactions),
 }));
 
+export const products = sqliteTable("product", {
+	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	name: text("name").notNull(),
+	defaultUnitCategory: text("default_unit_category").notNull(), // from UnitCategory enum in units.ts
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const productsRelations = relations(products, ({ many }) => ({
+	product_listings: many(product_listings),
+}));
+
+export const product_listings = sqliteTable("product_listings", {
+	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	productId: integer("product_id").references(() => products.id, {
+		onDelete: "cascade",
+	}),
+	name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
+	store: text("store").notNull(),
+	location: text("location"),
+
+	// Price details
+	price: real("price").notNull(),
+	quantity: real("quantity").notNull(),
+	unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
+
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: text("updated_at"),
+});
+
+export const productListingsRelations = relations(
+	product_listings,
+	({ one }) => ({
+		product: one(products, {
+			fields: [product_listings.productId],
+			references: [products.id],
+		}),
+	}),
+);
+
 // Types
 // Transaction Types
 export type SelectTransaction = typeof transactions.$inferSelect;
@@ -45,3 +84,11 @@ export type InsertTransaction = typeof transactions.$inferInsert;
 // Category Types
 export type SelectCategory = typeof categories.$inferSelect;
 export type InsertCategory = typeof categories.$inferInsert;
+
+// Product Types
+export type SelectProduct = typeof products.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;
+
+// Product Listings Types
+export type SelectProductListing = typeof product_listings.$inferSelect;
+export type InsertProductListing = typeof product_listings.$inferInsert;

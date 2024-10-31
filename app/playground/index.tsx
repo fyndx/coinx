@@ -30,6 +30,14 @@ const PlaygroundScreen = () => {
 		rootStore.transactionModel.createRandomTransactions();
 	};
 
+	const createRandomProducts = () => {
+		rootStore.productsModel.createRandomProducts();
+	};
+
+	const clearProducts = () => {
+		rootStore.productsModel.deleteAllProducts();
+	};
+
 	return (
 		<YStack padding={"$2"}>
 			<H3>{"Creation"}</H3>
@@ -45,6 +53,12 @@ const PlaygroundScreen = () => {
 					<ListItem
 						title={"Create Random Transactions"}
 						onPress={createRandomTransactions}
+					/>
+				</YGroup.Item>
+				<YGroup.Item>
+					<ListItem
+						title={"Create Random Products"}
+						onPress={createRandomProducts}
 					/>
 				</YGroup.Item>
 				<H3>{"Deletion"}</H3>
@@ -65,6 +79,16 @@ const PlaygroundScreen = () => {
 						theme={"red"}
 						subTitle={"This action cannot be undone"}
 						onPress={clearCategories}
+					/>
+				</YGroup.Item>
+				<Separator borderColor={"$color.gray8Light"} />
+				<YGroup.Item>
+					<ListItem
+						title={"Clear All Products"}
+						icon={Delete}
+						theme={"red"}
+						subTitle={"This action cannot be undone"}
+						onPress={clearProducts}
 					/>
 				</YGroup.Item>
 			</YGroup>

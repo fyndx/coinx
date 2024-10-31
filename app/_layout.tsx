@@ -63,6 +63,20 @@ const RootLayoutNav = () => {
 							name="add-transaction/index"
 							options={{ headerShown: false, presentation: "modal" }}
 						/>
+						<Stack.Screen
+							name="product-details/index"
+							options={{
+								headerTitle: "Product Details",
+								headerTitleAlign: "center",
+							}}
+						/>
+						<Stack.Screen
+							name="add-product/index"
+							options={{
+								headerTitle: "Add Product",
+								headerTitleAlign: "center",
+							}}
+						/>
 					</Stack>
 				</RootProvider>
 			</GestureHandlerRootView>

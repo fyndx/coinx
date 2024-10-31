@@ -33,7 +33,7 @@ const Categories = () => {
 				backgroundColor={"$blue10Light"}
 				padding={"$1"}
 			>
-				<Link href={"add-category"}>
+				<Link href={"/add-category"}>
 					<PlusCircle size={"$4"} color="white" />
 				</Link>
 			</Circle>

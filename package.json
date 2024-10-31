@@ -7,7 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "generate": "drizzle-kit generate:sqlite",
+    "generate": "drizzle-kit generate",
     "upgrade:tamagui": "bun update '*tamagui*'@latest '@tamagui/*'@latest",
     "postinstall": "patch-package"
   },
@@ -17,7 +17,7 @@
     "@gorhom/bottom-sheet": "^5.0.5",
     "@legendapp/state": "^2.1.15",
     "@react-native-async-storage/async-storage": "2.0.0",
-    "@react-native-menu/menu": "^1.1.4",
+    "@react-native-menu/menu": "^1.1.6",
     "@shopify/flash-list": "1.7.1",
     "@shopify/react-native-skia": "1.5.0",
     "@tamagui/animations-moti": "^1.116.8",
