@@ -17,26 +17,46 @@ export enum BaseUnit {
 
 // Conversion rates to base unit
 export const UnitConversions = {
-	// Weight
-	kg: 1000, // 1 kg = 1000 g
-	g: 1, // 1 g = 1 g
-	mg: 0.001, // 1 mg = 0.001 g
-
-	// Volume
-	l: 1000, // 1 l = 1000 ml
-	ml: 1, // 1 ml = 1 ml
-
-	// Quantity - no conversion needed
-	pc: 1, // piece
-	bag: 1, // bag
-	pack: 1, // pack
-
-	// Length
-	m: 100, // 1 m = 100 cm
-	cm: 1, // 1 cm = 1 cm
-	mm: 0.1, // 1 mm = 0.1 cm
-
-	// Area
-	m2: 10000, // 1 m² = 10000 cm²
-	cm2: 1, // 1 cm² = 1 cm²
+	weight: {
+		mg: 0.001, // milligram to gram
+		g: 1, // gram as the base unit
+		kg: 1000, // kilogram to gram
+		lb: 453.592, // pound to gram
+		oz: 28.3495, // ounce to gram
+		ton: 1000000, // metric ton to gram
+	},
+	volume: {
+		ml: 0.001, // milliliter to liter
+		l: 1, // liter as the base unit
+	},
+	quantity: {
+		piece: 1, // each item as base unit
+		bag: 1, // no direct conversion, context-dependent
+		packet: 1, // no direct conversion, context-dependent
+		dozen: 12, // dozen to piece
+		gross: 144, // gross to piece
+		bundle: 1, // no direct conversion, context-dependent
+		set: 1, // no direct conversion, context-dependent
+	},
+	length: {
+		mm: 0.001, // millimeter to meter
+		cm: 0.01, // centimeter to meter
+		m: 1, // meter as the base unit
+		km: 1000, // kilometer to meter
+		in: 0.0254, // inch to meter
+		ft: 0.3048, // foot to meter
+		yd: 0.9144, // yard to meter
+		mile: 1609.34, // mile to meter
+	},
+	area: {
+		"sq mm": 0.000001, // square millimeter to square meter
+		"sq cm": 0.0001, // square centimeter to square meter
+		"sq m": 1, // square meter as base unit
+		hectare: 10000, // hectare to square meter
+		acre: 4046.86, // acre to square meter
+		"sq km": 1000000, // square kilometer to square meter
+		"sq in": 0.00064516, // square inch to square meter
+		"sq ft": 0.092903, // square foot to square meter
+		"sq yd": 0.836127, // square yard to square meter
+	},
 } as const;

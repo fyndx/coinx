@@ -1,48 +1,38 @@
 import { db as database } from "@/db/client";
-import {Effect} from "effect";
 import {
-  type InsertProductListing,
-  product_listings as productsListingsRepo,
-  products as productsRepo
+	type InsertProductListing,
+	product_listings as productsListingsRepo,
+	products as productsRepo,
 } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { Effect } from "effect";
 
-export const getProductsListings = ({}) => {
-  return Effect.promise(() => {
-    const query = database
-      .select({
-        id: productsListingsRepo.id,
-        price: productsListingsRepo.price,
-        quantity: productsListingsRepo.quantity,
-        pricePerUnit: productsListingsRepo.pricePerUnit,
-        brand: productsListingsRepo.brand,
-        store: productsListingsRepo.store,
-        location: productsListingsRepo.location,
-        createdAt: productsListingsRepo.createdAt,
-        updatedAt: productsListingsRepo.updatedAt,
-        product: {
-          id: productsRepo.id,
-          name: productsRepo.name,
-          unit: productsRepo.unit,
-        },
-      })
-      .from(productsListingsRepo);
+export const getProductsListings = () => {
+	return Effect.promise(() => {
+		const query = database.select().from(productsListingsRepo);
 
-    return query.execute();
-  });
-}
+		return query.execute();
+	});
+};
 
-export const addProductListing = ({productId, price, quantity, pricePerUnit, brand, store, location}: InsertProductListing) => {
-  return Effect.promise(() => {
-    const query = database.insert(productsListingsRepo).values({
-      productId,
-      price,
-      quantity,
-      pricePerUnit,
-      brand,
-      store,
-      location,
-    })
+export const getProductListingsById = (id: number) => {
+	return Effect.promise(() => {
+		const query = database
+			.select()
+			.from(productsListingsRepo)
+			.where(eq(productsListingsRepo.productId, id));
 
-    return query.execute();
-  });
-}
+		return query.execute();
+	});
+};
+
+export const addProductListing = (productListing: InsertProductListing) => {
+	return Effect.promise(() => {
+		const query = database
+			.insert(productsListingsRepo)
+			.values(productListing)
+			.returning();
+
+		return query.execute();
+	});
+};

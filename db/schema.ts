@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
 export const transactions = sqliteTable("transaction", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -55,6 +56,7 @@ export const product_listings = sqliteTable("product_listings", {
 	}),
 	name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
 	store: text("store").notNull(),
+	url: text("url"),
 	location: text("location"),
 
 	// Price details
@@ -81,14 +83,26 @@ export const productListingsRelations = relations(
 export type SelectTransaction = typeof transactions.$inferSelect;
 export type InsertTransaction = typeof transactions.$inferInsert;
 
+export const selectTransactionSchema = createSelectSchema(transactions);
+export const insertTransactionSchema = createInsertSchema(transactions);
+
 // Category Types
 export type SelectCategory = typeof categories.$inferSelect;
 export type InsertCategory = typeof categories.$inferInsert;
+
+export const selectCategorySchema = createSelectSchema(categories);
+export const insertCategorySchema = createInsertSchema(categories);
 
 // Product Types
 export type SelectProduct = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
 
+export const selectProductSchema = createSelectSchema(products);
+export const insertProductSchema = createInsertSchema(products);
+
 // Product Listings Types
 export type SelectProductListing = typeof product_listings.$inferSelect;
 export type InsertProductListing = typeof product_listings.$inferInsert;
+
+export const selectProductListingSchema = createSelectSchema(product_listings);
+export const insertProductListingSchema = createInsertSchema(product_listings);

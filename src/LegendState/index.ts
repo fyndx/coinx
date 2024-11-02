@@ -1,10 +1,12 @@
-import { AppModel } from "./App.model";
-import { CategoryModel } from "./Category.model";
-import { InsightsModel } from "./Insights/Insights.model";
-import { ProductsModel } from "./Products.model";
-import { ProductsListingsModel } from "./ProductsListings.model";
-import { TransactionModel } from "./Transaction.model";
-import { TransactionsScreenModel } from "./TransactionsScreen.model";
+import { AddProductScreenModel } from "@/src/LegendState/AddProduct/AddProduct.model";
+import { AppModel } from "@/src/LegendState/App.model";
+import { CategoryModel } from "@/src/LegendState/Category.model";
+import { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
+import { ProductsModel } from "@/src/LegendState/Products.model";
+import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
+import { TransactionModel } from "@/src/LegendState/Transaction.model";
+import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
+import { AddProductDetailsModel } from "./AddProductDetails/AddProductDetails.model";
 
 class RootStore {
 	// App State
@@ -17,6 +19,8 @@ class RootStore {
 	productsListingsModel: ProductsListingsModel;
 	// Screens
 	transactionsScreenModel: TransactionsScreenModel;
+	addProductScreenModel: AddProductScreenModel;
+	addProductDetailsModel: AddProductDetailsModel;
 
 	constructor() {
 		this.appModel = new AppModel();
@@ -26,6 +30,8 @@ class RootStore {
 		this.insightsModel = new InsightsModel();
 		this.productsModel = new ProductsModel();
 		this.productsListingsModel = new ProductsListingsModel();
+		this.addProductScreenModel = new AddProductScreenModel();
+		this.addProductDetailsModel = new AddProductDetailsModel();
 	}
 
 	private startServices = async () => {

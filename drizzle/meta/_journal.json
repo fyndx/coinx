@@ -8,6 +8,13 @@
       "when": 1730304131380,
       "tag": "0000_parallel_loa",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1730537895891,
+      "tag": "0001_goofy_gamora",
+      "breakpoints": true
     }
   ]
 }

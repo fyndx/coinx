@@ -64,16 +64,16 @@ const RootLayoutNav = () => {
 							options={{ headerShown: false, presentation: "modal" }}
 						/>
 						<Stack.Screen
-							name="product-details/index"
+							name="add-product/index"
 							options={{
-								headerTitle: "Product Details",
+								headerTitle: "Add Product",
 								headerTitleAlign: "center",
 							}}
 						/>
 						<Stack.Screen
-							name="add-product/index"
+							name="add-product-details/index"
 							options={{
-								headerTitle: "Add Product",
+								headerTitle: "Add Product Details",
 								headerTitleAlign: "center",
 							}}
 						/>

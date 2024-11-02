@@ -13,7 +13,12 @@ const Product = ({
 	product,
 }: { product: Omit<SelectProduct, "createdAt"> }) => {
 	return (
-		<Link href={`/product-details?product_id=${product.id}`}>
+		<Link
+			href={{
+				pathname: "/product-details",
+				params: { id: product.id, name: product.name },
+			}}
+		>
 			<YGroup.Item key={product.id}>
 				<ListItem title={product.name} iconAfter={ChevronRight} />
 			</YGroup.Item>
@@ -50,7 +55,7 @@ const Products = observer(() => {
 				backgroundColor={"$blue10Light"}
 				padding={"$1"}
 			>
-				<Link href={"/add-product"}>
+				<Link href={{ pathname: "/add-product" }}>
 					<PlusCircle size={"$4"} color="white" />
 				</Link>
 			</Circle>

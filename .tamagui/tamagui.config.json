@@ -26925,50 +26925,23 @@
     "onlyAllowShorthands": false,
     "fontLanguages": [],
     "animations": {
-      "View": "Function",
-      "Text": "Function",
-      "isReactNative": true,
       "animations": {
-        "100ms": {
-          "type": "timing",
-          "duration": 100
-        },
-        "bouncy": {
-          "type": "spring",
-          "damping": 9,
-          "mass": 0.9,
-          "stiffness": 150
-        },
-        "lazy": {
-          "type": "spring",
-          "damping": 18,
-          "stiffness": 50
-        },
-        "medium": {
-          "damping": 15,
-          "stiffness": 120,
-          "mass": 1
-        },
-        "slow": {
-          "type": "spring",
-          "damping": 15,
-          "stiffness": 40
-        },
-        "quick": {
-          "type": "spring",
-          "damping": 20,
-          "mass": 1.2,
-          "stiffness": 250
-        },
-        "tooltip": {
-          "type": "spring",
-          "damping": 10,
-          "mass": 0.9,
-          "stiffness": 100
-        }
+        "75ms": "ease-in 75ms",
+        "100ms": "ease-in 100ms",
+        "200ms": "ease-in 200ms",
+        "bouncy": "ease-in 200ms",
+        "superBouncy": "ease-in 500ms",
+        "lazy": "ease-in 1000ms",
+        "medium": "ease-in 300ms",
+        "slow": "ease-in 500ms",
+        "quick": "cubic-bezier(0.215, 0.610, 0.355, 1.000) 400ms",
+        "quicker": "cubic-bezier(0.215, 0.610, 0.355, 1.000) 300ms",
+        "quickest": "cubic-bezier(0.215, 0.610, 0.355, 1.000) 200ms",
+        "tooltip": "ease-in 400ms"
       },
       "usePresence": "Function",
       "ResetPresence": "Function",
+      "supportsCSSVars": true,
       "useAnimatedNumber": "Function",
       "useAnimatedNumberReaction": "Function",
       "useAnimatedNumberStyle": "Function",
@@ -36895,7 +36868,6 @@
       "ai": "alignItems",
       "als": "alignSelf",
       "b": "bottom",
-      "bc": "backgroundColor",
       "bg": "backgroundColor",
       "bbc": "borderBottomColor",
       "bblr": "borderBottomLeftRadius",
@@ -36903,7 +36875,7 @@
       "bbw": "borderBottomWidth",
       "blc": "borderLeftColor",
       "blw": "borderLeftWidth",
-      "boc": "borderColor",
+      "bc": "borderColor",
       "br": "borderRadius",
       "bs": "borderStyle",
       "brw": "borderRightWidth",
@@ -36963,6 +36935,230 @@
     },
     "tokens": {
       "color": {
+        "white0": {
+          "isVar": true,
+          "key": "$white0",
+          "name": "c-white0",
+          "val": "rgba(255,255,255,0)",
+          "variable": ""
+        },
+        "white075": {
+          "isVar": true,
+          "key": "$white075",
+          "name": "c-white075",
+          "val": "rgba(255,255,255,0.75)",
+          "variable": ""
+        },
+        "white05": {
+          "isVar": true,
+          "key": "$white05",
+          "name": "c-white05",
+          "val": "rgba(255,255,255,0.5)",
+          "variable": ""
+        },
+        "white025": {
+          "isVar": true,
+          "key": "$white025",
+          "name": "c-white025",
+          "val": "rgba(255,255,255,0.25)",
+          "variable": ""
+        },
+        "black0": {
+          "isVar": true,
+          "key": "$black0",
+          "name": "c-black0",
+          "val": "rgba(10,10,10,0)",
+          "variable": ""
+        },
+        "black075": {
+          "isVar": true,
+          "key": "$black075",
+          "name": "c-black075",
+          "val": "rgba(10,10,10,0.75)",
+          "variable": ""
+        },
+        "black05": {
+          "isVar": true,
+          "key": "$black05",
+          "name": "c-black05",
+          "val": "rgba(10,10,10,0.5)",
+          "variable": ""
+        },
+        "black025": {
+          "isVar": true,
+          "key": "$black025",
+          "name": "c-black025",
+          "val": "rgba(10,10,10,0.25)",
+          "variable": ""
+        },
+        "white1": {
+          "isVar": true,
+          "key": "$white1",
+          "name": "c-white1",
+          "val": "#fff",
+          "variable": ""
+        },
+        "white2": {
+          "isVar": true,
+          "key": "$white2",
+          "name": "c-white2",
+          "val": "#f8f8f8",
+          "variable": ""
+        },
+        "white3": {
+          "isVar": true,
+          "key": "$white3",
+          "name": "c-white3",
+          "val": "hsl(0, 0%, 96.3%)",
+          "variable": ""
+        },
+        "white4": {
+          "isVar": true,
+          "key": "$white4",
+          "name": "c-white4",
+          "val": "hsl(0, 0%, 94.1%)",
+          "variable": ""
+        },
+        "white5": {
+          "isVar": true,
+          "key": "$white5",
+          "name": "c-white5",
+          "val": "hsl(0, 0%, 92.0%)",
+          "variable": ""
+        },
+        "white6": {
+          "isVar": true,
+          "key": "$white6",
+          "name": "c-white6",
+          "val": "hsl(0, 0%, 90.0%)",
+          "variable": ""
+        },
+        "white7": {
+          "isVar": true,
+          "key": "$white7",
+          "name": "c-white7",
+          "val": "hsl(0, 0%, 88.5%)",
+          "variable": ""
+        },
+        "white8": {
+          "isVar": true,
+          "key": "$white8",
+          "name": "c-white8",
+          "val": "hsl(0, 0%, 81.0%)",
+          "variable": ""
+        },
+        "white9": {
+          "isVar": true,
+          "key": "$white9",
+          "name": "c-white9",
+          "val": "hsl(0, 0%, 56.1%)",
+          "variable": ""
+        },
+        "white10": {
+          "isVar": true,
+          "key": "$white10",
+          "name": "c-white10",
+          "val": "hsl(0, 0%, 50.3%)",
+          "variable": ""
+        },
+        "white11": {
+          "isVar": true,
+          "key": "$white11",
+          "name": "c-white11",
+          "val": "hsl(0, 0%, 42.5%)",
+          "variable": ""
+        },
+        "white12": {
+          "isVar": true,
+          "key": "$white12",
+          "name": "c-white12",
+          "val": "hsl(0, 0%, 9.0%)",
+          "variable": ""
+        },
+        "black1": {
+          "isVar": true,
+          "key": "$black1",
+          "name": "c-black1",
+          "val": "#050505",
+          "variable": ""
+        },
+        "black2": {
+          "isVar": true,
+          "key": "$black2",
+          "name": "c-black2",
+          "val": "#151515",
+          "variable": ""
+        },
+        "black3": {
+          "isVar": true,
+          "key": "$black3",
+          "name": "c-black3",
+          "val": "#191919",
+          "variable": ""
+        },
+        "black4": {
+          "isVar": true,
+          "key": "$black4",
+          "name": "c-black4",
+          "val": "#232323",
+          "variable": ""
+        },
+        "black5": {
+          "isVar": true,
+          "key": "$black5",
+          "name": "c-black5",
+          "val": "#282828",
+          "variable": ""
+        },
+        "black6": {
+          "isVar": true,
+          "key": "$black6",
+          "name": "c-black6",
+          "val": "#323232",
+          "variable": ""
+        },
+        "black7": {
+          "isVar": true,
+          "key": "$black7",
+          "name": "c-black7",
+          "val": "#424242",
+          "variable": ""
+        },
+        "black8": {
+          "isVar": true,
+          "key": "$black8",
+          "name": "c-black8",
+          "val": "#494949",
+          "variable": ""
+        },
+        "black9": {
+          "isVar": true,
+          "key": "$black9",
+          "name": "c-black9",
+          "val": "#545454",
+          "variable": ""
+        },
+        "black10": {
+          "isVar": true,
+          "key": "$black10",
+          "name": "c-black10",
+          "val": "#626262",
+          "variable": ""
+        },
+        "black11": {
+          "isVar": true,
+          "key": "$black11",
+          "name": "c-black11",
+          "val": "#a5a5a5",
+          "variable": ""
+        },
+        "black12": {
+          "isVar": true,
+          "key": "$black12",
+          "name": "c-black12",
+          "val": "#fff",
+          "variable": ""
+        },
         "blue1Light": {
           "isVar": true,
           "key": "$blue1Light",
@@ -39072,6 +39268,7 @@
       },
       "themeClassNameOnRoot": true,
       "webContainerType": "inline-size",
+      "fastSchemeChange": true,
       "shouldAddPrefersColorThemes": true
     },
     "unset": {
@@ -39102,7 +39299,7 @@
       "borderBottomWidth": "bbw",
       "borderLeftColor": "blc",
       "borderLeftWidth": "blw",
-      "borderColor": "boc",
+      "borderColor": "bc",
       "borderRadius": "br",
       "borderStyle": "bs",
       "borderRightWidth": "brw",
@@ -39165,6 +39362,230 @@
     "defaultFont": "body",
     "fontSizeTokens": {},
     "specificTokens": {
+      "$color.white0": {
+        "isVar": true,
+        "key": "$white0",
+        "name": "c-white0",
+        "val": "rgba(255,255,255,0)",
+        "variable": ""
+      },
+      "$color.white075": {
+        "isVar": true,
+        "key": "$white075",
+        "name": "c-white075",
+        "val": "rgba(255,255,255,0.75)",
+        "variable": ""
+      },
+      "$color.white05": {
+        "isVar": true,
+        "key": "$white05",
+        "name": "c-white05",
+        "val": "rgba(255,255,255,0.5)",
+        "variable": ""
+      },
+      "$color.white025": {
+        "isVar": true,
+        "key": "$white025",
+        "name": "c-white025",
+        "val": "rgba(255,255,255,0.25)",
+        "variable": ""
+      },
+      "$color.black0": {
+        "isVar": true,
+        "key": "$black0",
+        "name": "c-black0",
+        "val": "rgba(10,10,10,0)",
+        "variable": ""
+      },
+      "$color.black075": {
+        "isVar": true,
+        "key": "$black075",
+        "name": "c-black075",
+        "val": "rgba(10,10,10,0.75)",
+        "variable": ""
+      },
+      "$color.black05": {
+        "isVar": true,
+        "key": "$black05",
+        "name": "c-black05",
+        "val": "rgba(10,10,10,0.5)",
+        "variable": ""
+      },
+      "$color.black025": {
+        "isVar": true,
+        "key": "$black025",
+        "name": "c-black025",
+        "val": "rgba(10,10,10,0.25)",
+        "variable": ""
+      },
+      "$color.white1": {
+        "isVar": true,
+        "key": "$white1",
+        "name": "c-white1",
+        "val": "#fff",
+        "variable": ""
+      },
+      "$color.white2": {
+        "isVar": true,
+        "key": "$white2",
+        "name": "c-white2",
+        "val": "#f8f8f8",
+        "variable": ""
+      },
+      "$color.white3": {
+        "isVar": true,
+        "key": "$white3",
+        "name": "c-white3",
+        "val": "hsl(0, 0%, 96.3%)",
+        "variable": ""
+      },
+      "$color.white4": {
+        "isVar": true,
+        "key": "$white4",
+        "name": "c-white4",
+        "val": "hsl(0, 0%, 94.1%)",
+        "variable": ""
+      },
+      "$color.white5": {
+        "isVar": true,
+        "key": "$white5",
+        "name": "c-white5",
+        "val": "hsl(0, 0%, 92.0%)",
+        "variable": ""
+      },
+      "$color.white6": {
+        "isVar": true,
+        "key": "$white6",
+        "name": "c-white6",
+        "val": "hsl(0, 0%, 90.0%)",
+        "variable": ""
+      },
+      "$color.white7": {
+        "isVar": true,
+        "key": "$white7",
+        "name": "c-white7",
+        "val": "hsl(0, 0%, 88.5%)",
+        "variable": ""
+      },
+      "$color.white8": {
+        "isVar": true,
+        "key": "$white8",
+        "name": "c-white8",
+        "val": "hsl(0, 0%, 81.0%)",
+        "variable": ""
+      },
+      "$color.white9": {
+        "isVar": true,
+        "key": "$white9",
+        "name": "c-white9",
+        "val": "hsl(0, 0%, 56.1%)",
+        "variable": ""
+      },
+      "$color.white10": {
+        "isVar": true,
+        "key": "$white10",
+        "name": "c-white10",
+        "val": "hsl(0, 0%, 50.3%)",
+        "variable": ""
+      },
+      "$color.white11": {
+        "isVar": true,
+        "key": "$white11",
+        "name": "c-white11",
+        "val": "hsl(0, 0%, 42.5%)",
+        "variable": ""
+      },
+      "$color.white12": {
+        "isVar": true,
+        "key": "$white12",
+        "name": "c-white12",
+        "val": "hsl(0, 0%, 9.0%)",
+        "variable": ""
+      },
+      "$color.black1": {
+        "isVar": true,
+        "key": "$black1",
+        "name": "c-black1",
+        "val": "#050505",
+        "variable": ""
+      },
+      "$color.black2": {
+        "isVar": true,
+        "key": "$black2",
+        "name": "c-black2",
+        "val": "#151515",
+        "variable": ""
+      },
+      "$color.black3": {
+        "isVar": true,
+        "key": "$black3",
+        "name": "c-black3",
+        "val": "#191919",
+        "variable": ""
+      },
+      "$color.black4": {
+        "isVar": true,
+        "key": "$black4",
+        "name": "c-black4",
+        "val": "#232323",
+        "variable": ""
+      },
+      "$color.black5": {
+        "isVar": true,
+        "key": "$black5",
+        "name": "c-black5",
+        "val": "#282828",
+        "variable": ""
+      },
+      "$color.black6": {
+        "isVar": true,
+        "key": "$black6",
+        "name": "c-black6",
+        "val": "#323232",
+        "variable": ""
+      },
+      "$color.black7": {
+        "isVar": true,
+        "key": "$black7",
+        "name": "c-black7",
+        "val": "#424242",
+        "variable": ""
+      },
+      "$color.black8": {
+        "isVar": true,
+        "key": "$black8",
+        "name": "c-black8",
+        "val": "#494949",
+        "variable": ""
+      },
+      "$color.black9": {
+        "isVar": true,
+        "key": "$black9",
+        "name": "c-black9",
+        "val": "#545454",
+        "variable": ""
+      },
+      "$color.black10": {
+        "isVar": true,
+        "key": "$black10",
+        "name": "c-black10",
+        "val": "#626262",
+        "variable": ""
+      },
+      "$color.black11": {
+        "isVar": true,
+        "key": "$black11",
+        "name": "c-black11",
+        "val": "#a5a5a5",
+        "variable": ""
+      },
+      "$color.black12": {
+        "isVar": true,
+        "key": "$black12",
+        "name": "c-black12",
+        "val": "#fff",
+        "variable": ""
+      },
       "$color.blue1Light": {
         "isVar": true,
         "key": "$blue1Light",

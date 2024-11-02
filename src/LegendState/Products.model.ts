@@ -16,7 +16,7 @@ export class ProductsModel {
 	}
 
 	getProductsList = async () => {
-		const products = await Effect.runPromise(getProducts({}));
+		const products = await Effect.runPromise(getProducts());
 		this.products.set(products);
 	};
 

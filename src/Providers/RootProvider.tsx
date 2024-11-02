@@ -15,7 +15,7 @@ export const RootProvider = ({ children }: { children: React.ReactNode }) => {
 		<SafeAreaProvider>
 			<TamaguiProvider
 				config={config}
-				defaultTheme={colorScheme === "dark" ? "dark_green" : "light_green"}
+				defaultTheme={colorScheme === "dark" ? "dark_blue" : "light_blue"}
 				disableInjectCSS
 			>
 				<NavigationThemeProvider

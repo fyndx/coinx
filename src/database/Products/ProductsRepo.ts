@@ -3,7 +3,7 @@ import { type InsertProduct, products as productsRepo } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
-export const getProducts = ({}) => {
+export const getProducts = () => {
 	return Effect.promise(() => {
 		const query = database
 			.select({
@@ -17,12 +17,45 @@ export const getProducts = ({}) => {
 	});
 };
 
+export const findProductById = ({ id }: { id: number }) => {
+	return Effect.promise(() => {
+		const query = database
+			.select({
+				id: productsRepo.id,
+				name: productsRepo.name,
+				defaultUnitCategory: productsRepo.defaultUnitCategory,
+			})
+			.from(productsRepo)
+			.where(eq(productsRepo.id, id));
+
+		return query.execute();
+	});
+};
+
+export const findProductByName = ({ name }: { name: string }) => {
+	return Effect.promise(() => {
+		const query = database
+			.select({
+				id: productsRepo.id,
+				name: productsRepo.name,
+				defaultUnitCategory: productsRepo.defaultUnitCategory,
+			})
+			.from(productsRepo)
+			.where(eq(productsRepo.name, name));
+
+		return query.execute();
+	});
+};
+
 export const addProduct = ({ name, defaultUnitCategory }: InsertProduct) => {
 	return Effect.promise(() => {
-		const query = database.insert(productsRepo).values({
-			name,
-			defaultUnitCategory,
-		});
+		const query = database
+			.insert(productsRepo)
+			.values({
+				name,
+				defaultUnitCategory,
+			})
+			.returning();
 
 		return query.execute();
 	});
