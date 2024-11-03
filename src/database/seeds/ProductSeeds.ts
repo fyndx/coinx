@@ -27,5 +27,10 @@ const generateRandomProduct = (): InsertProduct => {
 export const generateRandomProducts = ({
 	count,
 }: { count: number }): InsertProduct[] => {
+	if (!Number.isInteger(count) || count < 0 || count > 1000) {
+		throw new Error(
+			"Count must be a positive integer less than or equal to 1000",
+		);
+	}
 	return Array.from({ length: count }).map(() => generateRandomProduct());
 };

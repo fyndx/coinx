@@ -36,3 +36,11 @@ export const addProductListing = (productListing: InsertProductListing) => {
 		return query.execute();
 	});
 };
+
+export const deleteAllProductListings = () => {
+	return Effect.promise(() => {
+		const query = database.delete(productsListingsRepo);
+
+		return query.execute();
+	});
+};

@@ -11,6 +11,7 @@ import { type ObservableObject, observable } from "@legendapp/state";
 import { Value } from "@sinclair/typebox/value";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
+import { router } from "expo-router";
 
 export class AddProductDetailsModel {
 	product;
@@ -51,6 +52,7 @@ export class AddProductDetailsModel {
 		if (isProductListingValid) {
 			Effect.runPromise(addProductListing(productListing));
 			Burnt.toast({ title: "Product added successfully" });
+			router.back();
 			return;
 		}
 

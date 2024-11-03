@@ -38,6 +38,10 @@ const PlaygroundScreen = () => {
 		rootStore.productsModel.deleteAllProducts();
 	};
 
+	const clearProductListings = () => {
+		rootStore.productsListingsModel.deleteAllProductListings();
+	};
+
 	return (
 		<YStack padding={"$2"}>
 			<H3>{"Creation"}</H3>
@@ -89,6 +93,15 @@ const PlaygroundScreen = () => {
 						theme={"red"}
 						subTitle={"This action cannot be undone"}
 						onPress={clearProducts}
+					/>
+				</YGroup.Item>
+				<YGroup.Item>
+					<ListItem
+						title={"Clear All Product Listings"}
+						icon={Delete}
+						theme={"red"}
+						subTitle={"This action cannot be undone"}
+						onPress={clearProductListings}
 					/>
 				</YGroup.Item>
 			</YGroup>

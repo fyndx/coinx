@@ -1,10 +1,11 @@
+import { ProductListingTable } from "@/src/Containers/ProductListings/Containers/ProductListingTable";
 import { rootStore } from "@/src/LegendState";
 import { useMount } from "@legendapp/state/react";
 import { Construction, PlusCircle } from "@tamagui/lucide-icons";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Circle, YStack } from "tamagui";
+import { Circle, Text, XStack, YStack } from "tamagui";
 
 const ProductDetails = () => {
 	const { id, name } = useLocalSearchParams();
@@ -12,8 +13,11 @@ const ProductDetails = () => {
 	const productListing$ = rootStore.productsListingsModel;
 
 	useMount(() => {
-		productListing$.getProductListings();
 		productListing$.getProductListingsById(Number(id));
+
+		return () => {
+			productListing$.reset();
+		};
 	});
 
 	return (
@@ -21,8 +25,8 @@ const ProductDetails = () => {
 			<Stack.Screen
 				options={{ headerTitle: (name as string) ?? "Product Details" }}
 			/>
-			<YStack flex={1}>
-				<Construction size={64} />
+			<YStack flex={1} padding={"$3"} backgroundColor={"$background"}>
+				<ProductListingTable data={productListing$.productListingsTable} />
 			</YStack>
 			<Circle
 				position="absolute"
@@ -46,3 +50,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 });
+
+// {productListing$.productListings.get().map((product) => (
+// 	<XStack key={product.id} gap={"$2"}>
+// 		<Text>{product.name}</Text>
+// 		<Text>{product.price}</Text>
+// 		{/* Price per unit */}
+// 		<Text>{`${(product.price / product.quantity).toFixed(2)} per ${product.unit}`}</Text>
+// 		<Text>{`${product.quantity} ${product.unit} `}</Text>
+// 	</XStack>
+// ))}
