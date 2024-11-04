@@ -9,11 +9,12 @@ import { Circle, Text, XStack, YStack } from "tamagui";
 
 const ProductDetails = () => {
 	const { id, name } = useLocalSearchParams();
+	const productId = Number(id);
 
-	const productListing$ = rootStore.productsListingsModel;
+	const { productsListingsModel: productListing$ } = rootStore;
 
 	useMount(() => {
-		productListing$.getProductListingsById(Number(id));
+		productListing$.getProductListingsById(productId);
 
 		return () => {
 			productListing$.reset();
@@ -34,6 +35,9 @@ const ProductDetails = () => {
 				bottom={"$6"}
 				backgroundColor={"$blue10Light"}
 				padding={"$1"}
+				// biome-ignore lint/a11y/useSemanticElements: react-native does not have a semantic element for a button
+				role={"button"}
+				aria-label={"Add Product Details"}
 			>
 				<Link href={{ pathname: "/add-product-details", params: { id, name } }}>
 					<PlusCircle size={"$4"} color="white" />
@@ -50,13 +54,3 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 });
-
-// {productListing$.productListings.get().map((product) => (
-// 	<XStack key={product.id} gap={"$2"}>
-// 		<Text>{product.name}</Text>
-// 		<Text>{product.price}</Text>
-// 		{/* Price per unit */}
-// 		<Text>{`${(product.price / product.quantity).toFixed(2)} per ${product.unit}`}</Text>
-// 		<Text>{`${product.quantity} ${product.unit} `}</Text>
-// 	</XStack>
-// ))}

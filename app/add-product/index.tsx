@@ -17,7 +17,10 @@ const AddProduct = observer(() => {
 		addProductScreenModel$.product.defaultUnitCategory.set(value);
 	};
 
+	const isAddProductInProgress = addProductScreenModel$.isLoading.get();
+
 	return (
+		// TODO: Add error messages for input and select
 		<SafeAreaView style={styles.container}>
 			<YStack
 				flex={1}
@@ -29,11 +32,16 @@ const AddProduct = observer(() => {
 					<Input
 						placeholder={"Product Name"}
 						onChangeText={handleProductNameChange}
+						disabled={isAddProductInProgress}
 					/>
 					{/* Default Unit Select */}
 					<DefaultUnitSelect onValueChange={handleUnitCategoryChange} />
 				</YStack>
-				<Button onPress={addProductScreenModel$.addProduct}>
+				<Button
+					onPress={addProductScreenModel$.addProduct}
+					// TODO: Disable Button unless input and select is valid
+					disabled={isAddProductInProgress}
+				>
 					{"Add Product"}
 				</Button>
 			</YStack>

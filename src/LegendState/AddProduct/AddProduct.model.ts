@@ -15,6 +15,7 @@ interface AddProductDraft {
 }
 
 export class AddProductScreenModel {
+	isLoading;
 	product: ObservableObject<AddProductDraft>;
 
 	constructor() {
@@ -24,10 +25,10 @@ export class AddProductScreenModel {
 				| (typeof UnitCategory)[number]
 				| undefined,
 		});
+		this.isLoading = observable(false);
 	}
 
 	addProduct = async () => {
-		console.log("entered addProduct");
 		const product = this.product.peek();
 		// product object checks
 		if (!product.name) {
@@ -40,39 +41,45 @@ export class AddProductScreenModel {
 			return;
 		}
 
-		console.log("product checks passed");
+		this.isLoading.set(true);
 
-		// Check if the product already exists in the database
-		const existingProduct = await Effect.runPromise(
-			findProductByName({ name: product.name }),
-		);
+		try {
+			if (this.isLoading.peek()) return;
+			// Check if the product already exists in the database
+			const existingProduct = await Effect.runPromise(
+				findProductByName({ name: product.name }),
+			);
 
-		if (existingProduct.length > 0) {
-			// Product already exists
-			Burnt.toast({ title: "Product already exists" });
-			return;
-		}
+			if (existingProduct.length > 0) {
+				// Product already exists
+				Burnt.toast({ title: "Product already exists" });
+				return;
+			}
 
-		console.log("product does not exist in the database");
+			const createdProduct = await Effect.runPromise(
+				addProduct({
+					name: product.name,
+					defaultUnitCategory:
+						product.defaultUnitCategory as InsertProduct["defaultUnitCategory"],
+				}),
+			);
 
-		const createdProduct = await Effect.runPromise(
-			addProduct({
-				name: product.name,
-				defaultUnitCategory:
-					product.defaultUnitCategory as InsertProduct["defaultUnitCategory"],
-			}),
-		);
-
-		if (createdProduct.length > 0) {
-			Burnt.toast({ title: "Product added successfully" });
-			this.product.set({
-				name: "",
-				defaultUnitCategory: undefined,
+			if (createdProduct.length > 0) {
+				Burnt.toast({ title: "Product added successfully" });
+				this.product.set({
+					name: "",
+					defaultUnitCategory: undefined,
+				});
+			}
+		} catch (error) {
+			Burnt.toast({
+				title: "An error occurred",
+				message: error instanceof Error ? error.message : "Unknown error",
 			});
+		} finally {
+			this.isLoading.set(false);
 		}
 
 		router.back();
-
-		console.log("product added successfully");
 	};
 }

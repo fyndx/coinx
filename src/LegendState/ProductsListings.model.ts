@@ -6,14 +6,14 @@ import {
 	getProductsListings,
 } from "@/src/database/Products/ProductsListingsRepo";
 import { faker } from "@faker-js/faker";
-import { computed, observable } from "@legendapp/state";
+import { type Observable, computed, observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 
 export class ProductsListingsModel {
-	productListings;
+	productListings: Observable<SelectProductListing[]>;
 	constructor() {
-		this.productListings = observable<SelectProductListing[]>([]);
+		this.productListings = observable([]);
 	}
 
 	// @Actions
