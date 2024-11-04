@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "61b8a81b-2e02-44ba-890f-51f219fd9729",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1fa429bb-6672-4de2-a6c5-1f3a3b0b8e3f",
+  "prevId": "61b8a81b-2e02-44ba-890f-51f219fd9729",
   "tables": {
     "category": {
       "name": "category",
@@ -115,6 +115,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "location": {

@@ -55,22 +55,7 @@ export const MonthYearPicker = observer(
 							<Text>{transactionsScreenModel$.selectedTimeRange.get()}</Text>
 						</Button>
 					</Popover.Trigger>
-					<Popover.Content
-						borderWidth={1}
-						borderColor="$borderColor"
-						enterStyle={{ y: -10, opacity: 0 }}
-						exitStyle={{ y: -10, opacity: 0 }}
-						elevate
-						animation={[
-							"quick",
-							{
-								opacity: {
-									overshootClamping: true,
-								},
-							},
-						]}
-						marginHorizontal={"$6"}
-					>
+					<Popover.Content marginHorizontal={"$6"}>
 						<Popover.Arrow borderWidth={1} borderColor="$borderColor" />
 						<YStack>
 							{/* Year Row */}

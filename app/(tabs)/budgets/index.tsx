@@ -12,7 +12,7 @@ const Budgets = () => {
 					size={"$4"}
 					color={"$color.yellow8Light"}
 				/>
-				<H1 textAlign={"center"}>{"Coming Soon"}</H1>
+				<H1 textAlign={"center"}>{"Budgets Coming Soon"}</H1>
 				<Text textAlign={"center"}>
 					{"This feature is currently in development"}
 				</Text>
