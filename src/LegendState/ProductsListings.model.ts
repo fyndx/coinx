@@ -26,7 +26,6 @@ export class ProductsListingsModel {
 	getProductListingsById = async (id: number) => {
 		const productListings = await Effect.runPromise(getProductListingsById(id));
 		this.productListings.set(productListings);
-		console.log("productListings", productListings);
 	};
 
 	reset = () => {

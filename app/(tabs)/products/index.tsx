@@ -36,8 +36,6 @@ const Products = observer(() => {
 		}, []),
 	);
 
-	console.log(rootStore.productsModel.products.get());
-
 	return (
 		<SafeAreaView style={styles.container}>
 			{/* TODO: Search */}

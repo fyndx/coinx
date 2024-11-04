@@ -81,7 +81,6 @@ export default function RootLayout() {
 				name={"add-transaction-link/index"}
 				listeners={({ navigation }) => ({
 					tabPress: (e) => {
-						console.log("tabPress", e);
 						e.preventDefault();
 						navigation.navigate("add-transaction/index");
 					},

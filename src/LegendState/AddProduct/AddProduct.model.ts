@@ -29,6 +29,8 @@ export class AddProductScreenModel {
 	}
 
 	addProduct = async () => {
+		if (this.isLoading.peek()) return;
+
 		const product = this.product.peek();
 		// product object checks
 		if (!product.name) {
@@ -44,7 +46,6 @@ export class AddProductScreenModel {
 		this.isLoading.set(true);
 
 		try {
-			if (this.isLoading.peek()) return;
 			// Check if the product already exists in the database
 			const existingProduct = await Effect.runPromise(
 				findProductByName({ name: product.name }),
@@ -70,6 +71,7 @@ export class AddProductScreenModel {
 					name: "",
 					defaultUnitCategory: undefined,
 				});
+				router.back();
 			}
 		} catch (error) {
 			Burnt.toast({
@@ -79,7 +81,5 @@ export class AddProductScreenModel {
 		} finally {
 			this.isLoading.set(false);
 		}
-
-		router.back();
 	};
 }

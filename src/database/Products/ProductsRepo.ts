@@ -48,6 +48,7 @@ export const findProductByName = ({ name }: { name: string }) => {
 };
 
 export const addProduct = ({ name, defaultUnitCategory }: InsertProduct) => {
+	// TODO: check if the product already exists by using name
 	return Effect.promise(() => {
 		const query = database
 			.insert(productsRepo)
@@ -63,7 +64,10 @@ export const addProduct = ({ name, defaultUnitCategory }: InsertProduct) => {
 
 export const deleteProduct = ({ id }: { id: number }) => {
 	return Effect.promise(() => {
-		const query = database.delete(productsRepo).where(eq(productsRepo.id, id));
+		const query = database
+			.delete(productsRepo)
+			.where(eq(productsRepo.id, id))
+			.returning();
 
 		return query.execute();
 	});

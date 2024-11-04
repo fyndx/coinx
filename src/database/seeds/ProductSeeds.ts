@@ -1,26 +1,26 @@
 import type { InsertProduct } from "@/db/schema";
 import { faker } from "@faker-js/faker";
 
+const UNIT_CATEGORIES = ["weight", "volume", "quantity"];
+
+const PRODUCT_NAMES = [
+	"Milk",
+	"Tooth Paste",
+	"Carrots",
+	"Bread",
+	"Butter",
+	"Cheese",
+	"Apples",
+	"Bananas",
+	"Oranges",
+	"Pomagranate",
+	"Curd",
+];
+
 const generateRandomProduct = (): InsertProduct => {
 	return {
-		name: faker.helpers.arrayElement([
-			"Milk",
-			"Tooth Paste",
-			"Carrots",
-			"Bread",
-			"Butter",
-			"Cheese",
-			"Apples",
-			"Bananas",
-			"Oranges",
-			"Pomagranate",
-			"Curd",
-		]),
-		defaultUnitCategory: faker.helpers.arrayElement([
-			"weight",
-			"volume",
-			"quantity",
-		]),
+		name: faker.helpers.arrayElement(PRODUCT_NAMES),
+		defaultUnitCategory: faker.helpers.arrayElement(UNIT_CATEGORIES),
 	};
 };
 

@@ -12,7 +12,12 @@ const AddProductDetails = observer(() => {
 	const productModel$ = rootStore.addProductDetailsModel;
 
 	useMount(() => {
-		productModel$.getProductById(Number(id));
+		const productId = Number(id);
+		if (Number.isNaN(productId)) {
+			return;
+		}
+
+		productModel$.getProductById(productId);
 
 		return () => {
 			productModel$.reset();
@@ -46,6 +51,7 @@ const AddProductDetails = observer(() => {
 					<Input
 						placeholder="Product Name *"
 						size={"$5"}
+						aria-label={"Product Name"}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.name.set(text.trim())
 						}

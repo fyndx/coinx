@@ -1,7 +1,6 @@
 import type { ObservableComputed } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
 import { useMemo } from "react";
-import { Row, Rows, Table, TableWrapper } from "react-native-reanimated-table";
 import { ScrollView, Text, XStack, YStack, getTokens, useTheme } from "tamagui";
 
 interface ProductListingTableProps {
@@ -44,7 +43,13 @@ export const ProductListingTable = observer(
 
 		if (data?.length === 0) {
 			return (
-				<YStack flex={1} alignItems={"center"} justifyContent={"center"}>
+				<YStack
+					flex={1}
+					alignItems={"center"}
+					justifyContent={"center"}
+					role="alert"
+					aria-label="No products available"
+				>
 					<Text>Add a few Products</Text>
 				</YStack>
 			);

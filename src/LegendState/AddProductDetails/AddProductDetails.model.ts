@@ -36,7 +36,6 @@ export class AddProductDetailsModel {
 			this.product.defaultUnitCategory.get() as keyof typeof UnitConversions;
 		const unitsList = Object.keys(UnitConversions[defaultUnit]);
 		this.units.set(unitsList);
-		console.log("unitsList", unitsList);
 	};
 
 	addProductDetails = async () => {
