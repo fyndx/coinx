@@ -1,4 +1,4 @@
-import { UnitCategory } from "@/src/utils/units";
+import { MeasurementUnits } from "@/src/utils/units";
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
 import { Adapt, Select, Sheet, YStack } from "tamagui";
 import { LinearGradient } from "tamagui/linear-gradient";
@@ -71,9 +71,13 @@ export const DefaultUnitSelect = ({
 					minWidth={200}
 				>
 					<Select.Group>
-						{UnitCategory.map((category, i) => (
-							<Select.Item index={i} key={category} value={category}>
-								<Select.ItemText>{category}</Select.ItemText>
+						{MeasurementUnits.map((measurementUnit, i) => (
+							<Select.Item
+								index={i}
+								key={measurementUnit}
+								value={measurementUnit}
+							>
+								<Select.ItemText>{measurementUnit}</Select.ItemText>
 								<Select.ItemIndicator marginLeft="auto">
 									<Check size={16} />
 								</Select.ItemIndicator>

@@ -3,7 +3,7 @@ import {
 	addProduct,
 	findProductByName,
 } from "@/src/database/Products/ProductsRepo";
-import type { UnitCategory } from "@/src/utils/units";
+import type { MeasurementUnits } from "@/src/utils/units";
 import { type ObservableObject, observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
@@ -11,7 +11,7 @@ import { router } from "expo-router";
 
 interface AddProductDraft {
 	name: string;
-	defaultUnitCategory?: (typeof UnitCategory)[number];
+	defaultUnitCategory?: (typeof MeasurementUnits)[number];
 }
 
 export class AddProductScreenModel {
@@ -22,7 +22,7 @@ export class AddProductScreenModel {
 		this.product = observable({
 			name: "",
 			defaultUnitCategory: undefined as
-				| (typeof UnitCategory)[number]
+				| (typeof MeasurementUnits)[number]
 				| undefined,
 		});
 		this.isLoading = observable(false);

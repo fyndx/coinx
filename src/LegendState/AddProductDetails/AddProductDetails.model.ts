@@ -6,7 +6,7 @@ import {
 } from "@/db/schema";
 import { addProductListing } from "@/src/database/Products/ProductsListingsRepo";
 import { findProductById } from "@/src/database/Products/ProductsRepo";
-import { UnitConversions } from "@/src/utils/units";
+import { convert } from "@/src/utils/units";
 import { type ObservableObject, observable } from "@legendapp/state";
 import { Value } from "@sinclair/typebox/value";
 import * as Burnt from "burnt";
@@ -32,9 +32,8 @@ export class AddProductDetailsModel {
 	};
 
 	addUnitsForProduct = () => {
-		const defaultUnit =
-			this.product.defaultUnitCategory.get() as keyof typeof UnitConversions;
-		const unitsList = Object.keys(UnitConversions[defaultUnit]);
+		const defaultUnit = this.product.defaultUnitCategory.peek();
+		const unitsList = convert().possibilities(defaultUnit);
 		this.units.set(unitsList);
 	};
 
