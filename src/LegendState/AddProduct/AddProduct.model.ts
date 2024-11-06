@@ -33,11 +33,18 @@ export class AddProductScreenModel {
 			return "Product name is required";
 		}
 
+		if (product.name.trim().length < 2) {
+			return "Product name must be at least 2 characters long";
+		}
+		if (product.name.trim().length > 50) {
+			return "Product name must not exceed 50 characters";
+		}
+
 		if (
 			product.defaultUnitCategory === undefined ||
 			!isValidUnitCategory(product.defaultUnitCategory)
 		) {
-			return "Default unit category is required";
+			return "Please select a valid measurement unit";
 		}
 
 		return null;

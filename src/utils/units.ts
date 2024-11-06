@@ -27,8 +27,5 @@ export const MeasurementUnits = convert().measures();
 export const isValidUnitCategory = (
 	unit: (typeof MeasurementUnits)[number],
 ) => {
-	if (!MeasurementUnits.includes(unit)) {
-		return false;
-	}
-	return true; // Replace with actual validation
+	return MeasurementUnits.includes(unit);
 };
