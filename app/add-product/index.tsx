@@ -33,6 +33,7 @@ const AddProduct = observer(() => {
 						placeholder={"Product Name"}
 						onChangeText={handleProductNameChange}
 						disabled={isAddProductInProgress}
+						autoFocus
 					/>
 					{/* Default Unit Select */}
 					<DefaultUnitSelect onValueChange={handleUnitCategoryChange} />
