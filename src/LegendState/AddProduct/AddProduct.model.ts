@@ -3,7 +3,7 @@ import {
 	addProduct,
 	findProductByName,
 } from "@/src/database/Products/ProductsRepo";
-import type { MeasurementUnits } from "@/src/utils/units";
+import { type MeasurementUnits, isValidUnitCategory } from "@/src/utils/units";
 import { type ObservableObject, observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
@@ -28,18 +28,29 @@ export class AddProductScreenModel {
 		this.isLoading = observable(false);
 	}
 
+	private validateProduct(product: AddProductDraft) {
+		if (!product.name) {
+			return "Product name is required";
+		}
+
+		if (
+			product.defaultUnitCategory === undefined ||
+			!isValidUnitCategory(product.defaultUnitCategory)
+		) {
+			return "Default unit category is required";
+		}
+
+		return null;
+	}
+
 	addProduct = async () => {
 		if (this.isLoading.peek()) return;
 
 		const product = this.product.peek();
 		// product object checks
-		if (!product.name) {
-			Burnt.toast({ title: "Product name is required" });
-			return;
-		}
-
-		if (!product.defaultUnitCategory) {
-			Burnt.toast({ title: "Default unit category is required" });
+		const validationError = this.validateProduct(product);
+		if (validationError) {
+			Burnt.toast({ title: validationError });
 			return;
 		}
 
@@ -60,8 +71,7 @@ export class AddProductScreenModel {
 			const createdProduct = await Effect.runPromise(
 				addProduct({
 					name: product.name,
-					defaultUnitCategory:
-						product.defaultUnitCategory as InsertProduct["defaultUnitCategory"],
+					defaultUnitCategory: product.defaultUnitCategory,
 				}),
 			);
 

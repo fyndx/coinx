@@ -4,7 +4,7 @@ import { Adapt, Select, Sheet, YStack } from "tamagui";
 import { LinearGradient } from "tamagui/linear-gradient";
 
 interface DefaultUnitSelectProps {
-	onValueChange?: (value: string) => void;
+	onValueChange?: (value: (typeof MeasurementUnits)[number]) => void;
 }
 
 export const DefaultUnitSelect = ({
@@ -12,7 +12,7 @@ export const DefaultUnitSelect = ({
 }: DefaultUnitSelectProps) => {
 	return (
 		<Select
-			onValueChange={(value) => {
+			onValueChange={(value: (typeof MeasurementUnits)[number]) => {
 				onValueChange?.(value);
 			}}
 		>
