@@ -27,6 +27,7 @@
     "@tamagui/lucide-icons": "^1.116.12",
     "@tamagui/toast": "^1.116.12",
     "burnt": "^0.12.2",
+    "convert-units": "^3.0.0-beta.7",
     "dayjs": "^1.11.13",
     "drizzle-orm": "^0.36.0",
     "drizzle-typebox": "^0.1.1",

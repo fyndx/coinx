@@ -3,7 +3,7 @@ import {
 	addProduct,
 	findProductByName,
 } from "@/src/database/Products/ProductsRepo";
-import type { UnitCategory } from "@/src/utils/units";
+import { type MeasurementUnits, isValidUnitCategory } from "@/src/utils/units";
 import { type ObservableObject, observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
@@ -11,7 +11,7 @@ import { router } from "expo-router";
 
 interface AddProductDraft {
 	name: string;
-	defaultUnitCategory?: (typeof UnitCategory)[number];
+	defaultUnitCategory?: (typeof MeasurementUnits)[number];
 }
 
 export class AddProductScreenModel {
@@ -22,10 +22,32 @@ export class AddProductScreenModel {
 		this.product = observable({
 			name: "",
 			defaultUnitCategory: undefined as
-				| (typeof UnitCategory)[number]
+				| (typeof MeasurementUnits)[number]
 				| undefined,
 		});
 		this.isLoading = observable(false);
+	}
+
+	private validateProduct(product: AddProductDraft) {
+		if (!product.name) {
+			return "Product name is required";
+		}
+
+		if (product.name.trim().length < 2) {
+			return "Product name must be at least 2 characters long";
+		}
+		if (product.name.trim().length > 50) {
+			return "Product name must not exceed 50 characters";
+		}
+
+		if (
+			product.defaultUnitCategory === undefined ||
+			!isValidUnitCategory(product.defaultUnitCategory)
+		) {
+			return "Please select a valid measurement unit";
+		}
+
+		return null;
 	}
 
 	addProduct = async () => {
@@ -33,13 +55,9 @@ export class AddProductScreenModel {
 
 		const product = this.product.peek();
 		// product object checks
-		if (!product.name) {
-			Burnt.toast({ title: "Product name is required" });
-			return;
-		}
-
-		if (!product.defaultUnitCategory) {
-			Burnt.toast({ title: "Default unit category is required" });
+		const validationError = this.validateProduct(product);
+		if (validationError) {
+			Burnt.toast({ title: validationError });
 			return;
 		}
 
@@ -60,8 +78,7 @@ export class AddProductScreenModel {
 			const createdProduct = await Effect.runPromise(
 				addProduct({
 					name: product.name,
-					defaultUnitCategory:
-						product.defaultUnitCategory as InsertProduct["defaultUnitCategory"],
+					defaultUnitCategory: product.defaultUnitCategory,
 				}),
 			);
 
