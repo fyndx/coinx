@@ -1,5 +1,6 @@
 import { MeasurementUnits } from "@/src/utils/units";
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
+import { Keyboard } from "react-native";
 import { Adapt, Select, Sheet, YStack } from "tamagui";
 import { LinearGradient } from "tamagui/linear-gradient";
 
@@ -14,6 +15,11 @@ export const DefaultUnitSelect = ({
 		<Select
 			onValueChange={(value: (typeof MeasurementUnits)[number]) => {
 				onValueChange?.(value);
+			}}
+			onOpenChange={(isOpen) => {
+				if (isOpen) {
+					Keyboard.dismiss();
+				}
 			}}
 		>
 			<Select.Trigger>

@@ -1,6 +1,7 @@
 import type { ObservableObject } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
-import { ListItem, Square, Text, XStack, YGroup } from "tamagui";
+import { Trash2 } from "@tamagui/lucide-icons";
+import { ListItem, Square, Text, XStack, YGroup, YStack } from "tamagui";
 import { rootStore } from "../LegendState";
 import type { ICategory } from "../LegendState/Category.model";
 import { SwipeableRow } from "./SwipeableRow";
@@ -15,10 +16,18 @@ export const Category = observer(
 	({ category, onCategoryPressed, onCategoryDelete }: CategoryProps) => {
 		const categoryData = category.peek();
 		return (
-			<YGroup.Item>
+			<YGroup.Item key={categoryData.id}>
 				<SwipeableRow
 					key={categoryData.id}
-					onDelete={() => onCategoryDelete(categoryData)}
+					rightActions={[
+						{
+							content: <Trash2 color={"$white5"} />,
+							style: { backgroundColor: "red" },
+							onPress: () => {
+								onCategoryDelete(categoryData);
+							},
+						},
+					]}
 				>
 					<ListItem
 						onPress={() => onCategoryPressed(categoryData)}

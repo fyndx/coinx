@@ -1,8 +1,9 @@
 import { Trash2 } from "@tamagui/lucide-icons";
 import { Component, type PropsWithChildren } from "react";
-import { StyleSheet } from "react-native";
+import { type StyleProp, StyleSheet, type ViewStyle } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable, {
+	type SwipeableMethods,
 	type SwipeableRef,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
@@ -12,77 +13,126 @@ import Reanimated, {
 	type SharedValue,
 } from "react-native-reanimated";
 
+interface Action {
+	content: React.ReactNode;
+	onPress: () => void;
+	style?: StyleProp<ViewStyle>;
+}
+
 interface SwipeableRowProps {
-	onDelete?: () => void;
+	rightActions?: Action[];
+	leftActions?: Action[];
 }
 
 const SWIPE_THRESHOLD = 40;
-const SCALE_RANGE = {
-	INPUT: [-SWIPE_THRESHOLD, 0],
-	OUTPUT: [1, 0],
+
+const ActionButton = ({
+	action,
+	dragX,
+	inputRange,
+	outputRange,
+	swipeable,
+}: {
+	action: Action;
+	dragX: SharedValue<number>;
+	inputRange: number[];
+	outputRange: number[];
+	swipeable: SwipeableMethods;
+}) => {
+	const styleAnimation = useAnimatedStyle(() => ({
+		transform: [
+			{
+				scale: interpolate(
+					dragX.value,
+					inputRange,
+					outputRange,
+					Extrapolation.CLAMP,
+				),
+			},
+		],
+		opacity: interpolate(
+			dragX.value,
+			inputRange,
+			outputRange,
+			Extrapolation.CLAMP,
+		),
+	}));
+	return (
+		<RectButton
+			style={[styles.actionButton, action.style]}
+			onPress={() => {
+				swipeable.close();
+				action.onPress();
+			}}
+		>
+			<Reanimated.View style={styleAnimation}>{action.content}</Reanimated.View>
+		</RectButton>
+	);
 };
 
 export class SwipeableRow extends Component<
 	PropsWithChildren<SwipeableRowProps>
 > {
-	private swipeableRowRef?: SwipeableRef;
+	private swipeableRowRef?: SwipeableRef | null = null;
 
-	private updateRef = (ref: SwipeableRef) => {
+	private updateRef = (ref: SwipeableRef | null) => {
 		this.swipeableRowRef = ref;
 	};
 
-	private close = () => {
-		this.swipeableRowRef?.close();
-		this.props.onDelete?.();
-	};
+	private renderActions = ({
+		actions,
+		dragX,
+		isLeft,
+		swipeable,
+	}: {
+		actions: Action[];
+		progress: SharedValue<number>;
+		dragX: SharedValue<number>;
+		isLeft: boolean;
+		swipeable: SwipeableMethods;
+	}) => {
+		const inputRange = isLeft ? [0, SWIPE_THRESHOLD] : [-SWIPE_THRESHOLD, 0];
+		const outputRange = isLeft ? [0, 1] : [1, 0];
 
-	private renderRightActions = (
-		_progress: SharedValue<number>,
-		dragX: SharedValue<number>,
-	) => {
-		const styleAnimation = useAnimatedStyle(() => {
-			return {
-				transform: [
-					{
-						scale: interpolate(
-							dragX.value,
-							SCALE_RANGE.INPUT,
-							SCALE_RANGE.OUTPUT,
-							Extrapolation.CLAMP,
-						),
-					},
-				],
-				opacity: interpolate(
-					dragX.value,
-					SCALE_RANGE.INPUT,
-					[1, 0.7],
-					Extrapolation.CLAMP,
-				),
-			};
+		return actions.map((action, index) => {
+			return (
+				<ActionButton
+					key={`${action.content}-${index}`}
+					action={action}
+					dragX={dragX}
+					inputRange={inputRange}
+					outputRange={outputRange}
+					swipeable={swipeable}
+				/>
+			);
 		});
-
-		return (
-			<RectButton style={styles.deleteButton} onPress={this.close}>
-				<Reanimated.View
-					accessibilityLabel="Delete item"
-					accessibilityRole="button"
-					accessibilityHint="Double tap to delete this item"
-					style={styleAnimation}
-				>
-					<Trash2 size={"$3"} />
-				</Reanimated.View>
-			</RectButton>
-		);
 	};
 
 	render() {
-		const { children } = this.props;
+		const { children, leftActions = [], rightActions = [] } = this.props;
 		return (
 			<Swipeable
 				ref={this.updateRef}
-				renderRightActions={this.renderRightActions}
+				renderLeftActions={(progress, dragX, swipeable) =>
+					this.renderActions({
+						actions: leftActions,
+						progress,
+						dragX,
+						isLeft: true,
+						swipeable,
+					})
+				}
+				renderRightActions={(progress, dragX, swipeable) =>
+					this.renderActions({
+						actions: rightActions,
+						progress,
+						dragX,
+						isLeft: false,
+						swipeable,
+					})
+				}
+				leftThreshold={40}
 				rightThreshold={40}
-				friction={2}
 			>
 				{children}
 			</Swipeable>
@@ -91,6 +141,11 @@ export class SwipeableRow extends Component<
 }
 
 const styles = StyleSheet.create({
+	actionButton: {
+		justifyContent: "center",
+		alignItems: "center",
+		width: 48,
+	},
 	deleteButton: {
 		backgroundColor: "red",
 		justifyContent: "center",

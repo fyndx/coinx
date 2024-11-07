@@ -9,6 +9,7 @@ import { Effect } from "effect";
 import {
 	addProduct,
 	deleteAllProducts,
+	deleteProduct,
 	getProducts,
 } from "../database/Products/ProductsRepo";
 import { generateRandomProducts } from "../database/seeds/ProductSeeds";
@@ -34,6 +35,15 @@ export class ProductsModel {
 		} finally {
 			this.isLoading.set(false);
 		}
+	};
+
+	deleteProduct = async (id: number) => {
+		await Effect.runPromise(deleteProduct({ id }));
+		const updatedProducts = this.products
+			.peek()
+			.filter((product) => product.id !== id);
+		this.products.set(updatedProducts);
+		Burnt.toast({ title: "Product deleted successfully" });
 	};
 
 	createRandomProducts = async (count = 10) => {
