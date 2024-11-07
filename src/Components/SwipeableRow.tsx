@@ -3,6 +3,7 @@ import { Component, type PropsWithChildren } from "react";
 import { type StyleProp, StyleSheet, type ViewStyle } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable, {
+	type SwipeableMethods,
 	type SwipeableRef,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
@@ -25,6 +26,50 @@ interface SwipeableRowProps {
 
 const SWIPE_THRESHOLD = 40;
 
+const ActionButton = ({
+	action,
+	dragX,
+	inputRange,
+	outputRange,
+	swipeable,
+}: {
+	action: Action;
+	dragX: SharedValue<number>;
+	inputRange: number[];
+	outputRange: number[];
+	swipeable: SwipeableMethods;
+}) => {
+	const styleAnimation = useAnimatedStyle(() => ({
+		transform: [
+			{
+				scale: interpolate(
+					dragX.value,
+					inputRange,
+					outputRange,
+					Extrapolation.CLAMP,
+				),
+			},
+		],
+		opacity: interpolate(
+			dragX.value,
+			inputRange,
+			outputRange,
+			Extrapolation.CLAMP,
+		),
+	}));
+	return (
+		<RectButton
+			style={[styles.actionButton, action.style]}
+			onPress={() => {
+				swipeable.close();
+				action.onPress();
+			}}
+		>
+			<Reanimated.View style={styleAnimation}>{action.content}</Reanimated.View>
+		</RectButton>
+	);
+};
+
 export class SwipeableRow extends Component<
 	PropsWithChildren<SwipeableRowProps>
 > {
@@ -34,50 +79,29 @@ export class SwipeableRow extends Component<
 		this.swipeableRowRef = ref;
 	};
 
-	private renderActions = (
-		actions: Action[],
-		progress: SharedValue<number>,
-		dragX: SharedValue<number>,
-		isLeft: boolean,
-	) => {
+	private renderActions = ({
+		actions,
+		dragX,
+		isLeft,
+		swipeable,
+	}: {
+		actions: Action[];
+		progress: SharedValue<number>;
+		dragX: SharedValue<number>;
+		isLeft: boolean;
+		swipeable: SwipeableMethods;
+	}) => {
 		return actions.map((action, index) => {
 			const inputRange = isLeft ? [0, SWIPE_THRESHOLD] : [-SWIPE_THRESHOLD, 0];
 			const outputRange = isLeft ? [0, 1] : [1, 0];
-
-			const styleAnimation = useAnimatedStyle(() => {
-				return {
-					transform: [
-						{
-							scale: interpolate(
-								dragX.value,
-								inputRange,
-								outputRange,
-								Extrapolation.CLAMP,
-							),
-						},
-					],
-					opacity: interpolate(
-						dragX.value,
-						inputRange,
-						outputRange,
-						Extrapolation.CLAMP,
-					),
-				};
-			});
-
 			return (
-				<RectButton
+				<ActionButton
 					key={index}
-					style={[styles.actionButton, action.style]}
-					onPress={() => {
-						this.swipeableRowRef?.close();
-						action.onPress();
-					}}
-				>
-					<Reanimated.View style={styleAnimation}>
-						{action.content}
-					</Reanimated.View>
-				</RectButton>
+					action={action}
+					dragX={dragX}
+					inputRange={inputRange}
+					outputRange={outputRange}
+				/>
 			);
 		});
 	};
@@ -87,11 +111,23 @@ export class SwipeableRow extends Component<
 		return (
 			<Swipeable
 				ref={this.updateRef}
-				renderLeftActions={(progress, dragX) =>
-					this.renderActions(leftActions, progress, dragX, true)
+				renderLeftActions={(progress, dragX, swipeable) =>
+					this.renderActions({
+						actions: leftActions,
+						progress,
+						dragX,
+						isLeft: true,
+						swipeable,
+					})
 				}
-				renderRightActions={(progress, dragX) =>
-					this.renderActions(rightActions, progress, dragX, false)
+				renderRightActions={(progress, dragX, swipeable) =>
+					this.renderActions({
+						actions: rightActions,
+						progress,
+						dragX,
+						isLeft: false,
+						swipeable,
+					})
 				}
 				leftThreshold={40}
 				rightThreshold={40}
