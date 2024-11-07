@@ -91,16 +91,18 @@ export class SwipeableRow extends Component<
 		isLeft: boolean;
 		swipeable: SwipeableMethods;
 	}) => {
+		const inputRange = isLeft ? [0, SWIPE_THRESHOLD] : [-SWIPE_THRESHOLD, 0];
+		const outputRange = isLeft ? [0, 1] : [1, 0];
+
 		return actions.map((action, index) => {
-			const inputRange = isLeft ? [0, SWIPE_THRESHOLD] : [-SWIPE_THRESHOLD, 0];
-			const outputRange = isLeft ? [0, 1] : [1, 0];
 			return (
 				<ActionButton
-					key={index}
+					key={`${action.content}-${index}`}
 					action={action}
 					dragX={dragX}
 					inputRange={inputRange}
 					outputRange={outputRange}
+					swipeable={swipeable}
 				/>
 			);
 		});
