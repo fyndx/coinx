@@ -15,6 +15,20 @@
       "when": 1730537895891,
       "tag": "0001_goofy_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1731082763297,
+      "tag": "0002_loving_vapor",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1731086853710,
+      "tag": "0003_cynical_whiplash",
+      "breakpoints": true
     }
   ]
 }

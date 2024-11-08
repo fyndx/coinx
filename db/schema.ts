@@ -1,5 +1,12 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+	check,
+	index,
+	integer,
+	real,
+	sqliteTable,
+	text,
+} from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
 export const transactions = sqliteTable("transaction", {
@@ -49,6 +56,8 @@ export const productsRelations = relations(products, ({ many }) => ({
 	product_listings: many(product_listings),
 }));
 
+// TODO: Add constraints if needed
+// TODO: Add indexes if needed
 export const product_listings = sqliteTable("product_listings", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	productId: integer("product_id").references(() => products.id, {
@@ -70,10 +79,50 @@ export const product_listings = sqliteTable("product_listings", {
 
 export const productListingsRelations = relations(
 	product_listings,
-	({ one }) => ({
+	({ one, many }) => ({
 		product: one(products, {
 			fields: [product_listings.productId],
 			references: [products.id],
+		}),
+		product_listings_history: many(product_listings_history),
+	}),
+);
+
+export const product_listings_history = sqliteTable(
+	"product_listings_history",
+	{
+		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		productListingId: integer("product_listing_id")
+			.references(() => product_listings.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
+		price: real("price").notNull(),
+		quantity: real("quantity").notNull(),
+		unit: text("unit").notNull(),
+		recordedAt: text("recorded_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	},
+	(table) => {
+		return {
+			productListingIdIdx: index(
+				"idx_product_listings_history_product_listing_id",
+			).on(table.productListingId),
+			recordedAtIdx: index("idx_product_listings_history_recorded_at").on(
+				table.recordedAt,
+			),
+			// TODO: Add Constraints if needed
+			// checkPrice: check("price_check", sql`${table.price} >= 0`),
+			// checkQuantity: check("quantity_check", sql`${table.quantity} >= 0`),
+		};
+	},
+);
+
+export const productListingHistoryRelations = relations(
+	product_listings_history,
+	({ one }) => ({
+		product_listing: one(product_listings, {
+			fields: [product_listings_history.productListingId],
+			references: [product_listings.id],
 		}),
 	}),
 );

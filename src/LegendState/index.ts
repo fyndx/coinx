@@ -6,7 +6,7 @@ import { ProductsModel } from "@/src/LegendState/Products.model";
 import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import { TransactionModel } from "@/src/LegendState/Transaction.model";
 import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
-import { AddProductDetailsModel } from "./AddProductDetails/AddProductDetails.model";
+import { AddProductListingModel } from "./AddProductListing/AddProductListing.model";
 
 class RootStore {
 	// App State
@@ -20,7 +20,7 @@ class RootStore {
 	// Screens
 	transactionsScreenModel: TransactionsScreenModel;
 	addProductScreenModel: AddProductScreenModel;
-	addProductDetailsModel: AddProductDetailsModel;
+	addProductListingModel: AddProductListingModel;
 
 	constructor() {
 		this.appModel = new AppModel();
@@ -31,7 +31,7 @@ class RootStore {
 		this.productsModel = new ProductsModel();
 		this.productsListingsModel = new ProductsListingsModel();
 		this.addProductScreenModel = new AddProductScreenModel();
-		this.addProductDetailsModel = new AddProductDetailsModel();
+		this.addProductListingModel = new AddProductListingModel();
 	}
 
 	private startServices = async () => {

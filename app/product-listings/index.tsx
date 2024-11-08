@@ -2,7 +2,8 @@ import { ProductListingTable } from "@/src/Containers/ProductListings/Containers
 import { rootStore } from "@/src/LegendState";
 import { useMount } from "@legendapp/state/react";
 import { Construction, PlusCircle } from "@tamagui/lucide-icons";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Circle, Text, XStack, YStack } from "tamagui";
@@ -14,17 +15,22 @@ const ProductDetails = () => {
 	const { productsListingsModel: productListing$ } = rootStore;
 
 	useMount(() => {
-		productListing$.getProductListingsById(productId);
-
 		return () => {
 			productListing$.reset();
 		};
 	});
 
+	useFocusEffect(
+		// biome-ignore lint/correctness/useExhaustiveDependencies: legend state methods are not necessary
+		useCallback(() => {
+			productListing$.getProductListingsByProductId(productId);
+		}, [productId]),
+	);
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Stack.Screen
-				options={{ headerTitle: (name as string) ?? "Product Details" }}
+				options={{ headerTitle: (name as string) ?? "Product Listings" }}
 			/>
 			<YStack flex={1} padding={"$3"} backgroundColor={"$background"}>
 				<ProductListingTable data={productListing$.productListingsTable} />
@@ -37,9 +43,9 @@ const ProductDetails = () => {
 				padding={"$1"}
 				// biome-ignore lint/a11y/useSemanticElements: react-native does not have a semantic element for a button
 				role={"button"}
-				aria-label={"Add Product Details"}
+				aria-label={"Add Product Listing"}
 			>
-				<Link href={{ pathname: "/add-product-details", params: { id, name } }}>
+				<Link href={{ pathname: "/add-product-listing", params: { id, name } }}>
 					<PlusCircle size={"$4"} color="white" />
 				</Link>
 			</Circle>

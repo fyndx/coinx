@@ -1,0 +1,2 @@
+CREATE INDEX `idx_product_listings_history_product_listing_id` ON `product_listings_history` (`product_listing_id`);--> statement-breakpoint
+CREATE INDEX `idx_product_listings_history_recorded_at` ON `product_listings_history` (`recorded_at`);

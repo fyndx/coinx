@@ -16,12 +16,25 @@ export const getProductsListings = () => {
 	});
 };
 
-export const getProductListingsById = (id: number) => {
+// Get all Product Listings for a Product
+export const getProductListingsByProductId = (id: number) => {
 	return Effect.promise(() => {
 		const query = database
 			.select()
 			.from(productsListingsRepo)
 			.where(eq(productsListingsRepo.productId, id));
+
+		return query.execute();
+	});
+};
+
+// Get a Product Listing by ID
+export const getProductListingById = (id: number) => {
+	return Effect.promise(() => {
+		const query = database
+			.select()
+			.from(productsListingsRepo)
+			.where(eq(productsListingsRepo.id, id));
 
 		return query.execute();
 	});
@@ -33,6 +46,16 @@ export const addProductListing = (productListing: InsertProductListing) => {
 			.insert(productsListingsRepo)
 			.values(productListing)
 			.returning();
+
+		return query.execute();
+	});
+};
+
+export const deleteProductListingById = (id: number) => {
+	return Effect.promise(() => {
+		const query = database
+			.delete(productsListingsRepo)
+			.where(eq(productsListingsRepo.id, id));
 
 		return query.execute();
 	});
