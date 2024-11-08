@@ -20,7 +20,7 @@ class RootStore {
 	// Screens
 	transactionsScreenModel: TransactionsScreenModel;
 	addProductScreenModel: AddProductScreenModel;
-	addProductDetailsModel: AddProductListingModel;
+	addProductListingModel: AddProductListingModel;
 
 	constructor() {
 		this.appModel = new AppModel();
@@ -31,7 +31,7 @@ class RootStore {
 		this.productsModel = new ProductsModel();
 		this.productsListingsModel = new ProductsListingsModel();
 		this.addProductScreenModel = new AddProductScreenModel();
-		this.addProductDetailsModel = new AddProductListingModel();
+		this.addProductListingModel = new AddProductListingModel();
 	}
 
 	private startServices = async () => {

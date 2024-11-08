@@ -9,7 +9,7 @@ import { Button, Input, Label, Spinner, Text, YStack } from "tamagui";
 const AddProductListing = observer(() => {
 	const { id } = useLocalSearchParams();
 
-	const productModel$ = rootStore.addProductDetailsModel;
+	const productModel$ = rootStore.addProductListingModel;
 
 	useMount(() => {
 		const productId = Number(id);

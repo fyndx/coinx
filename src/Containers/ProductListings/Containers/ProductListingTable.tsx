@@ -27,15 +27,22 @@ interface ProductListingTableProps {
 
 // Helper function to calculate max widths for each column
 const calculateColumnWidths = ({ head, data }: ProductListingTable) => {
-	const columnWidths = head.map((header) => header.length * 10); // Initialize with header width
+	const MIN_CELL_WIDTH = 100;
+	const MAX_CELL_WIDTH = 200;
+	const CHAR_WIDTH_MULTIPLIER = 10;
+
+	const columnWidths = head.map(
+		(header) => header.length * CHAR_WIDTH_MULTIPLIER,
+	); // Initialize with header width
 
 	for (const row of data) {
 		for (const [index, cell] of row.entries()) {
-			const MAX_CELL_WIDTH = 200;
-			const MIN_CELL_WIDTH = 100;
 			const cellWidth = Math.max(
 				MIN_CELL_WIDTH,
-				Math.min(cell?.value?.length ?? 10 * 10, MAX_CELL_WIDTH),
+				Math.min(
+					(cell?.value?.length ?? 10) * CHAR_WIDTH_MULTIPLIER,
+					MAX_CELL_WIDTH,
+				),
 			); // Adjust multiplier as needed
 			if (cellWidth > columnWidths[index]) {
 				columnWidths[index] = cellWidth;
