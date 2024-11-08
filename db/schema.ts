@@ -70,10 +70,37 @@ export const product_listings = sqliteTable("product_listings", {
 
 export const productListingsRelations = relations(
 	product_listings,
-	({ one }) => ({
+	({ one, many }) => ({
 		product: one(products, {
 			fields: [product_listings.productId],
 			references: [products.id],
+		}),
+		product_listings_history: many(product_listings_history),
+	}),
+);
+
+export const product_listings_history = sqliteTable(
+	"product_listings_history",
+	{
+		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		productListingId: integer("product_listing_id")
+			.references(() => product_listings.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
+		price: real("price").notNull(),
+		quantity: real("quantity").notNull(),
+		unit: text("unit").notNull(),
+		recordedAt: text("recorded_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	},
+);
+
+export const productListingHistoryRelations = relations(
+	product_listings_history,
+	({ one }) => ({
+		product_listing: one(product_listings, {
+			fields: [product_listings_history.productListingId],
+			references: [product_listings.id],
 		}),
 	}),
 );

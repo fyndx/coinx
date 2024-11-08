@@ -12,6 +12,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@coinify/currency": "^1.4.2",
     "@expo/config-plugins": "~9.0.0",
     "@expo/vector-icons": "^14.0.3",
     "@gorhom/bottom-sheet": "^5.0.5",
