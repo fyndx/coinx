@@ -1,4 +1,5 @@
-import type { InsertProductListing, SelectProductListing } from "@/db/schema";
+import type { SelectProductListing } from "@/db/schema";
+import { deleteProductListingsByProductListingId } from "@/src/database/Products/ProductListingsHistoryRepo";
 import {
 	addProductListing,
 	deleteAllProductListings,
@@ -6,7 +7,6 @@ import {
 	getProductListingsByProductId,
 	getProductsListings,
 } from "@/src/database/Products/ProductsListingsRepo";
-import { faker } from "@faker-js/faker";
 import { type Observable, computed, observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
@@ -27,17 +27,21 @@ export class ProductsListingsModel {
 	// 	this.productListings.set(productListings);
 	// };
 
-	getProductListingsById = async (id: number) => {
+	getProductListingsByProductId = async (productId: number) => {
 		const productListings = await Effect.runPromise(
-			getProductListingsByProductId(id),
+			getProductListingsByProductId(productId),
 		);
-		this.productId.set(id);
+		this.productId.set(productId);
 		this.productListings.set(productListings);
 	};
 
 	deleteProductListingById = async (id: number) => {
+		// Delete all product listings history for this product listing
+		await Effect.runPromise(deleteProductListingsByProductListingId(id));
+		// Delete the product listing
 		await Effect.runPromise(deleteProductListingById(id));
-		await this.getProductListingsById(this.productId.peek());
+		// Get the updated product listings
+		await this.getProductListingsByProductId(this.productId.peek());
 		Burnt.toast({ title: "Product listing deleted successfully" });
 	};
 
@@ -74,7 +78,10 @@ export class ProductsListingsModel {
 				},
 				{
 					type: "text",
-					value: `${(productListing.price / productListing.quantity).toFixed(2)} per ${productListing.unit}`,
+					value:
+						productListing.quantity !== 0
+							? `${(productListing.price / productListing.quantity).toFixed(2)} per ${productListing.unit}`
+							: "N/A",
 				},
 				{
 					type: "text",

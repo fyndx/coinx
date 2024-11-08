@@ -23,7 +23,7 @@ const ProductDetails = () => {
 	useFocusEffect(
 		// biome-ignore lint/correctness/useExhaustiveDependencies: legend state methods are not necessary
 		useCallback(() => {
-			productListing$.getProductListingsById(productId);
+			productListing$.getProductListingsByProductId(productId);
 		}, [productId]),
 	);
 

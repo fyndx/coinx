@@ -15,7 +15,7 @@ import {
 interface ProductListingTable {
 	head: string[];
 	data: {
-		type: string;
+		type: "text" | "button";
 		value: string | null;
 		onPress?: () => void;
 	}[][];

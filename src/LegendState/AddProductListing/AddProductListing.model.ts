@@ -10,13 +10,13 @@ import {
 } from "@/src/database/Products/ProductsListingsRepo";
 import { findProductById } from "@/src/database/Products/ProductsRepo";
 import { convert } from "@/src/utils/units";
-import { type ObservableObject, observable } from "@legendapp/state";
+import { observable } from "@legendapp/state";
 import { Value } from "@sinclair/typebox/value";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
-export class AddProductDetailsModel {
+export class AddProductListingModel {
 	product;
 	units;
 	productDetailsDraft;
