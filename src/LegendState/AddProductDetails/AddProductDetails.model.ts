@@ -4,7 +4,10 @@ import {
 	type SelectProductListing,
 	insertProductListingSchema,
 } from "@/db/schema";
-import { addProductListing } from "@/src/database/Products/ProductsListingsRepo";
+import {
+	addProductListing,
+	getProductListingById,
+} from "@/src/database/Products/ProductsListingsRepo";
 import { findProductById } from "@/src/database/Products/ProductsRepo";
 import { convert } from "@/src/utils/units";
 import { type ObservableObject, observable } from "@legendapp/state";
@@ -30,6 +33,11 @@ export class AddProductDetailsModel {
 		this.productDetailsDraft.productId.set(id);
 		this.addUnitsForProduct();
 	};
+
+	// getProductListingById = async (id: number) => {
+	// 	const productListing = await Effect.runPromise(getProductListingById(id));
+	// 	this.productDetailsDraft.set(productListing[0]);
+	// };
 
 	addUnitsForProduct = () => {
 		const defaultUnit = this.product.defaultUnitCategory.peek();

@@ -1,26 +1,42 @@
+import type { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import type { ObservableComputed } from "@legendapp/state";
-import { observer } from "@legendapp/state/react";
+import { Switch, observer } from "@legendapp/state/react";
 import { useMemo } from "react";
-import { ScrollView, Text, XStack, YStack, getTokens, useTheme } from "tamagui";
+import {
+	Button,
+	ScrollView,
+	Text,
+	XStack,
+	YStack,
+	getTokens,
+	useTheme,
+} from "tamagui";
+
+interface ProductListingTable {
+	head: string[];
+	data: {
+		type: string;
+		value: string | null;
+		onPress?: () => void;
+	}[][];
+}
 
 interface ProductListingTableProps {
-	data: ObservableComputed<{
-		head: string[];
-		data: string[][];
-	}>;
+	data: ObservableComputed<ProductListingTable>;
 }
 
 // Helper function to calculate max widths for each column
-const calculateColumnWidths = ({
-	head,
-	data,
-}: { head: string[]; data: string[][] }) => {
+const calculateColumnWidths = ({ head, data }: ProductListingTable) => {
 	const columnWidths = head.map((header) => header.length * 10); // Initialize with header width
 
 	for (const row of data) {
 		for (const [index, cell] of row.entries()) {
-			const MAX_CELL_WIDTH = 100;
-			const cellWidth = Math.min(cell.length * 10, MAX_CELL_WIDTH); // Adjust multiplier as needed
+			const MAX_CELL_WIDTH = 200;
+			const MIN_CELL_WIDTH = 100;
+			const cellWidth = Math.max(
+				MIN_CELL_WIDTH,
+				Math.min(cell?.value?.length ?? 10 * 10, MAX_CELL_WIDTH),
+			); // Adjust multiplier as needed
 			if (cellWidth > columnWidths[index]) {
 				columnWidths[index] = cellWidth;
 			}
@@ -87,7 +103,22 @@ export const ProductListingTable = observer(
 										borderWidth={"$0.5"}
 										width={columnWidths[cellIndex]}
 									>
-										<Text color={theme.color.val}>{cell}</Text>
+										<Switch value={cell.type}>
+											{{
+												text: () => (
+													<Text color={theme.color.val}>{cell.value}</Text>
+												),
+												button: () => (
+													<Button
+														color={theme.color.val}
+														onPress={cell.onPress}
+													>
+														{cell.value}
+													</Button>
+												),
+												default: () => null,
+											}}
+										</Switch>
 									</YStack>
 								))}
 							</XStack>

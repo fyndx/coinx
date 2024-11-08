@@ -6,8 +6,8 @@ import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Input, Label, Spinner, Text, YStack } from "tamagui";
 
-const AddProductDetails = observer(() => {
-	const { id, name } = useLocalSearchParams();
+const AddProductListing = observer(() => {
+	const { id } = useLocalSearchParams();
 
 	const productModel$ = rootStore.addProductDetailsModel;
 
@@ -17,6 +17,7 @@ const AddProductDetails = observer(() => {
 			return;
 		}
 
+		// Fetch product details
 		productModel$.getProductById(productId);
 
 		return () => {
@@ -115,4 +116,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default AddProductDetails;
+export default AddProductListing;

@@ -71,9 +71,9 @@ const RootLayoutNav = () => {
 							}}
 						/>
 						<Stack.Screen
-							name="add-product-details/index"
+							name="add-product-listing/index"
 							options={{
-								headerTitle: "Add Product Details",
+								headerTitle: "Add Product Listing",
 								headerTitleAlign: "center",
 							}}
 						/>

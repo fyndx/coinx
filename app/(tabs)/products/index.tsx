@@ -35,7 +35,7 @@ const Product = ({
 	return (
 		<Link
 			href={{
-				pathname: "/product-details",
+				pathname: "/product-listings",
 				params: { id: product.id, name: product.name },
 			}}
 			asChild
