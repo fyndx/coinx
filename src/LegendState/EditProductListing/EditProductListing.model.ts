@@ -11,10 +11,15 @@ import { observable } from "@legendapp/state";
 import { Effect } from "effect";
 import * as Burnt from "burnt";
 import { router } from "expo-router";
+import Currency from "@coinify/currency";
 
 interface ProductListing {
 	status: "loading" | "success" | "error";
 	data?: SelectProductListing;
+}
+
+interface EditProductDraft {
+	price: string;
 }
 
 export class EditProductListing {
@@ -25,7 +30,7 @@ export class EditProductListing {
 		this.productListing = observable<ProductListing>({
 			status: "loading",
 		});
-		this.editProductDraft = observable({
+		this.editProductDraft = observable<EditProductDraft>({
 			price: "",
 		});
 	}
@@ -36,23 +41,32 @@ export class EditProductListing {
 	}
 
 	onUnmount() {
-		this.productListing.set(null);
+		this.productListing.set({ status: "loading", data: undefined });
+		this.editProductDraft.price.set("");
 	}
 
 	getProductListingById = async (id: number) => {
 		this.productListing.set({ status: "loading" });
 		const productListing = await Effect.runPromise(getProductListingById(id));
-		console.log(productListing);
 		this.productListing.set({ data: productListing[0], status: "success" });
 	};
 
-	modifyProductDraft = (key: string, value: string) => {
+	modifyProductDraft = <K extends keyof EditProductDraft>(
+		key: K,
+		value: EditProductDraft[K],
+	) => {
 		this.editProductDraft[key].set(value);
 	};
 
 	updateProductListing = async () => {
 		const productListing = this.productListing.data.peek();
-		const price = Number(this.editProductDraft.price.peek());
+		const price = Currency.toSmallestSubunit(
+			Number(this.editProductDraft.price.peek()),
+		);
+
+		if (Number.isNaN(price) || price <= 0) {
+			throw new Error("Invalid price value");
+		}
 
 		const updatedProductListing = await Effect.runPromise(
 			updateProductListingById({

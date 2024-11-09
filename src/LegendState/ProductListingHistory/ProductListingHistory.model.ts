@@ -1,18 +1,34 @@
 import type { SelectProductListingHistory } from "@/db/schema";
 import { getProductListingsHistoryByProductListingId } from "@/src/database/Products/ProductListingsHistoryRepo";
+import type { AsyncInterface } from "@/src/utils/async-interface";
 import { observable } from "@legendapp/state";
-import { Effect } from "effect";
+import { Effect, pipe } from "effect";
+
+interface ProductListingHistory extends AsyncInterface {
+	data?: SelectProductListingHistory;
+}
 
 export class ProductsListingHistoryModel {
-  productsListingHistory
+	productsListingHistory;
 
-  constructor() {
-    this.productsListingHistory = observable<SelectProductListingHistory[]>([]);
-  }
+	constructor() {
+		this.productsListingHistory = observable<ProductListingHistory>({
+			status: "pending",
+		});
+	}
 
-  getAllProductListingsByProductId = async (productId: number) => {
-    const productListingHistory = await Effect.runPromise(getProductListingsHistoryByProductListingId(productId))
-    console.log('productListingHistory', productListingHistory)
-    this.productsListingHistory.set(productListingHistory);
-  }
+	onUnmount = () => {
+		this.productsListingHistory.set({ status: "pending", data: undefined });
+	};
+
+	getAllProductListingsByProductId = async (productId: number) => {
+		this.productsListingHistory.status.set("pending");
+		const [productListingHistory] = await Effect.runPromise(
+			getProductListingsHistoryByProductListingId(productId),
+		);
+		this.productsListingHistory.set({
+			data: productListingHistory,
+			status: "success",
+		});
+	};
 }

@@ -16,6 +16,7 @@ import { Value } from "@sinclair/typebox/value";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
+import Currency from "@coinify/currency";
 
 export class AddProductListingModel {
 	product;
@@ -49,6 +50,11 @@ export class AddProductListingModel {
 	addProductDetails = async () => {
 		try {
 			const productListing = this.productDetailsDraft.peek();
+			// TODO: Change INR to currency from user settings
+			productListing.price = Currency.toSmallestSubunit(
+				productListing.price,
+				"INR",
+			);
 
 			const isProductListingValid = Value.Check(
 				insertProductListingSchema,
@@ -56,10 +62,9 @@ export class AddProductListingModel {
 			);
 
 			if (isProductListingValid) {
-				const createdProductListingList = await Effect.runPromise(
+				const [createdProductListing] = await Effect.runPromise(
 					addProductListing(productListing),
 				);
-				const createdProductListing = createdProductListingList[0];
 				await Effect.runPromise(
 					addProductListingsHistory({
 						productId: createdProductListing.productId,

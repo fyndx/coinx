@@ -8,7 +8,6 @@ import { Button, H1, Input, Spinner, Text, XStack, YStack } from "tamagui";
 
 const EditProductListing = observer(() => {
 	const { listing_id, product_id } = useLocalSearchParams();
-	console.log({ listing_id, product_id });
 
 	const listingId = Number(listing_id);
 	const productId = Number(product_id);
@@ -19,8 +18,6 @@ const EditProductListing = observer(() => {
 		if (Number.isNaN(listingId) || Number.isNaN(productId)) {
 			return;
 		}
-
-		console.log("EditProductListing: ", listingId, productId);
 
 		// Fetch product details
 		editProductListingModel.onMount({ listingId, productId });
@@ -34,7 +31,7 @@ const EditProductListing = observer(() => {
 
 	const handlePriceChange = (value: string) => {
 		editProductListingModel.modifyProductDraft("price", value);
-	}
+	};
 
 	if (productListing$.status === "loading") {
 		return (
@@ -59,9 +56,14 @@ const EditProductListing = observer(() => {
 					<Text>{`Name: ${productListing$.data?.name}`}</Text>
 					<Text>{`Store: ${productListing$.data?.store}`}</Text>
 					<Text>{`Location: ${productListing$.data?.location ?? "---"}`}</Text>
-					<Input placeholder="Enter New Price" onChangeText={handlePriceChange} />
+					<Input
+						placeholder="Enter New Price"
+						onChangeText={handlePriceChange}
+					/>
 				</YStack>
-				<Button onPress={editProductListingModel.updateProductListing}>Update Price</Button>
+				<Button onPress={editProductListingModel.updateProductListing}>
+					Update Price
+				</Button>
 			</YStack>
 		</SafeAreaView>
 	);

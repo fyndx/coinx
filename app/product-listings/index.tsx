@@ -12,11 +12,15 @@ const ProductDetails = () => {
 	const { id, name } = useLocalSearchParams();
 	const productId = Number(id);
 
-	const { productsListingsModel: productListing$, productListingHistoryModel: productListingHistoryModel$ } = rootStore;
+	const {
+		productsListingsModel: productListing$,
+		productListingHistoryModel: productListingHistoryModel$,
+	} = rootStore;
 
 	useMount(() => {
 		return () => {
 			productListing$.reset();
+			productListingHistoryModel$.onUnmount();
 		};
 	});
 
