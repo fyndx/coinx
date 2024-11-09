@@ -4,6 +4,7 @@ import {
 	type SelectProductListing,
 	insertProductListingSchema,
 } from "@/db/schema";
+import { addProductListingsHistory } from "@/src/database/Products/ProductListingsHistoryRepo";
 import {
 	addProductListing,
 	getProductListingById,
@@ -46,23 +47,35 @@ export class AddProductListingModel {
 	};
 
 	addProductDetails = async () => {
-		const productListing = this.productDetailsDraft.peek();
+		try {
+			const productListing = this.productDetailsDraft.peek();
 
-		const isProductListingValid = Value.Check(
-			insertProductListingSchema,
-			productListing,
-		);
+			const isProductListingValid = Value.Check(
+				insertProductListingSchema,
+				productListing,
+			);
 
-		console.log("isProductListingValid", isProductListingValid);
+			if (isProductListingValid) {
+				const createdProductListingList = await Effect.runPromise(
+					addProductListing(productListing),
+				);
+				const createdProductListing = createdProductListingList[0];
+				await Effect.runPromise(
+					addProductListingsHistory({
+						productId: createdProductListing.productId,
+						productListingId: createdProductListing.id,
+						price: createdProductListing.price,
+					}),
+				);
+				Burnt.toast({ title: "Product added successfully" });
+				router.back();
+				return;
+			}
 
-		if (isProductListingValid) {
-			Effect.runPromise(addProductListing(productListing));
-			Burnt.toast({ title: "Product added successfully" });
-			router.back();
-			return;
+			Burnt.toast({ title: "Invalid product details" });
+		} catch (error) {
+			console.log({ error });
 		}
-
-		Burnt.toast({ title: "Invalid product details" });
 	};
 
 	reset = () => {

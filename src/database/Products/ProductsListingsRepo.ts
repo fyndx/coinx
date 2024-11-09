@@ -51,6 +51,20 @@ export const addProductListing = (productListing: InsertProductListing) => {
 	});
 };
 
+export const updateProductListingById = (
+	productListing: Partial<InsertProductListing>,
+) => {
+	return Effect.promise(() => {
+		const query = database
+			.update(productsListingsRepo)
+			.set(productListing)
+			.where(eq(productsListingsRepo.id, productListing.id as number))
+			.returning();
+
+		return query.execute();
+	});
+};
+
 export const deleteProductListingById = (id: number) => {
 	return Effect.promise(() => {
 		const query = database

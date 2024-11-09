@@ -1,1 +1,0 @@
-ALTER TABLE `product_listings` ADD `url` text;

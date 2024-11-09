@@ -4,6 +4,7 @@ import {
 	addProductListing,
 	deleteAllProductListings,
 	deleteProductListingById,
+	getProductListingById,
 	getProductListingsByProductId,
 	getProductsListings,
 } from "@/src/database/Products/ProductsListingsRepo";
@@ -26,6 +27,11 @@ export class ProductsListingsModel {
 	// 	const productListings = await Effect.runPromise(getProductsListings());
 	// 	this.productListings.set(productListings);
 	// };
+
+	getProductListingById = async (id: number) => {
+		const productListing = await Effect.runPromise(getProductListingById(id));
+		return productListing;
+	}
 
 	getProductListingsByProductId = async (productId: number) => {
 		const productListings = await Effect.runPromise(
@@ -107,7 +113,7 @@ export class ProductsListingsModel {
 						router.push({
 							pathname: "/edit-product-listing",
 							params: {
-								id: productListing.productId,
+								product_id: productListing.productId,
 								listing_id: productListing.id,
 							},
 						});

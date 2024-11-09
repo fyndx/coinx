@@ -77,6 +77,13 @@ const RootLayoutNav = () => {
 								headerTitleAlign: "center",
 							}}
 						/>
+						<Stack.Screen
+							name="edit-product-listing/index"
+							options={{
+								headerTitle: "Edit Product Listing",
+								headerTitleAlign: "center",
+							}}
+						/>
 					</Stack>
 				</RootProvider>
 			</GestureHandlerRootView>
