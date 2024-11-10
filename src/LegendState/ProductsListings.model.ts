@@ -4,6 +4,7 @@ import {
 	addProductListing,
 	deleteAllProductListings,
 	deleteProductListingById,
+	getProductListingById,
 	getProductListingsByProductId,
 	getProductsListings,
 } from "@/src/database/Products/ProductsListingsRepo";
@@ -11,6 +12,7 @@ import { type Observable, computed, observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
+import Currency from "@coinify/currency";
 
 export class ProductsListingsModel {
 	productListings: Observable<SelectProductListing[]>;
@@ -27,10 +29,22 @@ export class ProductsListingsModel {
 	// 	this.productListings.set(productListings);
 	// };
 
+	getProductListingById = async (id: number) => {
+		const productListing = await Effect.runPromise(getProductListingById(id));
+		return productListing;
+	};
+
 	getProductListingsByProductId = async (productId: number) => {
 		const productListings = await Effect.runPromise(
 			getProductListingsByProductId(productId),
 		);
+		const updatedProductListings = productListings.map((productListing) => {
+			return {
+				...productListing,
+				// TODO: Change INR to currency from user settings
+				price: Currency.fromSmallestSubunit(productListing.price, "INR"),
+			};
+		});
 		this.productId.set(productId);
 		this.productListings.set(productListings);
 	};
@@ -107,7 +121,7 @@ export class ProductsListingsModel {
 						router.push({
 							pathname: "/edit-product-listing",
 							params: {
-								id: productListing.productId,
+								product_id: productListing.productId,
 								listing_id: productListing.id,
 							},
 						});

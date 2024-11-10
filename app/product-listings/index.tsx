@@ -12,11 +12,15 @@ const ProductDetails = () => {
 	const { id, name } = useLocalSearchParams();
 	const productId = Number(id);
 
-	const { productsListingsModel: productListing$ } = rootStore;
+	const {
+		productsListingsModel: productListing$,
+		productListingHistoryModel: productListingHistoryModel$,
+	} = rootStore;
 
 	useMount(() => {
 		return () => {
 			productListing$.reset();
+			productListingHistoryModel$.onUnmount();
 		};
 	});
 
@@ -24,6 +28,7 @@ const ProductDetails = () => {
 		// biome-ignore lint/correctness/useExhaustiveDependencies: legend state methods are not necessary
 		useCallback(() => {
 			productListing$.getProductListingsByProductId(productId);
+			productListingHistoryModel$.getAllProductListingsByProductId(productId);
 		}, [productId]),
 	);
 

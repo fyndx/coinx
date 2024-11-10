@@ -4,6 +4,7 @@ import {
 	type SelectProductListing,
 	insertProductListingSchema,
 } from "@/db/schema";
+import { addProductListingsHistory } from "@/src/database/Products/ProductListingsHistoryRepo";
 import {
 	addProductListing,
 	getProductListingById,
@@ -15,6 +16,7 @@ import { Value } from "@sinclair/typebox/value";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
+import Currency from "@coinify/currency";
 
 export class AddProductListingModel {
 	product;
@@ -46,23 +48,42 @@ export class AddProductListingModel {
 	};
 
 	addProductDetails = async () => {
-		const productListing = this.productDetailsDraft.peek();
+		try {
+			const productListing = this.productDetailsDraft.peek();
+			// TODO: Change INR to currency from user settings
+			productListing.price = Currency.toSmallestSubunit(
+				productListing.price,
+				"INR",
+			);
 
-		const isProductListingValid = Value.Check(
-			insertProductListingSchema,
-			productListing,
-		);
+			const isProductListingValid = Value.Check(
+				insertProductListingSchema,
+				productListing,
+			);
 
-		console.log("isProductListingValid", isProductListingValid);
+			if (!isProductListingValid) {
+				Burnt.toast({ title: "Invalid product details" });
+				return;
+			}
 
-		if (isProductListingValid) {
-			Effect.runPromise(addProductListing(productListing));
+			const [createdProductListing] = await Effect.runPromise(
+				addProductListing(productListing),
+			);
+			await Effect.runPromise(
+				addProductListingsHistory({
+					productId: createdProductListing.productId,
+					productListingId: createdProductListing.id,
+					price: createdProductListing.price,
+				}),
+			);
 			Burnt.toast({ title: "Product added successfully" });
 			router.back();
-			return;
+		} catch (error) {
+			console.error("Failed to add product listing:", error);
+			Burnt.toast({
+				title: "Failed to add product",
+			});
 		}
-
-		Burnt.toast({ title: "Invalid product details" });
 	};
 
 	reset = () => {

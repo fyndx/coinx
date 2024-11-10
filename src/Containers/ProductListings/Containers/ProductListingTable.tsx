@@ -73,7 +73,7 @@ export const ProductListingTable = observer(
 					role="alert"
 					aria-label="No products available"
 				>
-					<Text>Add a few Products</Text>
+					<Text>Add a few Listings</Text>
 				</YStack>
 			);
 		}

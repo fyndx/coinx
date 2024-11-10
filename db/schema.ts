@@ -54,22 +54,25 @@ export const products = sqliteTable("product", {
 
 export const productsRelations = relations(products, ({ many }) => ({
 	product_listings: many(product_listings),
+	product_listings_history: many(product_listings_history),
 }));
 
 // TODO: Add constraints if needed
 // TODO: Add indexes if needed
 export const product_listings = sqliteTable("product_listings", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	productId: integer("product_id").references(() => products.id, {
-		onDelete: "cascade",
-	}),
+	productId: integer("product_id")
+		.references(() => products.id, {
+			onDelete: "cascade",
+		})
+		.notNull(),
 	name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
 	store: text("store").notNull(),
 	url: text("url"),
 	location: text("location"),
 
 	// Price details
-	price: real("price").notNull(),
+	price: integer("price").notNull(),
 	quantity: real("quantity").notNull(),
 	unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
 
@@ -92,24 +95,37 @@ export const product_listings_history = sqliteTable(
 	"product_listings_history",
 	{
 		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		productId: integer("product_id")
+			.references(() => products.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
 		productListingId: integer("product_listing_id")
 			.references(() => product_listings.id, {
 				onDelete: "cascade",
 			})
 			.notNull(),
-		price: real("price").notNull(),
-		quantity: real("quantity").notNull(),
-		unit: text("unit").notNull(),
+		price: integer("price").notNull(),
+		// quantity: real("quantity").notNull(),
+		// unit: text("unit").notNull(),
 		recordedAt: text("recorded_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	},
 	(table) => {
 		return {
+			productIdIdx: index("idx_product_listings_history_product_id").on(
+				table.productId,
+			),
 			productListingIdIdx: index(
 				"idx_product_listings_history_product_listing_id",
 			).on(table.productListingId),
 			recordedAtIdx: index("idx_product_listings_history_recorded_at").on(
 				table.recordedAt,
 			),
+			// TODO: Composite Index if needed for performance improvement
+			// compositeIdx: index("idx_product_listings_history_product_id_recorded_at").on(
+			// 	table.productId,
+			// 	table.recordedAt,
+			// ),
 			// TODO: Add Constraints if needed
 			// checkPrice: check("price_check", sql`${table.price} >= 0`),
 			// checkQuantity: check("quantity_check", sql`${table.quantity} >= 0`),
@@ -120,6 +136,10 @@ export const product_listings_history = sqliteTable(
 export const productListingHistoryRelations = relations(
 	product_listings_history,
 	({ one }) => ({
+		product: one(products, {
+			fields: [product_listings_history.productId],
+			references: [products.id],
+		}),
 		product_listing: one(product_listings, {
 			fields: [product_listings_history.productListingId],
 			references: [product_listings.id],
@@ -155,3 +175,16 @@ export type InsertProductListing = typeof product_listings.$inferInsert;
 
 export const selectProductListingSchema = createSelectSchema(product_listings);
 export const insertProductListingSchema = createInsertSchema(product_listings);
+
+// Product Listings History Types
+export type SelectProductListingHistory =
+	typeof product_listings_history.$inferSelect;
+export type InsertProductListingHistory =
+	typeof product_listings_history.$inferInsert;
+
+export const selectProductListingHistorySchema = createSelectSchema(
+	product_listings_history,
+);
+export const insertProductListingHistorySchema = createInsertSchema(
+	product_listings_history,
+);

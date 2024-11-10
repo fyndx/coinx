@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "61b8a81b-2e02-44ba-890f-51f219fd9729",
+  "id": "d925ff87-fbbb-46ab-b532-f5cf816e64a6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "category": {
@@ -100,7 +100,7 @@
           "name": "product_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "name": {
@@ -117,6 +117,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "location": {
           "name": "location",
           "type": "text",
@@ -126,7 +133,7 @@
         },
         "price": {
           "name": "price",
-          "type": "real",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -169,6 +176,101 @@
           "tableTo": "product",
           "columnsFrom": [
             "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "product_listings_history": {
+      "name": "product_listings_history",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "product_listing_id": {
+          "name": "product_listing_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "price": {
+          "name": "price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "recorded_at": {
+          "name": "recorded_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "idx_product_listings_history_product_id": {
+          "name": "idx_product_listings_history_product_id",
+          "columns": [
+            "product_id"
+          ],
+          "isUnique": false
+        },
+        "idx_product_listings_history_product_listing_id": {
+          "name": "idx_product_listings_history_product_listing_id",
+          "columns": [
+            "product_listing_id"
+          ],
+          "isUnique": false
+        },
+        "idx_product_listings_history_recorded_at": {
+          "name": "idx_product_listings_history_recorded_at",
+          "columns": [
+            "recorded_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "product_listings_history_product_id_product_id_fk": {
+          "name": "product_listings_history_product_id_product_id_fk",
+          "tableFrom": "product_listings_history",
+          "tableTo": "product",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "product_listings_history_product_listing_id_product_listings_id_fk": {
+          "name": "product_listings_history_product_listing_id_product_listings_id_fk",
+          "tableFrom": "product_listings_history",
+          "tableTo": "product_listings",
+          "columnsFrom": [
+            "product_listing_id"
           ],
           "columnsTo": [
             "id"
