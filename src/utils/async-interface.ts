@@ -1,4 +1,4 @@
 export interface AsyncInterface {
-	status: "pending" | "success" | "error";
+	status: "idle" | "pending" | "success" | "error";
 	error?: Error;
 }

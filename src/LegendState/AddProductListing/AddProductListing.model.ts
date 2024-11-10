@@ -61,25 +61,28 @@ export class AddProductListingModel {
 				productListing,
 			);
 
-			if (isProductListingValid) {
-				const [createdProductListing] = await Effect.runPromise(
-					addProductListing(productListing),
-				);
-				await Effect.runPromise(
-					addProductListingsHistory({
-						productId: createdProductListing.productId,
-						productListingId: createdProductListing.id,
-						price: createdProductListing.price,
-					}),
-				);
-				Burnt.toast({ title: "Product added successfully" });
-				router.back();
+			if (!isProductListingValid) {
+				Burnt.toast({ title: "Invalid product details" });
 				return;
 			}
 
-			Burnt.toast({ title: "Invalid product details" });
+			const [createdProductListing] = await Effect.runPromise(
+				addProductListing(productListing),
+			);
+			await Effect.runPromise(
+				addProductListingsHistory({
+					productId: createdProductListing.productId,
+					productListingId: createdProductListing.id,
+					price: createdProductListing.price,
+				}),
+			);
+			Burnt.toast({ title: "Product added successfully" });
+			router.back();
 		} catch (error) {
-			console.log({ error });
+			console.error("Failed to add product listing:", error);
+			Burnt.toast({
+				title: "Failed to add product",
+			});
 		}
 	};
 

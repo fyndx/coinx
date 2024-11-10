@@ -33,7 +33,7 @@ const EditProductListing = observer(() => {
 		editProductListingModel.modifyProductDraft("price", value);
 	};
 
-	if (productListing$.status === "loading") {
+	if (productListing$.status === "pending") {
 		return (
 			<YStack
 				flex={1}
@@ -61,7 +61,10 @@ const EditProductListing = observer(() => {
 						onChangeText={handlePriceChange}
 					/>
 				</YStack>
-				<Button onPress={editProductListingModel.updateProductListing}>
+				<Button
+					onPress={editProductListingModel.updateProductListing}
+					disabled={editProductListingModel.views.isButtonDisabled.get()}
+				>
 					Update Price
 				</Button>
 			</YStack>

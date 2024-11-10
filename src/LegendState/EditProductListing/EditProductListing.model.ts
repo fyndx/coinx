@@ -7,19 +7,21 @@ import {
 	getProductListingById,
 	updateProductListingById,
 } from "@/src/database/Products/ProductsListingsRepo";
-import { observable } from "@legendapp/state";
+import { computed, observable } from "@legendapp/state";
 import { Effect } from "effect";
 import * as Burnt from "burnt";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
+import type { AsyncInterface } from "@/src/utils/async-interface";
 
-interface ProductListing {
-	status: "loading" | "success" | "error";
+interface ProductListing extends AsyncInterface {
 	data?: SelectProductListing;
 }
 
-interface EditProductDraft {
-	price: string;
+interface EditProductDraft extends AsyncInterface {
+	data: {
+		price: string;
+	};
 }
 
 export class EditProductListing {
@@ -28,10 +30,13 @@ export class EditProductListing {
 
 	constructor() {
 		this.productListing = observable<ProductListing>({
-			status: "loading",
+			status: "pending",
 		});
 		this.editProductDraft = observable<EditProductDraft>({
-			price: "",
+			status: "idle",
+			data: {
+				price: "",
+			},
 		});
 	}
 
@@ -41,53 +46,80 @@ export class EditProductListing {
 	}
 
 	onUnmount() {
-		this.productListing.set({ status: "loading", data: undefined });
-		this.editProductDraft.price.set("");
+		this.productListing.set({ status: "pending", data: undefined });
+		this.editProductDraft.data.price.set("");
 	}
 
 	getProductListingById = async (id: number) => {
-		this.productListing.set({ status: "loading" });
+		this.productListing.set({ status: "pending" });
 		const productListing = await Effect.runPromise(getProductListingById(id));
 		this.productListing.set({ data: productListing[0], status: "success" });
 	};
 
-	modifyProductDraft = <K extends keyof EditProductDraft>(
+	modifyProductDraft = <K extends keyof EditProductDraft["data"]>(
 		key: K,
-		value: EditProductDraft[K],
+		value: EditProductDraft["data"][K],
 	) => {
-		this.editProductDraft[key].set(value);
+		this.editProductDraft.data?.[key].set(value);
 	};
 
 	updateProductListing = async () => {
-		const productListing = this.productListing.data.peek();
-		const price = Currency.toSmallestSubunit(
-			Number(this.editProductDraft.price.peek()),
-		);
+		try {
+			this.editProductDraft.status.set("pending");
+			const productListing = this.productListing.data.peek();
+			const price = Currency.toSmallestSubunit(
+				Number(this.editProductDraft.data.price.peek()),
+			);
 
-		if (Number.isNaN(price) || price <= 0) {
-			throw new Error("Invalid price value");
-		}
+			if (Number.isNaN(price) || price <= 0) {
+				throw new Error("Invalid price value");
+			}
 
-		const updatedProductListing = await Effect.runPromise(
-			updateProductListingById({
-				id: productListing.id,
+			const updatedProductListing = await Effect.runPromise(
+				updateProductListingById({
+					id: productListing.id,
+					price: price,
+				}),
+			);
+
+			const productListingHistory: InsertProductListingHistory = {
+				productId: productListing.productId,
+				productListingId: productListing.id,
 				price: price,
-			}),
-		);
+			};
 
-		const productListingHistory: InsertProductListingHistory = {
-			productId: productListing.productId,
-			productListingId: productListing.id,
-			price: price,
-		};
+			const addedProductListingHistory = await Effect.runPromise(
+				addProductListingsHistory(productListingHistory),
+			);
+			this.editProductDraft.status.set("success");
+			Burnt.toast({
+				title: "Price Updated Successfully",
+			});
+			router.back();
+		} catch (error) {
+			console.log({ error });
+			this.editProductDraft.status.set("error");
+			Burnt.toast({
+				title: "Failed to update price",
+			});
+		} finally {
+			this.editProductDraft.status.set("idle");
+		}
+	};
 
-		const addedProductListingHistory = await Effect.runPromise(
-			addProductListingsHistory(productListingHistory),
-		);
+	// Views
+	private isButtonDisabled = computed(() => {
+		const price = this.editProductDraft.data.price.get();
+		const isInvalidPrice = price === "" || Number.isNaN(Number(price));
+		const isPriceSame =
+			this.productListing.data?.price.peek() === Number(price);
+		const isProductUpdatePending =
+			this.editProductDraft.status.get() === "pending";
 
-		Burnt.toast({
-			title: "Price Updated Successfully",
-		});
-		router.back();
+		return isInvalidPrice || isPriceSame || isProductUpdatePending;
+	});
+
+	views = {
+		isButtonDisabled: this.isButtonDisabled,
 	};
 }

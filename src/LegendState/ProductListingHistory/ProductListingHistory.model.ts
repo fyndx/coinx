@@ -26,6 +26,9 @@ export class ProductsListingHistoryModel {
 		const [productListingHistory] = await Effect.runPromise(
 			getProductListingsHistoryByProductListingId(productId),
 		);
+		if (productListingHistory === undefined) {
+			return;
+		}
 		this.productsListingHistory.set({
 			data: productListingHistory,
 			status: "success",
