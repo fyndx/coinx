@@ -85,6 +85,7 @@ export class ProductsListingsModel {
 		const table = [];
 
 		for (const productListing of productListings) {
+			const price = Currency.fromSmallestSubunit(productListing.price, "INR");
 			table.push([
 				{
 					type: "text",
@@ -94,12 +95,12 @@ export class ProductsListingsModel {
 					type: "text",
 					value:
 						productListing.quantity !== 0
-							? `${(productListing.price / productListing.quantity).toFixed(2)} per ${productListing.unit}`
+							? `${(price / productListing.quantity).toFixed(2)} per ${productListing.unit}`
 							: "N/A",
 				},
 				{
 					type: "text",
-					value: `${productListing.price}`,
+					value: `${price}`,
 				},
 				{
 					type: "text",

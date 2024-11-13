@@ -69,6 +69,7 @@ export class EditProductListing {
 			const productListing = this.productListing.data.peek();
 			const price = Currency.toSmallestSubunit(
 				Number(this.editProductDraft.data.price.peek()),
+				"INR",
 			);
 
 			if (Number.isNaN(price) || price <= 0) {

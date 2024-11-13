@@ -40,6 +40,7 @@ const ProductDetails = () => {
 			<YStack flex={1} padding={"$3"} backgroundColor={"$background"}>
 				<ProductListingTable data={productListing$.productListingsTable} />
 			</YStack>
+			{/* TODO: Create a Chart for product listings */}
 			<Circle
 				position="absolute"
 				right={"$6"}
