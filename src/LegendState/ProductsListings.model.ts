@@ -28,18 +28,22 @@ export class ProductsListingsModel {
 	};
 
 	getProductListingsByProductId = async (productId: number) => {
-		const productListings = await Effect.runPromise(
-			getProductListingsByProductId(productId),
-		);
-		const updatedProductListings = productListings.map((productListing) => {
-			return {
-				...productListing,
-				// TODO: Change INR to currency from user settings
-				price: Currency.fromSmallestSubunit(productListing.price, "INR"),
-			};
-		});
-		this.productId.set(productId);
-		this.productListings.set(updatedProductListings);
+		try {
+			const productListings = await Effect.runPromise(
+				getProductListingsByProductId(productId),
+			);
+			const updatedProductListings = productListings.map((productListing) => {
+				return {
+					...productListing,
+					// TODO: Change INR to currency from user settings
+					price: Currency.fromSmallestSubunit(productListing.price, "INR"),
+				};
+			});
+			this.productId.set(productId);
+			this.productListings.set(updatedProductListings);
+		} catch (error) {
+			Burnt.toast({ title: "Error fetching product listings" });
+		}
 	};
 
 	deleteProductListingById = async (id: number) => {
@@ -78,7 +82,7 @@ export class ProductsListingsModel {
 		const table = [];
 
 		for (const productListing of productListings) {
-			const price = Currency.fromSmallestSubunit(productListing.price, "INR");
+			const price = productListing.price;
 			table.push([
 				{
 					type: "text",

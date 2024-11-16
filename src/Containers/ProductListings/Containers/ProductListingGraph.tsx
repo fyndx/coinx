@@ -5,6 +5,7 @@ import { Line, CartesianChart, useChartPressState } from "victory-native";
 import type { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
 import { Circle, useFont, Text as SkiaText } from "@shopify/react-native-skia";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
+import { Fragment } from "react";
 
 function ToolTip({
 	x,
@@ -122,7 +123,7 @@ export const ProductListingGraph = observer(
 				>
 					{({ points, chartBounds }) => {
 						return extractedProducts.map((key, index) => (
-							<>
+							<Fragment key={key}>
 								<Line
 									connectMissingData
 									key={key}
@@ -140,7 +141,7 @@ export const ProductListingGraph = observer(
 										index={index}
 									/>
 								)}
-							</>
+							</Fragment>
 						));
 					}}
 				</CartesianChart>

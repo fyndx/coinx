@@ -5,11 +5,12 @@ import dayjs from "dayjs";
 import { Effect, pipe } from "effect";
 import Currency from "@coinify/currency";
 
-interface ProductListingHistoryGraphData {
+interface ConsolidatedPriceData {
 	[key: string]: {
-		x: Date;
-		y: number;
-	}[];
+		[key: string]: number | string;
+		recordedAt: string;
+		date: string;
+	};
 }
 
 interface ProductListingHistoryData {
@@ -17,14 +18,6 @@ interface ProductListingHistoryData {
 	price: number;
 	recordedAt: string;
 	listingName: string;
-}
-
-interface ChartData extends Record<string, unknown> {
-	name: string;
-	data: {
-		x: Date;
-		y: number;
-	}[];
 }
 
 interface ProductListingHistory extends AsyncInterface {
@@ -75,17 +68,18 @@ export class ProductsListingHistoryModel {
 			);
 
 			const consolidatedPriceData = updatedProductListingHistoryData.reduce(
-				(acc: Record<string, any>, entry) => {
+				(acc: ConsolidatedPriceData, entry) => {
 					const { listingName, price, recordedAt } = entry;
 					const date = dayjs(recordedAt);
 					const formattedDateWithYear = date.format("D MM YY");
 					const formattedDate = date.format("D MMM");
 					if (!acc[formattedDateWithYear]) {
-						acc[formattedDateWithYear] = {};
+						acc[formattedDateWithYear] = {
+							recordedAt: formattedDate,
+							date: formattedDateWithYear,
+						};
 					}
 					acc[formattedDateWithYear][listingName] = price;
-					acc[formattedDateWithYear].recordedAt = formattedDate;
-					acc[formattedDateWithYear].date = formattedDateWithYear;
 					return acc;
 				},
 				{},
@@ -120,6 +114,7 @@ export class ProductsListingHistoryModel {
 			console.log("groupedData", productListingHistoryGraphData);
 		} catch (error) {
 			this.productsListingHistory.status.set("error");
+			console.log("Error fetching product listings history", error);
 		}
 	};
 }

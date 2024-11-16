@@ -53,7 +53,12 @@ export const getProductListingsHistoryByProductId = ({
 			return query.execute();
 		},
 		catch: (error) => {
-			console.error(error);
+			// console.error(error);
+			Effect.logError({
+				error: error instanceof Error ? error.message : "Unknown error",
+				operation: "getProductListingsHistoryByProductId",
+				productId,
+			});
 			return Effect.fail(
 				new DrizzleError({
 					message:
