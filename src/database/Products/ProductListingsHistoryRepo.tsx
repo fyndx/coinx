@@ -1,10 +1,11 @@
 import { db as database } from "@/db/client";
 import {
+	product_listings as productListingsRepo,
 	product_listings_history as productsListingsHistoryRepo,
 	type InsertProductListingHistory,
 } from "@/db/schema";
 import { DrizzleError } from "@/src/utils/error";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const addProductListingsHistory = (
@@ -20,15 +21,34 @@ export const addProductListingsHistory = (
 	});
 };
 
-export const getProductListingsHistoryByProductListingId = (
-	productId: number,
-) => {
+/**
+ * Retrieves the product listings history for a given product ID Grouped by Listing ID.
+ *
+ * @param {Object} params - The parameters for the function.
+ * @param {number} params.productId - The ID of the product to retrieve the listings history for.
+ */
+export const getProductListingsHistoryByProductId = ({
+	productId,
+}: { productId: number }) => {
 	return Effect.tryPromise({
 		try: () => {
 			const query = database
-				.select()
+				.select({
+					productListingId: productsListingsHistoryRepo.productListingId,
+					price: productsListingsHistoryRepo.price,
+					recordedAt: productsListingsHistoryRepo.recordedAt,
+					listingName: productListingsRepo.name, // Selecting the listing name from product_listings
+				})
 				.from(productsListingsHistoryRepo)
-				.where(eq(productsListingsHistoryRepo.productListingId, productId));
+				.innerJoin(
+					productListingsRepo,
+					eq(
+						productsListingsHistoryRepo.productListingId,
+						productListingsRepo.id,
+					),
+				)
+				.where(eq(productsListingsHistoryRepo.productId, productId))
+				.orderBy(asc(productsListingsHistoryRepo.recordedAt));
 
 			return query.execute();
 		},
@@ -36,7 +56,8 @@ export const getProductListingsHistoryByProductListingId = (
 			console.error(error);
 			return Effect.fail(
 				new DrizzleError({
-					message: "Failed to get product listings history for the given id",
+					message:
+						"Failed to get product listings history for the given product id",
 				}),
 			);
 		},

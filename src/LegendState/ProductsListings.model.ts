@@ -22,13 +22,6 @@ export class ProductsListingsModel {
 		this.productListings = observable([]);
 	}
 
-	// @Actions
-
-	// getProductListings = async () => {
-	// 	const productListings = await Effect.runPromise(getProductsListings());
-	// 	this.productListings.set(productListings);
-	// };
-
 	getProductListingById = async (id: number) => {
 		const productListing = await Effect.runPromise(getProductListingById(id));
 		return productListing;
@@ -46,7 +39,7 @@ export class ProductsListingsModel {
 			};
 		});
 		this.productId.set(productId);
-		this.productListings.set(productListings);
+		this.productListings.set(updatedProductListings);
 	};
 
 	deleteProductListingById = async (id: number) => {

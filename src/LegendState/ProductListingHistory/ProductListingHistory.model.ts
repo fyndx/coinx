@@ -1,11 +1,37 @@
-import type { SelectProductListingHistory } from "@/db/schema";
-import { getProductListingsHistoryByProductListingId } from "@/src/database/Products/ProductListingsHistoryRepo";
+import { getProductListingsHistoryByProductId } from "@/src/database/Products/ProductListingsHistoryRepo";
 import type { AsyncInterface } from "@/src/utils/async-interface";
 import { observable } from "@legendapp/state";
+import dayjs from "dayjs";
 import { Effect, pipe } from "effect";
+import Currency from "@coinify/currency";
+
+interface ProductListingHistoryGraphData {
+	[key: string]: {
+		x: Date;
+		y: number;
+	}[];
+}
+
+interface ProductListingHistoryData {
+	productListingId: number;
+	price: number;
+	recordedAt: string;
+	listingName: string;
+}
+
+interface ChartData extends Record<string, unknown> {
+	name: string;
+	data: {
+		x: Date;
+		y: number;
+	}[];
+}
 
 interface ProductListingHistory extends AsyncInterface {
-	data?: SelectProductListingHistory;
+	data?: ProductListingHistoryData[];
+	productListingNames?: string[];
+	graphData?: Record<string, any>[];
+	colors?: Record<string, string>;
 }
 
 export class ProductsListingHistoryModel {
@@ -14,24 +40,86 @@ export class ProductsListingHistoryModel {
 	constructor() {
 		this.productsListingHistory = observable<ProductListingHistory>({
 			status: "pending",
+			data: [],
+			productListingNames: [],
+			graphData: [],
+			colors: {},
 		});
 	}
 
 	onUnmount = () => {
-		this.productsListingHistory.set({ status: "pending", data: undefined });
+		this.productsListingHistory.set({
+			status: "pending",
+			data: [],
+			graphData: [],
+			productListingNames: [],
+			colors: {},
+		});
 	};
 
-	getAllProductListingsByProductId = async (productId: number) => {
+	getProductListingsHistoryByProductId = async (productId: number) => {
 		this.productsListingHistory.status.set("pending");
-		const [productListingHistory] = await Effect.runPromise(
-			getProductListingsHistoryByProductListingId(productId),
-		);
-		if (productListingHistory === undefined) {
-			return;
+		try {
+			const productListingHistoryData = await Effect.runPromise(
+				getProductListingsHistoryByProductId({ productId }),
+			);
+			console.log("product listing history", productListingHistoryData);
+
+			const updatedProductListingHistoryData = productListingHistoryData.map(
+				(listing) => {
+					return {
+						...listing,
+						price: Currency.fromSmallestSubunit(listing.price, "INR"),
+					};
+				},
+			);
+
+			const consolidatedPriceData = updatedProductListingHistoryData.reduce(
+				(acc: Record<string, any>, entry) => {
+					const { listingName, price, recordedAt } = entry;
+					const date = dayjs(recordedAt);
+					const formattedDateWithYear = date.format("D MM YY");
+					const formattedDate = date.format("D MMM");
+					if (!acc[formattedDateWithYear]) {
+						acc[formattedDateWithYear] = {};
+					}
+					acc[formattedDateWithYear][listingName] = price;
+					acc[formattedDateWithYear].recordedAt = formattedDate;
+					acc[formattedDateWithYear].date = formattedDateWithYear;
+					return acc;
+				},
+				{},
+			);
+
+			const uniqueProductListings = [
+				...new Set(
+					updatedProductListingHistoryData.map((item) => item.listingName),
+				),
+			];
+
+			const productListingColors = uniqueProductListings.reduce(
+				(acc: Record<string, string>, cur, index) => {
+					acc[cur] =
+						`hsl(${(index * 360) / uniqueProductListings.length}, 70%, 50%)`;
+					return acc;
+				},
+				{},
+			);
+
+			const productListingHistoryGraphData = Object.values(
+				consolidatedPriceData,
+			);
+
+			this.productsListingHistory.set({
+				status: "success",
+				data: updatedProductListingHistoryData,
+				graphData: Object.values(consolidatedPriceData),
+				productListingNames: uniqueProductListings,
+				colors: productListingColors,
+			});
+			console.log("groupedData", productListingHistoryGraphData);
+		} catch (error) {
+			this.productsListingHistory.status.set("error");
 		}
-		this.productsListingHistory.set({
-			data: productListingHistory,
-			status: "success",
-		});
 	};
 }

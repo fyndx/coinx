@@ -1,3 +1,4 @@
+import { ProductListingGraph } from "@/src/Containers/ProductListings/Containers/ProductListingGraph";
 import { ProductListingTable } from "@/src/Containers/ProductListings/Containers/ProductListingTable";
 import { rootStore } from "@/src/LegendState";
 import { useMount } from "@legendapp/state/react";
@@ -6,9 +7,9 @@ import { Link, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Circle, Text, XStack, YStack } from "tamagui";
+import { Circle, Spacer, YStack } from "tamagui";
 
-const ProductDetails = () => {
+const ProductListings = () => {
 	const { id, name } = useLocalSearchParams();
 	const productId = Number(id);
 
@@ -28,7 +29,9 @@ const ProductDetails = () => {
 		// biome-ignore lint/correctness/useExhaustiveDependencies: legend state methods are not necessary
 		useCallback(() => {
 			productListing$.getProductListingsByProductId(productId);
-			productListingHistoryModel$.getAllProductListingsByProductId(productId);
+			productListingHistoryModel$.getProductListingsHistoryByProductId(
+				productId,
+			);
 		}, [productId]),
 	);
 
@@ -39,8 +42,11 @@ const ProductDetails = () => {
 			/>
 			<YStack flex={1} padding={"$3"} backgroundColor={"$background"}>
 				<ProductListingTable data={productListing$.productListingsTable} />
+				<Spacer size={"$6"} />
+				<ProductListingGraph
+					listingHistory={productListingHistoryModel$.productsListingHistory}
+				/>
 			</YStack>
-			{/* TODO: Create a Chart for product listings */}
 			<Circle
 				position="absolute"
 				right={"$6"}
@@ -59,7 +65,7 @@ const ProductDetails = () => {
 	);
 };
 
-export default ProductDetails;
+export default ProductListings;
 
 const styles = StyleSheet.create({
 	container: {
