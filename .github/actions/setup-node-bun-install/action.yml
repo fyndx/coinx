@@ -12,3 +12,4 @@ runs:
 
     - name: 📦 Install Project Dependencies
       run: bun install --frozen-lockfile
+      shell: bash
