@@ -17,6 +17,7 @@ import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
+import { rootStore } from "../index";
 
 export class AddProductListingModel {
 	product;
@@ -53,7 +54,7 @@ export class AddProductListingModel {
 			// TODO: Change INR to currency from user settings
 			productListing.price = Currency.toSmallestSubunit(
 				productListing.price,
-				"INR",
+				rootStore.appModel.obs.currency.peek(),
 			);
 
 			const isProductListingValid = Value.Check(

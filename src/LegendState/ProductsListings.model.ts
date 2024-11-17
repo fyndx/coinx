@@ -13,6 +13,7 @@ import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
+import { rootStore } from "./index";
 
 export class ProductsListingsModel {
 	productListings: Observable<SelectProductListing[]>;
@@ -36,13 +37,22 @@ export class ProductsListingsModel {
 				return {
 					...productListing,
 					// TODO: Change INR to currency from user settings
-					price: Currency.fromSmallestSubunit(productListing.price, "INR"),
+					price: Currency.fromSmallestSubunit(
+						productListing.price,
+						rootStore.appModel.obs.currency.peek(),
+					),
 				};
 			});
 			this.productId.set(productId);
 			this.productListings.set(updatedProductListings);
 		} catch (error) {
-			Burnt.toast({ title: "Error fetching product listings" });
+			console.error("[ProductsListings] Failed to fetch listings:", error);
+			Burnt.toast({
+				title: "Error fetching product listings",
+				message:
+					error instanceof Error ? error.message : "Unknown error occurred",
+				preset: "error",
+			});
 		}
 	};
 

@@ -4,6 +4,7 @@ import { observable } from "@legendapp/state";
 import dayjs from "dayjs";
 import { Effect, pipe } from "effect";
 import Currency from "@coinify/currency";
+import { rootStore } from "../index";
 
 interface ConsolidatedPriceData {
 	[key: string]: {
@@ -62,7 +63,10 @@ export class ProductsListingHistoryModel {
 				(listing) => {
 					return {
 						...listing,
-						price: Currency.fromSmallestSubunit(listing.price, "INR"),
+						price: Currency.fromSmallestSubunit(
+							listing.price,
+							rootStore.appModel.obs.currency.peek(),
+						),
 					};
 				},
 			);
