@@ -2,9 +2,9 @@ name: Lint TS (Biome)
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
   lint:
@@ -28,6 +28,6 @@ jobs:
           reporter: github-pr-review
           fail_on_error: true
 
-      - name: 🏃‍♂️ Run ESLint PR
+      - name: 🏃‍♂️ Run Biome PR
         if: github.event_name != 'pull_request'
         run: bun run lint

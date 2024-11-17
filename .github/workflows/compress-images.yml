@@ -30,9 +30,9 @@ jobs:
 
       - name: Create Pull Request
         if: steps.calibre.outputs.markdown != ''
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
-          title: Auto Compress Images
+          title: 'chore: Optimize image assets using calibreapp/image-actions'
           branch-suffix: timestamp
-          commit-message: Compress Images
+          commit-message: 'chore: Optimize image assets using calibreapp/image-actions'
           body: ${{ steps.calibre.outputs.markdown }}
