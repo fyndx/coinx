@@ -1,0 +1,31 @@
+name: Expo Doctor (expo)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "package.json"
+      - "bun.lockb"
+  pull_request:
+    paths:
+      - "package.json"
+      - "bun.lockb"
+
+jobs:
+  doctor:
+    name: Expo Doctor (expo)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout project repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node + Bun + Install Dependencies
+        uses: ./.github/actions/setup-node-bun-install
+
+      - name: 🚑 Run Doctor Checks
+        run: npx expo-doctor@latest

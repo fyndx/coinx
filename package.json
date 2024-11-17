@@ -3,13 +3,15 @@
 	"version": "1.0.0",
 	"main": "./index",
 	"scripts": {
-		"start": "expo start",
 		"android": "expo run:android",
-		"ios": "expo run:ios",
-		"web": "expo start --web",
 		"generate": "drizzle-kit generate",
+		"ios": "expo run:ios",
+		"lint": "biome lint",
+		"postinstall": "patch-package",
+		"start": "expo start",
+		"type-check": "tsc  --noemit",
 		"upgrade:tamagui": "bun update '*tamagui*'@latest '@tamagui/*'@latest",
-		"postinstall": "patch-package"
+		"web": "expo start --web"
 	},
 	"dependencies": {
 		"@coinify/currency": "^1.4.2",
