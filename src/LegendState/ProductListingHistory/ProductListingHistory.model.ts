@@ -121,8 +121,14 @@ export class ProductsListingHistoryModel {
 			});
 			console.log("groupedData", productListingHistoryGraphData);
 		} catch (error) {
-			this.productsListingHistory.status.set("error");
-			console.log("Error fetching product listings history", error);
+			console.error("Error fetching product listings history:", error);
+			this.productsListingHistory.set({
+				status: "error",
+				data: [],
+				graphData: [],
+				productListingNames: [],
+				colors: {},
+			});
 		}
 	};
 }
