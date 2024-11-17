@@ -13,6 +13,7 @@ import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
+import { rootStore } from "./index";
 
 export class ProductsListingsModel {
 	productListings: Observable<SelectProductListing[]>;
@@ -22,31 +23,36 @@ export class ProductsListingsModel {
 		this.productListings = observable([]);
 	}
 
-	// @Actions
-
-	// getProductListings = async () => {
-	// 	const productListings = await Effect.runPromise(getProductsListings());
-	// 	this.productListings.set(productListings);
-	// };
-
 	getProductListingById = async (id: number) => {
 		const productListing = await Effect.runPromise(getProductListingById(id));
 		return productListing;
 	};
 
 	getProductListingsByProductId = async (productId: number) => {
-		const productListings = await Effect.runPromise(
-			getProductListingsByProductId(productId),
-		);
-		const updatedProductListings = productListings.map((productListing) => {
-			return {
-				...productListing,
-				// TODO: Change INR to currency from user settings
-				price: Currency.fromSmallestSubunit(productListing.price, "INR"),
-			};
-		});
-		this.productId.set(productId);
-		this.productListings.set(productListings);
+		try {
+			const productListings = await Effect.runPromise(
+				getProductListingsByProductId(productId),
+			);
+			const updatedProductListings = productListings.map((productListing) => {
+				return {
+					...productListing,
+					price: Currency.fromSmallestSubunit(
+						productListing.price,
+						rootStore.appModel.obs.currency.peek(),
+					),
+				};
+			});
+			this.productId.set(productId);
+			this.productListings.set(updatedProductListings);
+		} catch (error) {
+			console.error("[ProductsListings] Failed to fetch listings:", error);
+			Burnt.toast({
+				title: "Error fetching product listings",
+				message:
+					error instanceof Error ? error.message : "Unknown error occurred",
+				preset: "error",
+			});
+		}
 	};
 
 	deleteProductListingById = async (id: number) => {
@@ -85,7 +91,7 @@ export class ProductsListingsModel {
 		const table = [];
 
 		for (const productListing of productListings) {
-			const price = Currency.fromSmallestSubunit(productListing.price, "INR");
+			const price = productListing.price;
 			table.push([
 				{
 					type: "text",

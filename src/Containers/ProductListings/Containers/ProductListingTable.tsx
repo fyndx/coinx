@@ -67,7 +67,6 @@ export const ProductListingTable = observer(
 		if (data?.length === 0) {
 			return (
 				<YStack
-					flex={1}
 					alignItems={"center"}
 					justifyContent={"center"}
 					role="alert"

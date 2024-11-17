@@ -6,6 +6,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { observable } from "@legendapp/state";
 import { LatoRegular } from "@/assets/fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppStorage } from "../storage/mmkv";
 
 export class AppModel {
 	obs;
@@ -13,6 +14,8 @@ export class AppModel {
 		this.obs = observable({
 			isAppLoaded: false,
 			isFirstLaunch: "unknown",
+			// TODO: Currency Setup
+			currency: "INR" as string | undefined,
 		});
 	}
 
@@ -35,6 +38,13 @@ export class AppModel {
 		}
 	};
 
+	private loadCurrency = async () => {
+		const currency = AppStorage.getString("currency");
+		if (currency) {
+			this.obs.currency.set(currency);
+		}
+	};
+
 	checkFirstLaunch = async () => {
 		const isFirstLaunch = await AsyncStorage.getItem("isFirstLaunch");
 		if (isFirstLaunch === null) {
@@ -51,7 +61,11 @@ export class AppModel {
 
 	private startServices = async () => {
 		try {
-			await Promise.all([this.runDatabaseMigrations(), this.loadFonts()]);
+			await Promise.all([
+				this.runDatabaseMigrations(),
+				this.loadFonts(),
+				this.loadCurrency(),
+			]);
 		} catch (error) {
 			console.log("Error starting services:", error);
 		} finally {
