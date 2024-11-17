@@ -36,7 +36,6 @@ export class ProductsListingsModel {
 			const updatedProductListings = productListings.map((productListing) => {
 				return {
 					...productListing,
-					// TODO: Change INR to currency from user settings
 					price: Currency.fromSmallestSubunit(
 						productListing.price,
 						rootStore.appModel.obs.currency.peek(),

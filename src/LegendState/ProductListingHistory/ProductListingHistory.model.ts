@@ -24,7 +24,11 @@ interface ProductListingHistoryData {
 interface ProductListingHistory extends AsyncInterface {
 	data?: ProductListingHistoryData[];
 	productListingNames?: string[];
-	graphData?: Record<string, any>[];
+	graphData?: Array<{
+		[listingName: string]: number | string;
+		recordedAt: string;
+		date: string;
+	}>;
 	colors?: Record<string, string>;
 }
 
