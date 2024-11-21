@@ -59,10 +59,8 @@ export const exportDataToCsv = async () => {
 		const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
 		if (exportsDir.exists) {
 			exportsDir.delete();
-			exportsDir.create();
-		} else {
-			exportsDir.create();
 		}
+		exportsDir.create();
 		await saveTablesToCsv({
 			csvDestinationFolderPath: CSV_EXPORTS_FOLDER,
 			tableNames,

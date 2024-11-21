@@ -32,7 +32,13 @@ export const saveTableToCsv = async ({
 		for await (const row of iterator) {
 			openedFile.writeBytes(
 				new TextEncoder().encode(
-					Object.values(row as { [key: string]: unknown }).join(","),
+					Object.values(row as { [key: string]: unknown })
+						.map((value) => {
+							if (value === null) return "";
+							const str = String(value);
+							return str.includes(",") ? `"${str.replace(/"/g, '""')}"` : str;
+						})
+						.join(","),
 				),
 			);
 			openedFile.writeBytes(new TextEncoder().encode("\n"));
