@@ -1,9 +1,14 @@
 import { COINX_DATABASE_NAME, db, expoDb } from "@/db/client";
 import { observable } from "@legendapp/state";
-import { File, Paths } from "expo-file-system/next";
-import { defaultDatabaseDirectory } from "expo-sqlite";
+import { Directory, File, Paths } from "expo-file-system/next";
 import * as Sharing from "expo-sharing";
-import { zip } from "react-native-zip-archive";
+import { defaultDatabaseDirectory } from "expo-sqlite";
+import {
+	createZipArchive,
+	listDatabaseTables,
+	saveTablesToCsv,
+} from "./csv-exports";
+import { Effect } from "effect";
 
 export const SettingsModel = observable({});
 
@@ -37,52 +42,29 @@ export const exportData = async () => {
 };
 
 export const exportDataToCsv = async () => {
-	const DB_FOLDER = `${Paths.document.uri}csv_exports/`;
-	console.log("Exporting data to CSV", DB_FOLDER);
+	const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
+	console.log("Exporting data to CSV", CSV_EXPORTS_FOLDER);
 
 	try {
 		// Step 1: Fetch all table names
-		const result: { name: string }[] = await expoDb.getAllAsync(
-			`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`,
-			[],
-		);
+		const result = await Effect.runPromise(listDatabaseTables);
+
 		const tableNames = result
 			.map((row) => row.name)
 			.filter((name) => name.includes("coinx"));
 		console.log({ tableNames });
 
 		// Step 2: Loop through each table
-		for (const tableName of tableNames) {
-			const result: { name: string }[] = await expoDb.getAllAsync(
-				`PRAGMA table_info(${tableName});`,
-			);
-			// Headers
-			const headers = result.map((row) => row.name);
-			// Create File
-			const fileUri = `${DB_FOLDER}${tableName}.csv`;
-			const fileInstance = new File(fileUri);
-			fileInstance.parentDirectory.create();
-			fileInstance.create();
-			// Write Headers
-			const openedFile = fileInstance.open();
-			openedFile.writeBytes(new TextEncoder().encode(headers.join(",")));
-			openedFile.writeBytes(new TextEncoder().encode("\n"));
-
-			// Write Data
-			const iterator = expoDb.getEachAsync(`SELECT * FROM ${tableName};`, []);
-			for await (const row of iterator) {
-				openedFile.writeBytes(
-					new TextEncoder().encode(Object.values(row as string).join(",")),
-				);
-				openedFile.writeBytes(new TextEncoder().encode("\n"));
-			}
-			openedFile.close();
-		}
+		new Directory(CSV_EXPORTS_FOLDER).create();
+		await saveTablesToCsv({
+			csvDestinationFolderPath: CSV_EXPORTS_FOLDER,
+			tableNames,
+		});
 
 		// Create Zip
 		const SOURCE_DIR = `${Paths.document.uri}csv_exports/`;
 		const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
-		const zipFile = await zip(SOURCE_DIR, ZIP_FILE);
+		await createZipArchive({ sourceDir: SOURCE_DIR, destZipFile: ZIP_FILE });
 
 		// Share File
 		await Sharing.shareAsync(ZIP_FILE, {
