@@ -63,5 +63,9 @@ export const createZipArchive = async ({
 	sourceDir,
 	destZipFile,
 }: { sourceDir: string; destZipFile: string }) => {
-	await zip(sourceDir, destZipFile);
+	try {
+		await zip(sourceDir, destZipFile);
+	} catch (error) {
+		throw new Error(`Failed to create zip archive: ${error.message}`);
+	}
 };
