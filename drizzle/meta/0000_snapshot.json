@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d925ff87-fbbb-46ab-b532-f5cf816e64a6",
+  "id": "389318cd-894b-46b1-a977-cce707621e09",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "category": {
-      "name": "category",
+    "coinx_category": {
+      "name": "coinx_category",
       "columns": {
         "id": {
           "name": "id",
@@ -59,22 +59,22 @@
         }
       },
       "indexes": {
-        "category_name_unique": {
-          "name": "category_name_unique",
+        "coinx_category_name_unique": {
+          "name": "coinx_category_name_unique",
           "columns": [
             "name"
           ],
           "isUnique": true
         },
-        "category_icon_unique": {
-          "name": "category_icon_unique",
+        "coinx_category_icon_unique": {
+          "name": "coinx_category_icon_unique",
           "columns": [
             "icon"
           ],
           "isUnique": true
         },
-        "category_color_unique": {
-          "name": "category_color_unique",
+        "coinx_category_color_unique": {
+          "name": "coinx_category_color_unique",
           "columns": [
             "color"
           ],
@@ -86,8 +86,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "product_listings": {
-      "name": "product_listings",
+    "coinx_product_listing": {
+      "name": "coinx_product_listing",
       "columns": {
         "id": {
           "name": "id",
@@ -170,10 +170,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "product_listings_product_id_product_id_fk": {
-          "name": "product_listings_product_id_product_id_fk",
-          "tableFrom": "product_listings",
-          "tableTo": "product",
+        "coinx_product_listing_product_id_coinx_product_id_fk": {
+          "name": "coinx_product_listing_product_id_coinx_product_id_fk",
+          "tableFrom": "coinx_product_listing",
+          "tableTo": "coinx_product",
           "columnsFrom": [
             "product_id"
           ],
@@ -188,8 +188,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "product_listings_history": {
-      "name": "product_listings_history",
+    "coinx_product_listing_history": {
+      "name": "coinx_product_listing_history",
       "columns": {
         "id": {
           "name": "id",
@@ -252,10 +252,10 @@
         }
       },
       "foreignKeys": {
-        "product_listings_history_product_id_product_id_fk": {
-          "name": "product_listings_history_product_id_product_id_fk",
-          "tableFrom": "product_listings_history",
-          "tableTo": "product",
+        "coinx_product_listing_history_product_id_coinx_product_id_fk": {
+          "name": "coinx_product_listing_history_product_id_coinx_product_id_fk",
+          "tableFrom": "coinx_product_listing_history",
+          "tableTo": "coinx_product",
           "columnsFrom": [
             "product_id"
           ],
@@ -265,10 +265,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "product_listings_history_product_listing_id_product_listings_id_fk": {
-          "name": "product_listings_history_product_listing_id_product_listings_id_fk",
-          "tableFrom": "product_listings_history",
-          "tableTo": "product_listings",
+        "coinx_product_listing_history_product_listing_id_coinx_product_listing_id_fk": {
+          "name": "coinx_product_listing_history_product_listing_id_coinx_product_listing_id_fk",
+          "tableFrom": "coinx_product_listing_history",
+          "tableTo": "coinx_product_listing",
           "columnsFrom": [
             "product_listing_id"
           ],
@@ -283,8 +283,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "product": {
-      "name": "product",
+    "coinx_product": {
+      "name": "coinx_product",
       "columns": {
         "id": {
           "name": "id",
@@ -322,8 +322,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "transaction": {
-      "name": "transaction",
+    "coinx_transaction": {
+      "name": "coinx_transaction",
       "columns": {
         "id": {
           "name": "id",

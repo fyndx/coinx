@@ -1,4 +1,4 @@
-CREATE TABLE `category` (
+CREATE TABLE `coinx_category` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`icon` text NOT NULL,
@@ -8,10 +8,10 @@ CREATE TABLE `category` (
 	`updated_at` text
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `category_name_unique` ON `category` (`name`);--> statement-breakpoint
-CREATE UNIQUE INDEX `category_icon_unique` ON `category` (`icon`);--> statement-breakpoint
-CREATE UNIQUE INDEX `category_color_unique` ON `category` (`color`);--> statement-breakpoint
-CREATE TABLE `product_listings` (
+CREATE UNIQUE INDEX `coinx_category_name_unique` ON `coinx_category` (`name`);--> statement-breakpoint
+CREATE UNIQUE INDEX `coinx_category_icon_unique` ON `coinx_category` (`icon`);--> statement-breakpoint
+CREATE UNIQUE INDEX `coinx_category_color_unique` ON `coinx_category` (`color`);--> statement-breakpoint
+CREATE TABLE `coinx_product_listing` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer NOT NULL,
 	`name` text NOT NULL,
@@ -23,30 +23,30 @@ CREATE TABLE `product_listings` (
 	`unit` text NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text,
-	FOREIGN KEY (`product_id`) REFERENCES `product`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`product_id`) REFERENCES `coinx_product`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `product_listings_history` (
+CREATE TABLE `coinx_product_listing_history` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer NOT NULL,
 	`product_listing_id` integer NOT NULL,
 	`price` integer NOT NULL,
 	`recorded_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	FOREIGN KEY (`product_id`) REFERENCES `product`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`product_listing_id`) REFERENCES `product_listings`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`product_id`) REFERENCES `coinx_product`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`product_listing_id`) REFERENCES `coinx_product_listing`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE INDEX `idx_product_listings_history_product_id` ON `product_listings_history` (`product_id`);--> statement-breakpoint
-CREATE INDEX `idx_product_listings_history_product_listing_id` ON `product_listings_history` (`product_listing_id`);--> statement-breakpoint
-CREATE INDEX `idx_product_listings_history_recorded_at` ON `product_listings_history` (`recorded_at`);--> statement-breakpoint
-CREATE TABLE `product` (
+CREATE INDEX `idx_product_listings_history_product_id` ON `coinx_product_listing_history` (`product_id`);--> statement-breakpoint
+CREATE INDEX `idx_product_listings_history_product_listing_id` ON `coinx_product_listing_history` (`product_listing_id`);--> statement-breakpoint
+CREATE INDEX `idx_product_listings_history_recorded_at` ON `coinx_product_listing_history` (`recorded_at`);--> statement-breakpoint
+CREATE TABLE `coinx_product` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`default_unit_category` text NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `transaction` (
+CREATE TABLE `coinx_transaction` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`transaction_time` integer NOT NULL,
 	`amount` real NOT NULL,
