@@ -11,7 +11,9 @@
 			"resizeMode": "contain",
 			"backgroundColor": "#ffffff"
 		},
-		"assetBundlePatterns": ["**/*"],
+		"assetBundlePatterns": [
+			"**/*"
+		],
 		"newArchEnabled": true,
 		"ios": {
 			"supportsTablet": true,
@@ -34,7 +36,15 @@
 		"plugins": [
 			"expo-router",
 			"expo-font",
-			"expo-build-properties",
+			[
+				"expo-build-properties",
+				{
+					"ios": {
+						// Needed for react-native-zip-archive
+						"deploymentTarget": "15.5"
+					}
+				}
+			],
 			[
 				"expo-dev-launcher",
 				{

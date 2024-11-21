@@ -22,7 +22,9 @@ export class AppModel {
 	runDatabaseMigrations = async () => {
 		try {
 			await migrate(db, migrations);
+			console.log("Database migrations ran successfully");
 		} catch (error) {
+			console.log("Error running database migrations:", error);
 			throw error;
 		}
 	};

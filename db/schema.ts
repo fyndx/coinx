@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
-export const transactions = sqliteTable("transaction", {
+export const transactions = sqliteTable("coinx_transaction", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	transactionTime: integer("transaction_time", { mode: "timestamp" }).notNull(),
 	amount: real("amount").notNull(),
@@ -30,7 +30,7 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 	}),
 }));
 
-export const categories = sqliteTable("category", {
+export const categories = sqliteTable("coinx_category", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	name: text("name").notNull().unique(),
 	icon: text("icon").notNull().unique(),
@@ -45,7 +45,7 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
 	transactions: many(transactions),
 }));
 
-export const products = sqliteTable("product", {
+export const products = sqliteTable("coinx_product", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
 	defaultUnitCategory: text("default_unit_category").notNull(), // from UnitCategory enum in units.ts
@@ -59,7 +59,7 @@ export const productsRelations = relations(products, ({ many }) => ({
 
 // TODO: Add constraints if needed
 // TODO: Add indexes if needed
-export const product_listings = sqliteTable("product_listings", {
+export const product_listings = sqliteTable("coinx_product_listing", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	productId: integer("product_id")
 		.references(() => products.id, {
@@ -92,7 +92,7 @@ export const productListingsRelations = relations(
 );
 
 export const product_listings_history = sqliteTable(
-	"product_listings_history",
+	"coinx_product_listing_history",
 	{
 		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 		productId: integer("product_id")

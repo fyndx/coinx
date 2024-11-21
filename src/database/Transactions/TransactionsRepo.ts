@@ -26,7 +26,7 @@ export const getTransactions = ({
 				 * This formatted date is aliased as `transaction_day` in the resulting SQL query.
 				 */
 				transaction_time: sql<string>`strftime('%d-%m-%Y', transaction_time, 'unixepoch') as transaction_day`,
-				transactions: sql<string>`json_group_array(json_object('amount', amount, 'note', note, 'transactionTime', transaction_time, 'transactionType', transaction_type, 'category_id', category_id, 'category_name', category.name, 'category_icon', category.icon, 'category_color', category.color, 'category_type', category.type)) as transactions_list`,
+				transactions: sql<string>`json_group_array(json_object('amount', amount, 'note', note, 'transactionTime', transaction_time, 'transactionType', transaction_type, 'category_id', category_id, 'category_name', coinx_category.name, 'category_icon', coinx_category.icon, 'category_color', coinx_category.color, 'category_type', coinx_category.type)) as transactions_list`,
 				/**
 				 * This SQL query calculates the total balance for each grouped transaction date.
 				 * It sums up all amounts, treating 'Income' type transactions as positive and

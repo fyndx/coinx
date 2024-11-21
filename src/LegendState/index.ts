@@ -45,6 +45,7 @@ class RootStore {
 		const isFirstLaunch = await this.appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
 			await this.categoryModel.createDefaultCategories();
+			await this.productsModel.createRandomProducts();
 		}
 	};
 

@@ -1,3 +1,7 @@
+import {
+	exportData,
+	exportDataToCsv,
+} from "@/src/LegendState/Settings/Settings.model";
 import { ChevronRight } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
@@ -11,17 +15,8 @@ import {
 	YGroup,
 	YStack,
 } from "tamagui";
-import { rootStore } from "../../../src/LegendState";
 
 const Settings = () => {
-	const clearTransactions = () => {
-		rootStore.transactionModel.deleteAllTransactions();
-	};
-
-	const clearCategories = () => {
-		rootStore.categoryModel.deleteAllCategories();
-	};
-
 	return (
 		<YStack padding={"$2"}>
 			<H3 textAlign={"center"}>{"Settings"}</H3>
@@ -30,6 +25,10 @@ const Settings = () => {
 					<Link href={"/categories"} asChild>
 						<ListItem title={"Categories"} iconAfter={ChevronRight} />
 					</Link>
+				</YGroup.Item>
+				<Separator />
+				<YGroup.Item>
+					<ListItem title={"Export Data"} onPress={exportDataToCsv} />
 				</YGroup.Item>
 				{__DEV__ && (
 					<>

@@ -34,6 +34,10 @@ const PlaygroundScreen = () => {
 		rootStore.productsModel.createRandomProducts();
 	};
 
+	const createRandomProductListings = () => {
+		// rootStore.productsListingsModel.createRandomProductListings();
+	};
+
 	const clearProducts = () => {
 		rootStore.productsModel.deleteAllProducts();
 	};
@@ -63,6 +67,12 @@ const PlaygroundScreen = () => {
 					<ListItem
 						title={"Create Random Products"}
 						onPress={createRandomProducts}
+					/>
+				</YGroup.Item>
+				<YGroup.Item>
+					<ListItem
+						title={"Create Random Product Listings"}
+						onPress={createRandomProductListings}
 					/>
 				</YGroup.Item>
 				<H3>{"Deletion"}</H3>
