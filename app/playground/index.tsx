@@ -35,7 +35,7 @@ const PlaygroundScreen = () => {
 	};
 
 	const createRandomProductListings = () => {
-		// rootStore.productsListingsModel.createRandomProductListings();
+		rootStore.productsListingsModel.createRandomProductListings();
 	};
 
 	const clearProducts = () => {

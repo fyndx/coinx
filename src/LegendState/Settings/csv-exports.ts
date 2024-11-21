@@ -14,29 +14,33 @@ export const saveTableToCsv = async ({
 	tableName,
 	fileUri,
 }: { tableName: string; fileUri: string }) => {
-	const result: { name: string }[] = await expoDb.getAllAsync(
-		`PRAGMA table_info(${tableName});`,
-	);
-	// Headers
-	const headers = result.map((row) => row.name);
-	// Create File
-	const fileInstance = new File(fileUri);
-	// TODO: Create parent directory if it doesn't exist
-	fileInstance.parentDirectory.create();
-	fileInstance.create();
-	// Write Headers
-	const openedFile = fileInstance.open();
-	openedFile.writeBytes(new TextEncoder().encode(headers.join(",")));
-	openedFile.writeBytes(new TextEncoder().encode("\n"));
-	// Write Data
-	const iterator = expoDb.getEachAsync(`SELECT * FROM ${tableName};`, []);
-	for await (const row of iterator) {
-		openedFile.writeBytes(
-			new TextEncoder().encode(Object.values(row as string).join(",")),
+	try {
+		const result: { name: string }[] = await expoDb.getAllAsync(
+			`PRAGMA table_info(${tableName});`,
 		);
+		// Headers
+		const headers = result.map((row) => row.name);
+		// Create File
+		const fileInstance = new File(fileUri);
+		fileInstance.create();
+		// Write Headers
+		const openedFile = fileInstance.open();
+		openedFile.writeBytes(new TextEncoder().encode(headers.join(",")));
 		openedFile.writeBytes(new TextEncoder().encode("\n"));
+		// Write Data
+		const iterator = expoDb.getEachAsync(`SELECT * FROM ${tableName};`, []);
+		for await (const row of iterator) {
+			openedFile.writeBytes(
+				new TextEncoder().encode(
+					Object.values(row as { [key: string]: unknown }).join(","),
+				),
+			);
+			openedFile.writeBytes(new TextEncoder().encode("\n"));
+		}
+		openedFile.close();
+	} catch (error) {
+		console.error(`Failed to save table ${tableName} to CSV:`, error);
 	}
-	openedFile.close();
 };
 
 export const saveTablesToCsv = async ({

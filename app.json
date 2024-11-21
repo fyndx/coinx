@@ -40,7 +40,6 @@
 				"expo-build-properties",
 				{
 					"ios": {
-						// Needed for react-native-zip-archive
 						"deploymentTarget": "15.5"
 					}
 				}

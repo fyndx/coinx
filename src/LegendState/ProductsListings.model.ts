@@ -14,6 +14,7 @@ import { Effect } from "effect";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
 import { rootStore } from "./index";
+import { generateRandomProductListings } from "../database/seeds/ProductListingSeeds";
 
 export class ProductsListingsModel {
 	productListings: Observable<SelectProductListing[]>;
@@ -73,6 +74,11 @@ export class ProductsListingsModel {
 	deleteAllProductListings = async () => {
 		await Effect.runPromise(deleteAllProductListings());
 		Burnt.toast({ title: "All product listings deleted successfully" });
+	};
+
+	createRandomProductListings = async () => {
+		// TODO: Pick Product IDs from the table
+		generateRandomProductListings(10, { productIds: [1, 2, 3] });
 	};
 
 	// @Views

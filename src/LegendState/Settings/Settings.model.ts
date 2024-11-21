@@ -1,5 +1,6 @@
-import { COINX_DATABASE_NAME, db, expoDb } from "@/db/client";
+import { COINX_DATABASE_NAME } from "@/db/client";
 import { observable } from "@legendapp/state";
+import { Effect } from "effect";
 import { Directory, File, Paths } from "expo-file-system/next";
 import * as Sharing from "expo-sharing";
 import { defaultDatabaseDirectory } from "expo-sqlite";
@@ -8,7 +9,6 @@ import {
 	listDatabaseTables,
 	saveTablesToCsv,
 } from "./csv-exports";
-import { Effect } from "effect";
 
 export const SettingsModel = observable({});
 
@@ -43,6 +43,7 @@ export const exportData = async () => {
 
 export const exportDataToCsv = async () => {
 	const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
+	const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
 	console.log("Exporting data to CSV", CSV_EXPORTS_FOLDER);
 
 	try {
@@ -54,17 +55,24 @@ export const exportDataToCsv = async () => {
 			.filter((name) => name.includes("coinx"));
 		console.log({ tableNames });
 
-		// Step 2: Loop through each table
-		new Directory(CSV_EXPORTS_FOLDER).create();
+		// Step 2: Save each table to CSV
+		const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
+		if (exportsDir.exists) {
+			exportsDir.delete();
+			exportsDir.create();
+		} else {
+			exportsDir.create();
+		}
 		await saveTablesToCsv({
 			csvDestinationFolderPath: CSV_EXPORTS_FOLDER,
 			tableNames,
 		});
 
 		// Create Zip
-		const SOURCE_DIR = `${Paths.document.uri}csv_exports/`;
-		const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
-		await createZipArchive({ sourceDir: SOURCE_DIR, destZipFile: ZIP_FILE });
+		await createZipArchive({
+			sourceDir: CSV_EXPORTS_FOLDER,
+			destZipFile: ZIP_FILE,
+		});
 
 		// Share File
 		await Sharing.shareAsync(ZIP_FILE, {
@@ -74,5 +82,16 @@ export const exportDataToCsv = async () => {
 		});
 	} catch (error) {
 		console.error("Error exporting data to CSV", error);
+	} finally {
+		// Cleanup
+		const zipFile = new File(ZIP_FILE);
+		if (zipFile.exists) {
+			zipFile.delete();
+		}
+
+		const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
+		if (exportsDir.exists) {
+			exportsDir.delete();
+		}
 	}
 };
