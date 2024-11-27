@@ -9,7 +9,7 @@
 		"splash": {
 			"image": "./assets/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#def5f0"
 		},
 		"assetBundlePatterns": [
 			"**/*"
@@ -26,7 +26,7 @@
 			"softwareKeyboardLayoutMode": "pan",
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#ffffff"
+				"backgroundColor": "#def5f0"
 			},
 			"package": "io.fyndx.coinx"
 		},
@@ -42,6 +42,14 @@
 					"ios": {
 						"deploymentTarget": "15.5"
 					}
+				}
+			],
+			[
+				"expo-splash-screen",
+				{
+					"backgroundColor": "#def5f0",
+          "image": "./assets/splash.png",
+          "imageWidth": 600
 				}
 			],
 			[
