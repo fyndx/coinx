@@ -13,8 +13,8 @@ import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
-import { rootStore } from "./index";
 import { generateRandomProductListings } from "../database/seeds/ProductListingSeeds";
+import { appModel } from "./AppState/App.model";
 
 export class ProductsListingsModel {
 	productListings: Observable<SelectProductListing[]>;
@@ -39,7 +39,7 @@ export class ProductsListingsModel {
 					...productListing,
 					price: Currency.fromSmallestSubunit(
 						productListing.price,
-						rootStore.appModel.obs.currency.peek(),
+						appModel.obs.currency.peek(),
 					),
 				};
 			});

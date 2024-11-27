@@ -5,10 +5,7 @@ import {
 	insertProductListingSchema,
 } from "@/db/schema";
 import { addProductListingsHistory } from "@/src/database/Products/ProductListingsHistoryRepo";
-import {
-	addProductListing,
-	getProductListingById,
-} from "@/src/database/Products/ProductsListingsRepo";
+import { addProductListing } from "@/src/database/Products/ProductsListingsRepo";
 import { findProductById } from "@/src/database/Products/ProductsRepo";
 import { convert } from "@/src/utils/units";
 import { observable } from "@legendapp/state";
@@ -17,7 +14,7 @@ import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 import Currency from "@coinify/currency";
-import { rootStore } from "../index";
+import { appModel } from "../AppState/App.model";
 
 export class AddProductListingModel {
 	product;
@@ -54,7 +51,7 @@ export class AddProductListingModel {
 			// TODO: Change INR to currency from user settings
 			productListing.price = Currency.toSmallestSubunit(
 				productListing.price,
-				rootStore.appModel.obs.currency.peek(),
+				appModel.obs.currency.peek(),
 			);
 
 			const isProductListingValid = Value.Check(

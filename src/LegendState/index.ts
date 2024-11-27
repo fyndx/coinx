@@ -1,5 +1,5 @@
 import { AddProductScreenModel } from "@/src/LegendState/AddProduct/AddProduct.model";
-import { AppModel } from "@/src/LegendState/App.model";
+import { appModel, AppModel } from "@/src/LegendState/AppState/App.model";
 import { CategoryModel } from "@/src/LegendState/Category.model";
 import { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { ProductsModel } from "@/src/LegendState/Products.model";
@@ -11,8 +11,6 @@ import { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHis
 import { EditProductListing } from "@/src/LegendState/EditProductListing/EditProductListing.model";
 
 class RootStore {
-	// App State
-	appModel: AppModel;
 	// Database
 	categoryModel: CategoryModel;
 	transactionModel: TransactionModel;
@@ -27,7 +25,6 @@ class RootStore {
 	editProductListingModel: EditProductListing;
 
 	constructor() {
-		this.appModel = new AppModel();
 		this.categoryModel = new CategoryModel();
 		this.transactionModel = new TransactionModel();
 		this.transactionsScreenModel = new TransactionsScreenModel();
@@ -41,8 +38,8 @@ class RootStore {
 	}
 
 	private startServices = async () => {
-		await this.appModel.actions.startServices();
-		const isFirstLaunch = await this.appModel.checkFirstLaunch();
+		await appModel.actions.startServices();
+		const isFirstLaunch = await appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
 			await this.categoryModel.createDefaultCategories();
 		}

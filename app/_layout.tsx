@@ -1,5 +1,6 @@
 import { expoDb } from "@/db/client";
 import { rootStore } from "@/src/LegendState";
+import { appModel } from "@/src/LegendState/AppState/App.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { observer, useMount } from "@legendapp/state/react";
 import dayjs from "dayjs";
@@ -9,7 +10,7 @@ import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
 import localeData from "dayjs/plugin/localeData";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
-import { SplashScreen } from "expo-router";
+import { Redirect, SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -38,6 +39,7 @@ const RootLayoutNav = () => {
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<RootProvider>
 					<Stack screenOptions={{ statusBarStyle: "dark" }}>
+						<Stack.Screen name="index" options={{ headerShown: false }} />
 						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 						<Stack.Screen
 							name="add-category/index"
@@ -84,6 +86,10 @@ const RootLayoutNav = () => {
 								headerTitleAlign: "center",
 							}}
 						/>
+						<Stack.Screen
+							name={"currency-select/index"}
+							options={{ headerShown: false }}
+						/>
 					</Stack>
 				</RootProvider>
 			</GestureHandlerRootView>
@@ -92,7 +98,7 @@ const RootLayoutNav = () => {
 };
 
 const RootLayout = observer(() => {
-	const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
+	const isAppLoaded = appModel.obs.isAppLoaded.get();
 	if (!process.env.EXPO_PUBLIC_DISABLE_FEATURE) {
 		useDrizzleStudio(expoDb);
 	}

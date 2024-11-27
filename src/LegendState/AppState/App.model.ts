@@ -6,7 +6,8 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { observable } from "@legendapp/state";
 import { LatoRegular } from "@/assets/fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AppStorage } from "../storage/mmkv";
+import { AppStorage } from "@/src/storage/mmkv";
+import type { CurrencyData } from "rn-currency-picker";
 
 export class AppModel {
 	obs;
@@ -15,7 +16,7 @@ export class AppModel {
 			isAppLoaded: false,
 			isFirstLaunch: "unknown",
 			// TODO: Currency Setup
-			currency: "INR" as string | undefined,
+			currency: undefined as string | undefined,
 		});
 	}
 
@@ -45,6 +46,11 @@ export class AppModel {
 		if (currency) {
 			this.obs.currency.set(currency);
 		}
+	};
+
+	private setCurrency = async (currency: CurrencyData) => {
+		AppStorage.set("currency", JSON.stringify(currency));
+		this.obs.currency.set(currency);
 	};
 
 	checkFirstLaunch = async () => {
@@ -77,5 +83,8 @@ export class AppModel {
 
 	actions = {
 		startServices: this.startServices,
+		setCurrency: this.setCurrency,
 	};
 }
+
+export const appModel = new AppModel();
