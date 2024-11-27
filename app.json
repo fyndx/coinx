@@ -8,7 +8,7 @@
 		"userInterfaceStyle": "light",
 		"splash": {
 			"image": "./assets/splash.png",
-			"resizeMode": "cover",
+			"resizeMode": "contain",
 			"backgroundColor": "#def5f0"
 		},
 		"assetBundlePatterns": [
@@ -42,6 +42,18 @@
 					"ios": {
 						"deploymentTarget": "15.5"
 					}
+				}
+			],
+			[
+				"expo-splash-screen",
+				{
+					"backgroundColor": "#def5f0",
+          "image": "./assets/splash.png",
+          // "dark": {
+          //   "image": "./assets/splash-icon-dark.png",
+          //   "backgroundColor": "#000000"
+          // },
+          "imageWidth": 600
 				}
 			],
 			[
