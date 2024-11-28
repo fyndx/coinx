@@ -10,7 +10,7 @@ import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
 import localeData from "dayjs/plugin/localeData";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
-import { Redirect, SplashScreen } from "expo-router";
+import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -113,10 +113,12 @@ const RootLayout = observer(() => {
 		}
 	}, [isAppLoaded]);
 
+	// TODO: Check if this is visible in the app.
 	if (isAppLoaded === false) {
 		return null;
 	}
 
+	// TODO: Pass the initial route to the RootLayoutNav component.
 	return <RootLayoutNav />;
 });
 

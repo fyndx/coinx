@@ -1,17 +1,24 @@
 import { appModel } from "@/src/LegendState/AppState/App.model";
-import { Show } from "@legendapp/state/react";
 import { ChevronRightCircle } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
+	type CurrencyData,
 	CurrencyPicker,
 	type CurrencyPickerRef,
-	type CurrencyData,
 } from "rn-currency-picker";
-import { Button, H2, H4, Text, XStack, YStack } from "tamagui";
+import { H4, YStack } from "tamagui";
 
 const CurrencySelect = () => {
 	const currencyPickerRef = useRef<CurrencyPickerRef>();
+
+	const handleCurrencySelect = (data: CurrencyData) => {
+		if (!data || !data.symbol) {
+			console.error("Invalid currency data received");
+			return;
+		}
+		appModel.actions.setCurrency(data);
+	};
 
 	return (
 		<YStack flex={1} alignItems={"center"} gap={"$3"}>
@@ -29,13 +36,15 @@ const CurrencySelect = () => {
 						justifyContent: "center",
 					},
 				}}
-				onSelectCurrency={(data: CurrencyData) => {
-					appModel.actions.setCurrency(data);
-				}}
+				onSelectCurrency={handleCurrencySelect}
 			/>
 			<YStack flex={1} />
 			<YStack alignSelf={"flex-end"} paddingHorizontal={"$6"}>
-				<Link href={"/(tabs)/transactions"}>
+				<Link
+					href={"/(tabs)/transactions"}
+					replace={true}
+					disabled={appModel.obs.currency.get() === undefined}
+				>
 					<ChevronRightCircle size={"$4"} />
 				</Link>
 			</YStack>

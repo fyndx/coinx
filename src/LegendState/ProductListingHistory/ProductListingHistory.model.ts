@@ -1,9 +1,9 @@
 import { getProductListingsHistoryByProductId } from "@/src/database/Products/ProductListingsHistoryRepo";
 import type { AsyncInterface } from "@/src/utils/async-interface";
+import Currency from "@coinify/currency";
 import { observable } from "@legendapp/state";
 import dayjs from "dayjs";
 import { Effect, pipe } from "effect";
-import Currency from "@coinify/currency";
 import { appModel } from "../AppState/App.model";
 
 interface ConsolidatedPriceData {
@@ -69,7 +69,7 @@ export class ProductsListingHistoryModel {
 						...listing,
 						price: Currency.fromSmallestSubunit(
 							listing.price,
-							appModel.obs.currency.peek(),
+							appModel.obs.currency.code.peek(),
 						),
 					};
 				},

@@ -1,7 +1,7 @@
-import React from "react";
-import { Redirect, Slot } from "expo-router";
-import { observer } from "@legendapp/state/react";
 import { appModel } from "@/src/LegendState/AppState/App.model";
+import { observer } from "@legendapp/state/react";
+import { Redirect } from "expo-router";
+import React from "react";
 
 const AppRoot = observer(() => {
 	if (appModel.obs.currency.get() === undefined) {

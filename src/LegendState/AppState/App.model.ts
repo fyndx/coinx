@@ -1,12 +1,12 @@
-import { migrate } from "drizzle-orm/expo-sqlite/migrator";
+import { LatoRegular } from "@/assets/fonts";
 import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
-import { loadAsync } from "expo-font";
+import { AppStorage } from "@/src/storage/mmkv";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { observable } from "@legendapp/state";
-import { LatoRegular } from "@/assets/fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AppStorage } from "@/src/storage/mmkv";
+import { migrate } from "drizzle-orm/expo-sqlite/migrator";
+import { loadAsync } from "expo-font";
 import type { CurrencyData } from "rn-currency-picker";
 
 export class AppModel {
@@ -16,7 +16,7 @@ export class AppModel {
 			isAppLoaded: false,
 			isFirstLaunch: "unknown",
 			// TODO: Currency Setup
-			currency: undefined as string | undefined,
+			currency: undefined as { code: string; symbol: string } | undefined,
 		});
 	}
 
@@ -44,13 +44,18 @@ export class AppModel {
 	private loadCurrency = async () => {
 		const currency = AppStorage.getString("currency");
 		if (currency) {
-			this.obs.currency.set(currency);
+			this.obs.currency.set(JSON.parse(currency));
 		}
 	};
 
 	private setCurrency = async (currency: CurrencyData) => {
-		AppStorage.set("currency", JSON.stringify(currency));
-		this.obs.currency.set(currency);
+		const currencyData = {
+			code: currency.code,
+			symbol: currency.symbol,
+		};
+
+		AppStorage.set("currency", JSON.stringify(currencyData));
+		this.obs.currency.set(currencyData);
 	};
 
 	checkFirstLaunch = async () => {
