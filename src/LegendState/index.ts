@@ -1,18 +1,16 @@
 import { AddProductScreenModel } from "@/src/LegendState/AddProduct/AddProduct.model";
-import { AppModel } from "@/src/LegendState/App.model";
+import { AddProductListingModel } from "@/src/LegendState/AddProductListing/AddProductListing.model";
+import { appModel } from "@/src/LegendState/AppState/App.model";
 import { CategoryModel } from "@/src/LegendState/Category.model";
+import { EditProductListing } from "@/src/LegendState/EditProductListing/EditProductListing.model";
 import { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
+import { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
 import { ProductsModel } from "@/src/LegendState/Products.model";
 import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import { TransactionModel } from "@/src/LegendState/Transaction.model";
 import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
-import { AddProductListingModel } from "@/src/LegendState/AddProductListing/AddProductListing.model";
-import { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
-import { EditProductListing } from "@/src/LegendState/EditProductListing/EditProductListing.model";
 
 class RootStore {
-	// App State
-	appModel: AppModel;
 	// Database
 	categoryModel: CategoryModel;
 	transactionModel: TransactionModel;
@@ -27,7 +25,6 @@ class RootStore {
 	editProductListingModel: EditProductListing;
 
 	constructor() {
-		this.appModel = new AppModel();
 		this.categoryModel = new CategoryModel();
 		this.transactionModel = new TransactionModel();
 		this.transactionsScreenModel = new TransactionsScreenModel();
@@ -41,8 +38,8 @@ class RootStore {
 	}
 
 	private startServices = async () => {
-		await this.appModel.actions.startServices();
-		const isFirstLaunch = await this.appModel.checkFirstLaunch();
+		await appModel.actions.startServices();
+		const isFirstLaunch = await appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
 			await this.categoryModel.createDefaultCategories();
 		}

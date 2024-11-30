@@ -7,13 +7,13 @@ import {
 	getProductListingById,
 	updateProductListingById,
 } from "@/src/database/Products/ProductsListingsRepo";
-import { computed, observable } from "@legendapp/state";
-import { Effect } from "effect";
-import * as Burnt from "burnt";
-import { router } from "expo-router";
-import Currency from "@coinify/currency";
 import type { AsyncInterface } from "@/src/utils/async-interface";
-import { rootStore } from "../index";
+import Currency from "@coinify/currency";
+import { computed, observable } from "@legendapp/state";
+import * as Burnt from "burnt";
+import { Effect } from "effect";
+import { router } from "expo-router";
+import { appModel } from "../AppState/App.model";
 
 interface ProductListing extends AsyncInterface {
 	data?: SelectProductListing;
@@ -70,7 +70,7 @@ export class EditProductListing {
 			const productListing = this.productListing.data.peek();
 			const price = Currency.toSmallestSubunit(
 				Number(this.editProductDraft.data.price.peek()),
-				rootStore.appModel.obs.currency.peek(),
+				appModel.obs.currency.code.peek(),
 			);
 
 			if (Number.isNaN(price) || price <= 0) {

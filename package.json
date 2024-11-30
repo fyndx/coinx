@@ -64,6 +64,7 @@
 		"react-native-ui-datepicker": "^2.0.4",
 		"react-native-zip-archive": "^7.0.1",
 		"reanimated-color-picker": "^3.0.4",
+		"rn-currency-picker": "^0.1.2",
 		"rn-emoji-keyboard": "^1.7.0",
 		"tamagui": "^1.117.1",
 		"victory-native": "^41.9.0"

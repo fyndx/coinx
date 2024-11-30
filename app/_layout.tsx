@@ -1,5 +1,7 @@
 import { expoDb } from "@/db/client";
+import { Splash } from "@/src/Components/Splash";
 import { rootStore } from "@/src/LegendState";
+import { appModel } from "@/src/LegendState/AppState/App.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { observer, useMount } from "@legendapp/state/react";
 import dayjs from "dayjs";
@@ -38,6 +40,7 @@ const RootLayoutNav = () => {
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<RootProvider>
 					<Stack screenOptions={{ statusBarStyle: "dark" }}>
+						<Stack.Screen name="index" options={{ headerShown: false }} />
 						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 						<Stack.Screen
 							name="add-category/index"
@@ -84,6 +87,10 @@ const RootLayoutNav = () => {
 								headerTitleAlign: "center",
 							}}
 						/>
+						<Stack.Screen
+							name={"currency-select/index"}
+							options={{ headerShown: false }}
+						/>
 					</Stack>
 				</RootProvider>
 			</GestureHandlerRootView>
@@ -92,7 +99,7 @@ const RootLayoutNav = () => {
 };
 
 const RootLayout = observer(() => {
-	const isAppLoaded = rootStore.appModel.obs.isAppLoaded.get();
+	const isAppLoaded = appModel.obs.isAppLoaded.get();
 	if (!process.env.EXPO_PUBLIC_DISABLE_FEATURE) {
 		useDrizzleStudio(expoDb);
 	}
@@ -108,9 +115,10 @@ const RootLayout = observer(() => {
 	}, [isAppLoaded]);
 
 	if (isAppLoaded === false) {
-		return null;
+		return <Splash />;
 	}
 
+	// TODO: Pass the initial route to the RootLayoutNav component.
 	return <RootLayoutNav />;
 });
 
