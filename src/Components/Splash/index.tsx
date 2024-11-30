@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import Animated, {
+	cancelAnimation,
 	useAnimatedStyle,
 	useSharedValue,
 	withRepeat,
@@ -14,6 +15,11 @@ export const Splash = () => {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		scale.value = withRepeat(withTiming(1.5, { duration: 1000 }), -1, true);
+
+		return () => {
+			scale.value = 0;
+			cancelAnimation(scale);
+		};
 	}, []);
 
 	const animatedStyle = useAnimatedStyle(() => ({
