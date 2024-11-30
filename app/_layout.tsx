@@ -1,4 +1,5 @@
 import { expoDb } from "@/db/client";
+import { Splash } from "@/src/Components/Splash";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
@@ -113,9 +114,8 @@ const RootLayout = observer(() => {
 		}
 	}, [isAppLoaded]);
 
-	// TODO: Check if this is visible in the app.
 	if (isAppLoaded === false) {
-		return null;
+		return <Splash />;
 	}
 
 	// TODO: Pass the initial route to the RootLayoutNav component.
