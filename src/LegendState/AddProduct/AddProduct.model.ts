@@ -91,6 +91,7 @@ export class AddProductScreenModel {
 				router.back();
 			}
 		} catch (error) {
+			console.log("error", error);
 			Burnt.toast({
 				title: "An error occurred",
 				message: error instanceof Error ? error.message : "Unknown error",
