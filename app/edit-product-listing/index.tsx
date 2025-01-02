@@ -1,10 +1,9 @@
 import { rootStore } from "@/src/LegendState";
 import { observer, useMount } from "@legendapp/state/react";
-import { Construction } from "@tamagui/lucide-icons";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, H1, Input, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button, Input, Spinner, Text, XStack, YStack } from "tamagui";
 
 const EditProductListing = observer(() => {
 	const { listing_id, product_id } = useLocalSearchParams();
@@ -54,8 +53,8 @@ const EditProductListing = observer(() => {
 			<YStack flex={1} padding={"$4"}>
 				<YStack flex={1} gap={"$2"}>
 					<Text>{`Name: ${productListing$.data?.name}`}</Text>
-					<Text>{`Store: ${productListing$.data?.store}`}</Text>
-					<Text>{`Location: ${productListing$.data?.location ?? "---"}`}</Text>
+					<Text>{`Store: ${productListing$.data?.storeName}`}</Text>
+					<Text>{`Location: ${productListing$.data?.storeLocation ?? "---"}`}</Text>
 					<Input
 						placeholder="Enter New Price"
 						onChangeText={handlePriceChange}

@@ -48,6 +48,8 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
 export const products = sqliteTable("coinx_product", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
+	image: text("image"),
+	notes: text("notes"),
 	defaultUnitCategory: text("default_unit_category").notNull(), // from UnitCategory enum in units.ts
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -55,6 +57,20 @@ export const products = sqliteTable("coinx_product", {
 export const productsRelations = relations(products, ({ many }) => ({
 	product_listings: many(product_listings),
 	product_listings_history: many(product_listings_history),
+}));
+
+export const stores = sqliteTable("coinx_store", {
+	id: integer("id", { mode: "number" })
+		.primaryKey({ autoIncrement: true })
+		.notNull(),
+	name: text("name").notNull().unique(),
+	location: text("location"),
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: text("updated_at"),
+});
+
+export const storesRelations = relations(stores, ({ many }) => ({
+	product_listings: many(product_listings),
 }));
 
 // TODO: Add constraints if needed
@@ -67,11 +83,12 @@ export const product_listings = sqliteTable("coinx_product_listing", {
 		})
 		.notNull(),
 	name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
-	store: text("store").notNull(),
+	storeId: integer("store_id")
+		.references(() => stores.id, {
+			onDelete: "cascade",
+		})
+		.notNull(),
 	url: text("url"),
-	location: text("location"),
-
-	// Price details
 	price: integer("price").notNull(),
 	quantity: real("quantity").notNull(),
 	unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
@@ -86,6 +103,10 @@ export const productListingsRelations = relations(
 		product: one(products, {
 			fields: [product_listings.productId],
 			references: [products.id],
+		}),
+		store: one(stores, {
+			fields: [product_listings.storeId],
+			references: [stores.id],
 		}),
 		product_listings_history: many(product_listings_history),
 	}),
@@ -188,3 +209,10 @@ export const selectProductListingHistorySchema = createSelectSchema(
 export const insertProductListingHistorySchema = createInsertSchema(
 	product_listings_history,
 );
+
+// Store Types
+export type SelectStore = typeof stores.$inferSelect;
+export type InsertStore = typeof stores.$inferInsert;
+
+export const selectStoreSchema = createSelectSchema(stores);
+export const insertStoreSchema = createInsertSchema(stores);

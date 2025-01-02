@@ -16,7 +16,7 @@ import { router } from "expo-router";
 import { appModel } from "../AppState/App.model";
 
 interface ProductListing extends AsyncInterface {
-	data?: SelectProductListing;
+	data?: SelectProductListing & { storeName: string; storeLocation: string };
 }
 
 interface EditProductDraft extends AsyncInterface {

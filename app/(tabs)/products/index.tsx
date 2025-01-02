@@ -14,7 +14,6 @@ import {
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	Circle,

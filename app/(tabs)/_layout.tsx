@@ -24,7 +24,7 @@ export default function RootLayout() {
 			<Tabs.Screen
 				name={"products/index"}
 				options={{
-					header: () => null,
+					// header: () => null,
 					headerTitle: "Products",
 					tabBarLabel: () => null,
 					tabBarIcon: ({ color, focused, size }) => (

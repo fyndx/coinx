@@ -8,6 +8,13 @@
       "when": 1732117407665,
       "tag": "0000_aspiring_mercury",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1733070725556,
+      "tag": "0001_thin_sleepwalker",
+      "breakpoints": true
     }
   ]
 }

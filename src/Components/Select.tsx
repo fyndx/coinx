@@ -2,20 +2,39 @@ import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
 import { Adapt, Sheet, Select as TamaguiSelect, YStack } from "tamagui";
 import { LinearGradient } from "tamagui/linear-gradient";
 
-interface DefaultUnitSelectProps {
-	data: string[];
+interface DefaultUnitSelectProps<T> {
+	placeholder: string;
+	data: T[];
+	displayField?: keyof T | ((item: T) => string);
 	onValueChange?: (value: string) => void;
 }
 
-export const Select = ({ data, onValueChange }: DefaultUnitSelectProps) => {
+export const Select = <T extends {}>({
+	placeholder,
+	data,
+	onValueChange,
+	displayField,
+}: DefaultUnitSelectProps<T>) => {
+	const getDisplayValue = (item: T) => {
+		if (!displayField) {
+			return String(item);
+		}
+		if (typeof displayField === "function") {
+			return displayField(item);
+		}
+		console.log(String(item[displayField]), "item[displayField]");
+
+		return String(item[displayField]);
+	};
+
 	return (
 		<TamaguiSelect
 			onValueChange={(value) => {
 				onValueChange?.(value);
 			}}
 		>
-			<TamaguiSelect.Trigger size={"$4.5"}>
-				<TamaguiSelect.Value placeholder={"Select a Unit"} />
+			<TamaguiSelect.Trigger size={"$4.5"} iconAfter={ChevronDown}>
+				<TamaguiSelect.Value placeholder={placeholder} />
 			</TamaguiSelect.Trigger>
 			<Adapt when="sm" platform="touch">
 				<Sheet
@@ -61,22 +80,24 @@ export const Select = ({ data, onValueChange }: DefaultUnitSelectProps) => {
 					/>
 				</TamaguiSelect.ScrollUpButton>
 				<TamaguiSelect.Viewport
-					// to do animations:
-					// animation="quick"
-					// animateOnly={['transform', 'opacity']}
-					// enterStyle={{ o: 0, y: -10 }}
-					// exitStyle={{ o: 0, y: 10 }}
+					animation="quick"
+					animateOnly={["transform", "opacity"]}
+					enterStyle={{ o: 0, y: -10 }}
+					exitStyle={{ o: 0, y: 10 }}
 					minWidth={200}
 				>
 					<TamaguiSelect.Group>
-						{data.map((item, index) => (
-							<TamaguiSelect.Item index={index} key={item} value={item}>
-								<TamaguiSelect.ItemText>{item}</TamaguiSelect.ItemText>
-								<TamaguiSelect.ItemIndicator marginLeft="auto">
-									<Check size={16} />
-								</TamaguiSelect.ItemIndicator>
-							</TamaguiSelect.Item>
-						))}
+						{data.map((item, index) => {
+							const value = getDisplayValue(item);
+							return (
+								<TamaguiSelect.Item index={index} key={value} value={value}>
+									<TamaguiSelect.ItemText>{value}</TamaguiSelect.ItemText>
+									<TamaguiSelect.ItemIndicator marginLeft="auto">
+										<Check size={16} />
+									</TamaguiSelect.ItemIndicator>
+								</TamaguiSelect.Item>
+							);
+						})}
 					</TamaguiSelect.Group>
 				</TamaguiSelect.Viewport>
 				<TamaguiSelect.ScrollDownButton

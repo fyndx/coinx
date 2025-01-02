@@ -1,10 +1,11 @@
 import { Select } from "@/src/Components/Select";
 import { rootStore } from "@/src/LegendState";
+import { storeModel$ } from "@/src/LegendState/Store/Store.model";
 import { observer, useMount } from "@legendapp/state/react";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Input, Label, Spinner, Text, YStack } from "tamagui";
+import { Button, Input, Spinner, Text, YStack } from "tamagui";
 
 const AddProductListing = observer(() => {
 	const { id } = useLocalSearchParams();
@@ -19,6 +20,7 @@ const AddProductListing = observer(() => {
 
 		// Fetch product details
 		productModel$.getProductById(productId);
+		storeModel$.getStoresList();
 
 		return () => {
 			productModel$.reset();
@@ -26,8 +28,18 @@ const AddProductListing = observer(() => {
 	});
 
 	const handleUnitChange = (value: string) => {
-		console.log("handleUnitChange", value);
 		productModel$.productDetailsDraft.unit.set(value);
+	};
+
+	const handleStoreChange = (value: string) => {
+		const stores = storeModel$.storesList.peek();
+
+		const storeIndex = stores.findIndex(
+			(store) => `${store.name} - ${store.location}` === value,
+		);
+
+		const storeId = stores[storeIndex].id;
+		productModel$.productDetailsDraft.storeId.set(storeId);
 	};
 
 	const addProductDetails = () => {
@@ -76,29 +88,21 @@ const AddProductListing = observer(() => {
 						}
 					/>
 					<Select
+						placeholder={"Unit *"}
 						data={productModel$.units.get()}
 						onValueChange={handleUnitChange}
 					/>
-					{/* TODO: Create Stores Table */}
-					<Input
-						placeholder="Store *"
-						size={"$5"}
-						onChangeText={(text) =>
-							productModel$.productDetailsDraft.store.set(text.trim())
-						}
+					<Select
+						placeholder={"Store *"}
+						data={storeModel$.storesList.get()}
+						displayField={(item) => `${item.name} - ${item.location}`}
+						onValueChange={handleStoreChange}
 					/>
 					<Input
 						placeholder="URL"
 						size={"$5"}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.url.set(text.trim())
-						}
-					/>
-					<Input
-						placeholder="Location"
-						size={"$5"}
-						onChangeText={(text) =>
-							productModel$.productDetailsDraft.location.set(text.trim())
 						}
 					/>
 				</YStack>
