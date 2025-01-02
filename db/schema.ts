@@ -18,7 +18,9 @@ export const transactions = sqliteTable("coinx_transaction", {
 	transactionType: text("transaction_type", {
 		enum: ["Income", "Expense"],
 	}).notNull(),
-	categoryId: integer("category_id").notNull(),
+	categoryId: integer("category_id")
+		.notNull()
+		.references(() => categories.id),
 
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: text("updated_at"),
@@ -85,27 +87,34 @@ export const storesRelations = relations(stores, ({ many }) => ({
 
 // TODO: Add constraints if needed
 // TODO: Add indexes if needed
-export const product_listings = sqliteTable("coinx_product_listing", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	productId: integer("product_id")
-		.references(() => products.id, {
-			onDelete: "cascade",
-		})
-		.notNull(),
-	name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
-	storeId: integer("store_id")
-		.references(() => stores.id, {
-			onDelete: "cascade",
-		})
-		.notNull(),
-	url: text("url"),
-	price: integer("price").notNull(),
-	quantity: real("quantity").notNull(),
-	unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
+export const product_listings = sqliteTable(
+	"coinx_product_listing",
+	{
+		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		productId: integer("product_id")
+			.references(() => products.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
+		name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
+		storeId: integer("store_id")
+			.references(() => stores.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
+		url: text("url"),
+		price: integer("price").notNull(),
+		quantity: real("quantity").notNull(),
+		unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
 
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: text("updated_at"),
-});
+		createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: text("updated_at"),
+	},
+	(table) => ({
+		productIdIdx: index("idx_product_listings_product_id").on(table.productId),
+		storeIdIdx: index("idx_product_listings_store_id").on(table.storeId),
+	}),
+);
 
 export const productListingsRelations = relations(
 	product_listings,
