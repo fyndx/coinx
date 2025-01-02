@@ -6,6 +6,7 @@ import {
 	real,
 	sqliteTable,
 	text,
+	unique,
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
@@ -59,15 +60,24 @@ export const productsRelations = relations(products, ({ many }) => ({
 	product_listings_history: many(product_listings_history),
 }));
 
-export const stores = sqliteTable("coinx_store", {
-	id: integer("id", { mode: "number" })
-		.primaryKey({ autoIncrement: true })
-		.notNull(),
-	name: text("name").notNull().unique(),
-	location: text("location"),
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: text("updated_at"),
-});
+export const stores = sqliteTable(
+	"coinx_store",
+	{
+		id: integer("id", { mode: "number" })
+			.primaryKey({ autoIncrement: true })
+			.notNull(),
+		name: text("name").notNull().unique(),
+		location: text("location"),
+		createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: text("updated_at"),
+	},
+	(table) => ({
+		uniqueNameAndLocation: unique("unique_store_name_location").on(
+			table.name,
+			table.location,
+		),
+	}),
+);
 
 export const storesRelations = relations(stores, ({ many }) => ({
 	product_listings: many(product_listings),
