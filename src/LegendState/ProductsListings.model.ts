@@ -17,7 +17,7 @@ import { generateRandomProductListings } from "../database/seeds/ProductListingS
 import { appModel } from "./AppState/App.model";
 
 export class ProductsListingsModel {
-	productListings: Observable<SelectProductListing[]>;
+	productListings: Observable<(SelectProductListing & { storeName: string })[]>;
 	productId: Observable<number>;
 	constructor() {
 		this.productId = observable(0);
@@ -120,7 +120,7 @@ export class ProductsListingsModel {
 				},
 				{
 					type: "text",
-					value: productListing.store,
+					value: productListing.storeName,
 				},
 				{
 					type: "text",

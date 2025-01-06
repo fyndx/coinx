@@ -6,6 +6,7 @@ import {
 	real,
 	sqliteTable,
 	text,
+	unique,
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
@@ -17,7 +18,9 @@ export const transactions = sqliteTable("coinx_transaction", {
 	transactionType: text("transaction_type", {
 		enum: ["Income", "Expense"],
 	}).notNull(),
-	categoryId: integer("category_id").notNull(),
+	categoryId: integer("category_id")
+		.notNull()
+		.references(() => categories.id),
 
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: text("updated_at"),
@@ -48,6 +51,8 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
 export const products = sqliteTable("coinx_product", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
+	image: text("image"),
+	notes: text("notes"),
 	defaultUnitCategory: text("default_unit_category").notNull(), // from UnitCategory enum in units.ts
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -57,28 +62,59 @@ export const productsRelations = relations(products, ({ many }) => ({
 	product_listings_history: many(product_listings_history),
 }));
 
+export const stores = sqliteTable(
+	"coinx_store",
+	{
+		id: integer("id", { mode: "number" })
+			.primaryKey({ autoIncrement: true })
+			.notNull(),
+		name: text("name").notNull().unique(),
+		location: text("location"),
+		createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: text("updated_at"),
+	},
+	(table) => ({
+		uniqueNameAndLocation: unique("unique_store_name_location").on(
+			table.name,
+			table.location,
+		),
+	}),
+);
+
+export const storesRelations = relations(stores, ({ many }) => ({
+	product_listings: many(product_listings),
+}));
+
 // TODO: Add constraints if needed
 // TODO: Add indexes if needed
-export const product_listings = sqliteTable("coinx_product_listing", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	productId: integer("product_id")
-		.references(() => products.id, {
-			onDelete: "cascade",
-		})
-		.notNull(),
-	name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
-	store: text("store").notNull(),
-	url: text("url"),
-	location: text("location"),
+export const product_listings = sqliteTable(
+	"coinx_product_listing",
+	{
+		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		productId: integer("product_id")
+			.references(() => products.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
+		name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
+		storeId: integer("store_id")
+			.references(() => stores.id, {
+				onDelete: "cascade",
+			})
+			.notNull(),
+		url: text("url"),
+		price: integer("price").notNull(),
+		quantity: real("quantity").notNull(),
+		unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
 
-	// Price details
-	price: integer("price").notNull(),
-	quantity: real("quantity").notNull(),
-	unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
-
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: text("updated_at"),
-});
+		createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: text("updated_at"),
+	},
+	(table) => ({
+		productIdIdx: index("idx_product_listings_product_id").on(table.productId),
+		storeIdIdx: index("idx_product_listings_store_id").on(table.storeId),
+	}),
+);
 
 export const productListingsRelations = relations(
 	product_listings,
@@ -86,6 +122,10 @@ export const productListingsRelations = relations(
 		product: one(products, {
 			fields: [product_listings.productId],
 			references: [products.id],
+		}),
+		store: one(stores, {
+			fields: [product_listings.storeId],
+			references: [stores.id],
 		}),
 		product_listings_history: many(product_listings_history),
 	}),
@@ -188,3 +228,10 @@ export const selectProductListingHistorySchema = createSelectSchema(
 export const insertProductListingHistorySchema = createInsertSchema(
 	product_listings_history,
 );
+
+// Store Types
+export type SelectStore = typeof stores.$inferSelect;
+export type InsertStore = typeof stores.$inferInsert;
+
+export const selectStoreSchema = createSelectSchema(stores);
+export const insertStoreSchema = createInsertSchema(stores);

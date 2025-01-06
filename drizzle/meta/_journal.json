@@ -8,6 +8,34 @@
       "when": 1732117407665,
       "tag": "0000_aspiring_mercury",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1733070725556,
+      "tag": "0001_thin_sleepwalker",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1735835769602,
+      "tag": "0002_nasty_captain_flint",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1735837370470,
+      "tag": "0003_ambitious_blade",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1735838026679,
+      "tag": "0004_shocking_liz_osborn",
+      "breakpoints": true
     }
   ]
 }
