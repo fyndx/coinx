@@ -77,26 +77,6 @@ export default function RootLayout() {
 					),
 				}}
 			/>
-			<Tabs.Screen
-				name={"add-transaction-link/index"}
-				listeners={({ navigation }) => ({
-					tabPress: (e) => {
-						e.preventDefault();
-						navigation.navigate("add-transaction/index");
-					},
-				})}
-				options={{
-					header: () => null,
-					tabBarLabel: () => null,
-					tabBarIcon: () => (
-						<Image
-							source={require("../../assets/icons/add.png")}
-							width={24}
-							height={24}
-						/>
-					),
-				}}
-			/>
 		</Tabs>
 	);
 }

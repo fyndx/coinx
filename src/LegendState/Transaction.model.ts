@@ -1,7 +1,11 @@
 import { db as database } from "@/db/client";
-import { transactions as transactionsRepo } from "@/db/schema";
+import {
+	type InsertTransaction,
+	transactions as transactionsRepo,
+} from "@/db/schema";
+import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
-import dayjs, { type Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 import type { CategoryModel } from "./Category.model";
 
@@ -84,13 +88,7 @@ export class TransactionModel {
 		note,
 		transactionTime,
 		transactionType,
-	}: {
-		amount: number;
-		categoryId: number | undefined;
-		note?: string | null;
-		transactionTime: Date;
-		transactionType: string;
-	}) {
+	}: InsertTransaction) {
 		return await database
 			.insert(transactionsRepo)
 			.values({

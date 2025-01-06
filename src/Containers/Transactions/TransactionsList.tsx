@@ -1,16 +1,29 @@
-import type { ObservableComputed } from "@legendapp/state";
 import { Transaction } from "@/src/Containers/Transactions/Components/Transaction";
-import { observer } from "@legendapp/state/react";
-import { FlashList } from "@shopify/flash-list";
-import type { FlashListTransactionsList } from "@/src/LegendState/TransactionsScreen.model";
 import { TransactionSummary } from "@/src/Containers/Transactions/Components/TransactionSummary";
+import type { FlashListTransactionsList } from "@/src/LegendState/TransactionsScreen.model";
+import type { ObservableComputed } from "@legendapp/state";
+import { observer } from "@legendapp/state/react";
+import { FlashList, type FlashListProps } from "@shopify/flash-list";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import Animated from "react-native-reanimated";
+
+const AnimatedFlashList =
+	Animated.createAnimatedComponent<FlashListProps<FlashListTransactionsList>>(
+		FlashList,
+	);
 
 export const TransactionsList = observer(
 	({
 		transactions,
-	}: { transactions: ObservableComputed<FlashListTransactionsList[]> }) => {
+		onScroll,
+	}: {
+		transactions: ObservableComputed<FlashListTransactionsList[]>;
+		onScroll:
+			| ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
+			| undefined;
+	}) => {
 		return (
-			<FlashList
+			<AnimatedFlashList
 				data={transactions.get()}
 				renderItem={({ item }) => {
 					if ("transaction" in item) {
@@ -23,6 +36,7 @@ export const TransactionsList = observer(
 						/>
 					);
 				}}
+				onScroll={onScroll}
 				showsVerticalScrollIndicator={false}
 				estimatedItemSize={44}
 			/>

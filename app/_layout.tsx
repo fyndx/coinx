@@ -4,23 +4,12 @@ import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { observer, useMount } from "@legendapp/state/react";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import isToday from "dayjs/plugin/isToday";
-import isTomorrow from "dayjs/plugin/isTomorrow";
-import isYesterday from "dayjs/plugin/isYesterday";
-import localeData from "dayjs/plugin/localeData";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { SplashScreen } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-dayjs.extend(isToday);
-dayjs.extend(isYesterday);
-dayjs.extend(isTomorrow);
-dayjs.extend(customParseFormat);
-dayjs.extend(localeData);
+import "@/src/utils/date";
 
 export {
 	// Catch any errors thrown by the Layout component.

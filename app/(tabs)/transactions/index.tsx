@@ -5,12 +5,20 @@ import type { TransactionsScreenModel } from "@/src/LegendState/TransactionsScre
 import { observer, useMount } from "@legendapp/state/react";
 import { MenuView } from "@react-native-menu/menu";
 import type { NativeActionEvent } from "@react-native-menu/menu";
-import { ChevronDownSquare, Search } from "@tamagui/lucide-icons";
-import { useFocusEffect } from "expo-router";
+import { PlusCircle } from "@tamagui/lucide-icons";
+import { Link, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet } from "react-native";
+import Animated, {
+	useAnimatedScrollHandler,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, H1, H3, Header, Stack, Text, XStack, YStack } from "tamagui";
+import { Button, Circle, H3, Stack, Text, XStack, YStack } from "tamagui";
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const ACTIONS = [
 	{
@@ -79,6 +87,9 @@ const SpentMenuComponent = observer(
  */
 const Transactions = () => {
 	const transactionsScreenModel$ = rootStore.transactionsScreenModel;
+	const transactionScrollY = useSharedValue(0);
+	const lastScrollY = useSharedValue(0);
+	const translateY = useSharedValue(0);
 
 	useMount(() => {
 		transactionsScreenModel$.onMount();
@@ -89,6 +100,26 @@ const Transactions = () => {
 			transactionsScreenModel$.transactionsList();
 		}, []),
 	);
+
+	const animatedFabStyle = useAnimatedStyle(() => {
+		return {
+			transform: [
+				{
+					translateY: withSpring(translateY.value),
+				},
+			],
+		};
+	});
+
+	const scrollHandler = useAnimatedScrollHandler((event) => {
+		const currentScrollY = event.contentOffset.y;
+		const scrollDiff = currentScrollY - lastScrollY.value;
+		if (Math.abs(scrollDiff) > 5) {
+			translateY.value = scrollDiff > 0 ? 100 : 0;
+		}
+		lastScrollY.value = currentScrollY;
+		transactionScrollY.value = currentScrollY;
+	});
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -104,8 +135,22 @@ const Transactions = () => {
 				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
 				<TransactionsList
 					transactions={transactionsScreenModel$.groupedTransactions}
+					onScroll={scrollHandler}
 				/>
 			</Stack>
+
+			<AnimatedCircle
+				position="absolute"
+				right={"$6"}
+				bottom={"$6"}
+				backgroundColor={"$blue10Light"}
+				padding={"$1"}
+				style={animatedFabStyle}
+			>
+				<Link href={{ pathname: "/add-transaction" }}>
+					<PlusCircle size={"$4"} color="white" />
+				</Link>
+			</AnimatedCircle>
 		</SafeAreaView>
 	);
 };

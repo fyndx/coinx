@@ -186,8 +186,12 @@ const DatePicker = observer(
 		const snapPoints = useMemo(() => ["50%"], []);
 
 		const handleValueChange = (value: { date: DateType }) => {
-			console.log("Value changed", value);
-			transactionModel$.transaction.date.set(dayjs(value.date));
+			const utcAdjustedDate = dayjs(value.date).add(
+				dayjs().utcOffset(),
+				"minute",
+			);
+
+			transactionModel$.transaction.date.set(utcAdjustedDate);
 			dateSheetRef.current.close();
 		};
 
@@ -197,7 +201,7 @@ const DatePicker = observer(
 					<Stack>
 						<DateTimePicker
 							mode={"single"}
-							date={transactionModel$.transaction.date.get()}
+							date={transactionModel$.transaction.date.get().toDate()}
 							onChange={handleValueChange}
 						/>
 					</Stack>
