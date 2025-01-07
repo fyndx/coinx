@@ -13,7 +13,7 @@ import { observer, useMount, useUnmount } from "@legendapp/state/react";
 import { CheckSquare, Delete } from "@tamagui/lucide-icons";
 import { Toast, useToastController } from "@tamagui/toast";
 import dayjs from "dayjs";
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useMemo, useRef } from "react";
 import {
 	Dimensions,
@@ -40,9 +40,11 @@ const TransactionType = observer(
 			<XStack justifyContent="center" py={"$6"}>
 				<ToggleGroup
 					type="single"
-					defaultValue={transactionModel$.transaction.selectedTransactionType.get()}
+					defaultValue={transactionModel$.transaction.transactionType.get()}
 					onValueChange={(value) => {
-						transactionModel$.transaction.selectedTransactionType.set(value);
+						transactionModel$.transaction.transactionType.set(
+							value as "Expense" | "Income",
+						);
 					}}
 					disableDeactivation
 				>
@@ -279,6 +281,7 @@ const Note = observer(
 				placeholder={"Note"}
 				width={"$16"}
 				textAlign="center"
+				value={transactionModel$.transaction.note.get()}
 				onChangeText={transactionModel$.transaction.note.set}
 			/>
 		);
@@ -291,14 +294,53 @@ const AddTransaction = () => {
 	const transactionModel$ = rootStore.transactionModel;
 	const categoryModel$ = rootStore.categoryModel;
 	const navigation = useNavigation();
+	const {
+		id,
+		amount = "0",
+		transactionType,
+		transactionTime: stringTransactionTime,
+		categoryId: stringCategoryId,
+		categoryName,
+		note,
+	} = useLocalSearchParams<{
+		id?: string;
+		amount?: string;
+		transactionType?: string;
+		transactionTime?: string;
+		categoryId: string;
+		categoryName: string;
+		note: string;
+	}>();
+
+	const params = useLocalSearchParams();
+
+	// TODO: Fix multiplying time by 1000
+	const transactionTime = stringTransactionTime
+		? dayjs(Number.parseInt(stringTransactionTime) * 1000)
+		: dayjs();
+
+	const categoryId = Number.parseInt(stringCategoryId);
 
 	const toast = useToastController();
 
 	useMount(() => {
 		categoryModel$.getCategoriesList({
-			type: transactionModel$.transaction.selectedTransactionType.peek(),
+			type: transactionModel$.transaction.transactionType.peek(),
 		});
 		transactionModel$.onMount({ categoryModel$ });
+		console.log("Transaction id", id);
+		// Set the transaction values from the URL params if there is transaction id
+		if (id) {
+			transactionModel$.transaction.set({
+				id: Number.parseInt(id),
+				amount,
+				transactionType: transactionType as "Expense" | "Income",
+				date: transactionTime,
+				categoryId,
+				categoryName,
+				note,
+			});
+		}
 	});
 
 	useUnmount(() => {
