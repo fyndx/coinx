@@ -14,7 +14,7 @@ export const Transaction = ({
 					id: transaction.id,
 					amount: transaction.amount,
 					transactionType: transaction.transactionType,
-					transactionTime: transaction.transactionTime.toString(),
+					transactionTime: transaction.transactionTime,
 					categoryId: transaction.category_id,
 					categoryName: transaction.category_name,
 					note: transaction.note,

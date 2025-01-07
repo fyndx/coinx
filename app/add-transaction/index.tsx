@@ -1,5 +1,6 @@
 import { CategoriesList } from "@/src/Components/CategoriesList";
 import { rootStore } from "@/src/LegendState";
+import { appModel } from "@/src/LegendState/AppState/App.model";
 import type {
 	CategoryModel,
 	ICategory,
@@ -163,7 +164,9 @@ const CategoryAndDateButtons = observer(
 					onPress={openDatepicker}
 				>
 					<SizableText color={"white"}>
-						{transactionModel$.transaction.date.get().format("ddd D MMM")}
+						{dayjs(transactionModel$.transaction.date.get()).format(
+							"ddd D MMM hh:mm a",
+						)}
 					</SizableText>
 				</Button>
 				<Button
@@ -185,15 +188,11 @@ const DatePicker = observer(
 		transactionModel$,
 		dateSheetRef,
 	}: { transactionModel$: TransactionModel; dateSheetRef: any }) => {
+		const locale = appModel.obs.locale.get();
 		const snapPoints = useMemo(() => ["50%"], []);
 
 		const handleValueChange = (value: { date: DateType }) => {
-			const utcAdjustedDate = dayjs(value.date).add(
-				dayjs().utcOffset(),
-				"minute",
-			);
-
-			transactionModel$.transaction.date.set(utcAdjustedDate);
+			transactionModel$.transaction.date.set(value.date);
 			dateSheetRef.current.close();
 		};
 
@@ -203,8 +202,11 @@ const DatePicker = observer(
 					<Stack>
 						<DateTimePicker
 							mode={"single"}
-							date={transactionModel$.transaction.date.get().toDate()}
+							date={transactionModel$.transaction.date.get()}
 							onChange={handleValueChange}
+							timePicker
+							displayFullDays
+							locale={locale}
 						/>
 					</Stack>
 				</BottomSheetView>

@@ -7,13 +7,14 @@ import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";
 import { eq } from "drizzle-orm";
+import type { DateType } from "react-native-ui-datepicker";
 import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 import type { CategoryModel } from "./Category.model";
 
 export interface ITransactionDraft {
 	id?: number;
 	amount: string;
-	date: Dayjs;
+	date: DateType;
 	categoryId?: number;
 	categoryName?: string;
 	note?: string;
@@ -27,7 +28,7 @@ export class TransactionModel {
 	constructor() {
 		this.transaction = observable<ITransactionDraft>({
 			amount: "0",
-			date: dayjs(),
+			date: new Date(),
 			categoryId: undefined,
 			categoryName: "",
 			note: "",
@@ -143,7 +144,7 @@ export class TransactionModel {
 				amount: amountInNumber,
 				categoryId,
 				note: note,
-				transactionTime: date.toDate(),
+				transactionTime: new Date(date).toISOString(),
 				transactionType: transactionType,
 				id,
 			});
@@ -153,7 +154,7 @@ export class TransactionModel {
 				amount: amountInNumber,
 				categoryId,
 				note: note?.length ? note : categoryName,
-				transactionTime: date.toDate(),
+				transactionTime: new Date(date).toISOString(),
 				transactionType: transactionType,
 			});
 		}
@@ -162,7 +163,7 @@ export class TransactionModel {
 		this.transaction.set({
 			...this.transaction.peek(),
 			amount: "0",
-			date: dayjs(),
+			date: new Date(),
 			categoryId: undefined,
 			categoryName: "",
 			note: "",

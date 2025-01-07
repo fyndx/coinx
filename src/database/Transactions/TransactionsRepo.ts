@@ -25,7 +25,7 @@ export const getTransactions = ({
 				 * Formats the `transaction_time` from UNIX epoch to a string in the format 'DD-MM-YYYY'.
 				 * This formatted date is aliased as `transaction_day` in the resulting SQL query.
 				 */
-				transaction_time: sql<string>`strftime('%d-%m-%Y', transaction_time, 'unixepoch') as transaction_day`,
+				transaction_time: sql<string>`strftime('%d-%m-%Y', transaction_time, 'localtime') as transaction_day`,
 				transactions: sql<string>`json_group_array(json_object('id', coinx_transaction.id, 'amount', amount, 'note', note, 'transactionTime', transaction_time, 'transactionType', transaction_type, 'category_id', category_id, 'category_name', coinx_category.name, 'category_icon', coinx_category.icon, 'category_color', coinx_category.color, 'category_type', coinx_category.type)) as transactions_list`,
 				/**
 				 * This SQL query calculates the total balance for each grouped transaction date.
@@ -45,7 +45,7 @@ export const getTransactions = ({
 			/**
 			 * Groups the transactions by the transaction date.
 			 */
-			.groupBy(sql<string>`strftime('%d-%m-%Y', transaction_time, 'unixepoch')`)
+			.groupBy(sql<string>`strftime('%d-%m-%Y', transaction_time, 'localtime')`)
 			/**
 			 * Orders the transactions by the transaction date in descending order.
 			 */
@@ -57,8 +57,8 @@ export const getTransactions = ({
 			whereQueries.push(
 				between(
 					transactionsRepo.transactionTime,
-					new Date(startDate),
-					new Date(endDate),
+					new Date(startDate).toISOString(),
+					new Date(endDate).toISOString(),
 				),
 			);
 		}

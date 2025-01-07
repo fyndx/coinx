@@ -7,6 +7,7 @@ import { observable } from "@legendapp/state";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { loadAsync } from "expo-font";
+import { getLocales } from "expo-localization";
 import type { CurrencyData } from "rn-currency-picker";
 
 export class AppModel {
@@ -17,6 +18,7 @@ export class AppModel {
 			isFirstLaunch: "unknown",
 			// TODO: Currency Setup
 			currency: undefined as { code: string; symbol: string } | undefined,
+			locale: getLocales()[0].languageCode ?? "en",
 		});
 	}
 
