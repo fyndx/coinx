@@ -21,6 +21,9 @@ export interface ITransactionDraft {
 	transactionType: "Expense" | "Income";
 }
 
+type UpdateTransaction = Required<Pick<InsertTransaction, "id">> &
+	InsertTransaction;
+
 export class TransactionModel {
 	transaction;
 	listeners: ObservableListenerDispose[] = [];
@@ -111,7 +114,7 @@ export class TransactionModel {
 		note,
 		transactionTime,
 		transactionType,
-	}: InsertTransaction & { id: number }) {
+	}: UpdateTransaction) {
 		return await database
 			.update(transactionsRepo)
 			.set({
