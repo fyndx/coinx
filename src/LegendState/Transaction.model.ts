@@ -111,7 +111,7 @@ export class TransactionModel {
 		note,
 		transactionTime,
 		transactionType,
-	}: InsertTransaction) {
+	}: InsertTransaction & { id: number }) {
 		return await database
 			.update(transactionsRepo)
 			.set({
@@ -121,7 +121,6 @@ export class TransactionModel {
 				transactionTime,
 				transactionType,
 			})
-			// @ts-expect-error
 			.where(eq(transactionsRepo.id, id))
 			.returning();
 	}
