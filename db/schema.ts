@@ -12,7 +12,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
 export const transactions = sqliteTable("coinx_transaction", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	transactionTime: integer("transaction_time", { mode: "timestamp" }).notNull(),
+	transactionTime: text("transaction_time").notNull(),
 	amount: real("amount").notNull(),
 	note: text("note"),
 	transactionType: text("transaction_type", {

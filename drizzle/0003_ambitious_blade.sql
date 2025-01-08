@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX `unique_store_name_location` ON `coinx_store` (`name`,`location`);

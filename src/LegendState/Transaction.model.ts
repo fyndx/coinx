@@ -6,18 +6,23 @@ import {
 import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";
+import { eq } from "drizzle-orm";
+import type { DateType } from "react-native-ui-datepicker";
 import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 import type { CategoryModel } from "./Category.model";
 
 export interface ITransactionDraft {
+	id?: number;
 	amount: string;
-	date: Dayjs;
+	date: DateType;
 	categoryId?: number;
 	categoryName?: string;
 	note?: string;
-	transactionType: string;
-	selectedTransactionType: "Expense" | "Income";
+	transactionType: "Expense" | "Income";
 }
+
+type UpdateTransaction = Required<Pick<InsertTransaction, "id">> &
+	InsertTransaction;
 
 export class TransactionModel {
 	transaction;
@@ -25,23 +30,23 @@ export class TransactionModel {
 
 	constructor() {
 		this.transaction = observable<ITransactionDraft>({
-			selectedTransactionType: "Expense",
 			amount: "0",
-			date: dayjs(),
+			date: new Date(),
 			categoryId: undefined,
 			categoryName: "",
 			note: "",
-			transactionType: "",
+			transactionType: "Expense",
 		});
 	}
 
 	onMount = ({ categoryModel$ }: { categoryModel$: CategoryModel }) => {
-		const transactionTypeListener =
-			this.transaction.selectedTransactionType.onChange(({ value }) => {
+		const transactionTypeListener = this.transaction.transactionType.onChange(
+			({ value }) => {
 				categoryModel$.getCategoriesList({
 					type: value,
 				});
-			});
+			},
+		);
 
 		this.listeners.push(transactionTypeListener);
 	};
@@ -102,28 +107,70 @@ export class TransactionModel {
 			.returning();
 	}
 
+	private async updateTransaction({
+		id,
+		amount,
+		categoryId,
+		note,
+		transactionTime,
+		transactionType,
+	}: UpdateTransaction) {
+		return await database
+			.update(transactionsRepo)
+			.set({
+				amount,
+				categoryId,
+				note,
+				transactionTime,
+				transactionType,
+			})
+			.where(eq(transactionsRepo.id, id))
+			.returning();
+	}
+
 	createTransaction = async () => {
-		const { amount, date, categoryId, note, transactionType, categoryName } =
-			this.transaction.peek();
-		const amountInNumber = Number.parseFloat(amount);
-		const newTransaction = await this.createNewTransaction({
-			amount: amountInNumber,
+		const {
+			amount,
+			date,
 			categoryId,
-			note: note?.length ? note : categoryName,
-			transactionTime: date.toDate(),
-			transactionType: transactionType,
-		});
-		// Reset the transaction
+			note,
+			transactionType,
+			categoryName,
+			id,
+		} = this.transaction.peek();
+		const amountInNumber = Number.parseFloat(amount);
+
+		// If the transaction has an id, it means it is an existing transaction that needs to be updated
+		if (id) {
+			await this.updateTransaction({
+				amount: amountInNumber,
+				categoryId,
+				note: note,
+				transactionTime: new Date(date).toISOString(),
+				transactionType: transactionType,
+				id,
+			});
+		} else {
+			// Create a new transaction
+			await this.createNewTransaction({
+				amount: amountInNumber,
+				categoryId,
+				note: note?.length ? note : categoryName,
+				transactionTime: new Date(date).toISOString(),
+				transactionType: transactionType,
+			});
+		}
+		// Reset the transaction to its initial state
+
 		this.transaction.set({
+			...this.transaction.peek(),
 			amount: "0",
-			date: dayjs(),
+			date: new Date(),
 			categoryId: undefined,
 			categoryName: "",
 			note: "",
-			transactionType: "",
-			selectedTransactionType: this.transaction.selectedTransactionType.peek(),
+			id: undefined,
 		});
-		return newTransaction;
 	};
 
 	/**

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "389318cd-894b-46b1-a977-cce707621e09",
+  "id": "165f108b-a68a-40de-96b8-4b174a4c34f2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "coinx_category": {
@@ -110,22 +110,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "store": {
-          "name": "store",
-          "type": "text",
+        "store_id": {
+          "name": "store_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "url": {
           "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "location": {
-          "name": "location",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -168,7 +161,22 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_product_listings_product_id": {
+          "name": "idx_product_listings_product_id",
+          "columns": [
+            "product_id"
+          ],
+          "isUnique": false
+        },
+        "idx_product_listings_store_id": {
+          "name": "idx_product_listings_store_id",
+          "columns": [
+            "store_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "coinx_product_listing_product_id_coinx_product_id_fk": {
           "name": "coinx_product_listing_product_id_coinx_product_id_fk",
@@ -176,6 +184,19 @@
           "tableTo": "coinx_product",
           "columnsFrom": [
             "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "coinx_product_listing_store_id_coinx_store_id_fk": {
+          "name": "coinx_product_listing_store_id_coinx_store_id_fk",
+          "tableFrom": "coinx_product_listing",
+          "tableTo": "coinx_store",
+          "columnsFrom": [
+            "store_id"
           ],
           "columnsTo": [
             "id"
@@ -300,6 +321,20 @@
           "notNull": true,
           "autoincrement": false
         },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "default_unit_category": {
           "name": "default_unit_category",
           "type": "text",
@@ -322,6 +357,68 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "coinx_store": {
+      "name": "coinx_store",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "coinx_store_name_unique": {
+          "name": "coinx_store_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        },
+        "unique_store_name_location": {
+          "name": "unique_store_name_location",
+          "columns": [
+            "name",
+            "location"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "coinx_transaction": {
       "name": "coinx_transaction",
       "columns": {
@@ -334,7 +431,7 @@
         },
         "transaction_time": {
           "name": "transaction_time",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -384,7 +481,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "coinx_transaction_category_id_coinx_category_id_fk": {
+          "name": "coinx_transaction_category_id_coinx_category_id_fk",
+          "tableFrom": "coinx_transaction",
+          "tableTo": "coinx_category",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
