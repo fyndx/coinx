@@ -96,10 +96,13 @@ export class TransactionsScreenModel {
 	};
 
 	startLiseners = () => {
-		this.obs.duration.onChange((duration) => {
-			this.calculateInsights({
-				timeFrame: duration.value,
-			});
+		// this.obs.duration.onChange((duration) => {
+		// 	this.calculateInsights({
+		// 		timeFrame: duration.value,
+		// 	});
+		// });
+		this.obs.timeRange.onChange((timeRange) => {
+			this.onTimeRangeChange();
 		});
 	};
 
@@ -309,9 +312,8 @@ export class TransactionsScreenModel {
 		this.calculateInsights({ timeFrame: duration });
 	};
 
-	onTimeRangeChange = (timeRange: TimeRangeOptions) => {
-		this.obs.timeRange.set(timeRange);
+	onTimeRangeChange = () => {
 		// this.calculateInsights({ timeFrame: this.obs.duration.peek() });
-		// this.transactionsList();
+		this.transactionsList();
 	};
 }
