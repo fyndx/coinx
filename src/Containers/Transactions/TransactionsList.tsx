@@ -6,7 +6,6 @@ import { observer } from "@legendapp/state/react";
 import { FlashList, type FlashListProps } from "@shopify/flash-list";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import Animated from "react-native-reanimated";
-import { YGroup } from "tamagui";
 
 const AnimatedFlashList =
 	Animated.createAnimatedComponent<FlashListProps<FlashListTransactionsList>>(
