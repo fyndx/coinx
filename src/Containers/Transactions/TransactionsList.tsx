@@ -38,6 +38,7 @@ export const TransactionsList = observer(
 				}}
 				onScroll={onScroll}
 				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps={"handled"}
 				estimatedItemSize={44}
 			/>
 		);

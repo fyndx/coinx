@@ -173,6 +173,12 @@ export class TransactionModel {
 		});
 	};
 
+	deleteTransaction = async (id: number) => {
+		return await database
+			.delete(transactionsRepo)
+			.where(eq(transactionsRepo.id, id));
+	};
+
 	/**
 	 * Deletes all transactions from the database.
 	 * @returns A promise that resolves when all transactions have been deleted.
