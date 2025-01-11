@@ -23,6 +23,10 @@ const Stores = () => {
 				bottom={"$6"}
 				backgroundColor={"$blue10Light"}
 				padding={"$1"}
+				pressStyle={{ opacity: 0.8 }}
+				// biome-ignore lint/a11y/useSemanticElements: Fab button is not a semantic element
+				role="button"
+				aria-label="Add new store"
 			>
 				<Link href={"/add-store"}>
 					<PlusCircle size={"$4"} color="white" />

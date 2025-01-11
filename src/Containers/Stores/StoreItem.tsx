@@ -42,8 +42,8 @@ export const StoreItem = observer(({ store }: StoreItemProps) => {
 						onPress={handleStoreEdit}
 					>
 						<XStack flex={1} gap={"$4"} justifyContent={"space-between"}>
-							<Text fontSize={"$6"}>{store.name}</Text>
-							<Text fontSize={"$6"}>{store.location}</Text>
+							<Text fontSize={"$6"}>{storeData.name}</Text>
+							<Text fontSize={"$6"}>{storeData.location}</Text>
 						</XStack>
 					</Link>
 				</ListItem>

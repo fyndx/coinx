@@ -26,6 +26,8 @@ const AddStore = observer(() => {
 		}
 	};
 
+	const isSubmitting = storeModel$.isSubmitting.get();
+
 	return (
 		<YStack
 			flex={1}
@@ -46,7 +48,13 @@ const AddStore = observer(() => {
 					value={storeDraft.location.get()}
 				/>
 			</YStack>
-			<Button onPress={handleSubmit}>{"Add Store"}</Button>
+			<Button onPress={handleSubmit} disabled={isSubmitting}>
+				{isSubmitting
+					? "Saving..."
+					: storeDraft.id
+						? "Update Store"
+						: "Add Store"}
+			</Button>
 		</YStack>
 	);
 });
