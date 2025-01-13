@@ -4,6 +4,7 @@ import {
 } from "@/src/LegendState/Settings/Settings.model";
 import { ChevronRight } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
+import { Fragment } from "react";
 import { StyleSheet } from "react-native";
 import {
 	Button,
@@ -28,17 +29,23 @@ const Settings = () => {
 				</YGroup.Item>
 				<Separator />
 				<YGroup.Item>
+					<Link href={"/stores"} asChild>
+						<ListItem title={"Stores"} iconAfter={ChevronRight} />
+					</Link>
+				</YGroup.Item>
+				<Separator />
+				<YGroup.Item>
 					<ListItem title={"Export Data"} onPress={exportDataToCsv} />
 				</YGroup.Item>
 				{__DEV__ && (
-					<>
+					<Fragment>
 						<Separator />
 						<YGroup.Item>
 							<Link href={"/playground"} asChild>
 								<ListItem title={"Play Ground"} iconAfter={ChevronRight} />
 							</Link>
 						</YGroup.Item>
-					</>
+					</Fragment>
 				)}
 			</YGroup>
 		</YStack>

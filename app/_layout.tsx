@@ -80,6 +80,17 @@ const RootLayoutNav = () => {
 							name={"currency-select/index"}
 							options={{ headerShown: false }}
 						/>
+						<Stack.Screen
+							name={"stores/index"}
+							options={{ headerTitle: "Stores", headerTitleAlign: "center" }}
+						/>
+						<Stack.Screen
+							name={"add-store/index"}
+							options={{
+								headerTitle: "Add Store",
+								headerTitleAlign: "center",
+							}}
+						/>
 					</Stack>
 				</RootProvider>
 			</GestureHandlerRootView>
