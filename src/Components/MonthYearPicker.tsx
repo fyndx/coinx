@@ -36,6 +36,8 @@ export const MonthYearPicker = observer(
 			month,
 			index,
 		}: { month: string; index: number }) => {
+			setSelectedMonth(index);
+			setSelectedYear(tempYear);
 			const startOfMonth = dayjs().year(tempYear).month(index).startOf("month");
 			const endOfMonth = dayjs().year(tempYear).month(index).endOf("month");
 			const timeRange: TimeRangeOptions = {
@@ -46,9 +48,51 @@ export const MonthYearPicker = observer(
 			transactionsScreenModel$.obs.timeRange.set(timeRange);
 		};
 
+		const handlePreviousMonth = () => {
+			const newMonth = selectedMonth === 0 ? 11 : selectedMonth - 1;
+			const newYear = selectedMonth === 0 ? selectedYear - 1 : selectedYear;
+
+			setSelectedMonth(newMonth);
+			setSelectedYear(newYear);
+			setTempYear(newYear);
+
+			const startOfMonth = dayjs()
+				.year(newYear)
+				.month(newMonth)
+				.startOf("month");
+			const endOfMonth = dayjs().year(newYear).month(newMonth).endOf("month");
+			const timeRange: TimeRangeOptions = {
+				type: "month",
+				startDate: startOfMonth.format(),
+				endDate: endOfMonth.format(),
+			};
+			transactionsScreenModel$.obs.timeRange.set(timeRange);
+		};
+
+		const handleNextMonth = () => {
+			const newMonth = selectedMonth === 11 ? 0 : selectedMonth + 1;
+			const newYear = selectedMonth === 11 ? selectedYear + 1 : selectedYear;
+
+			setSelectedMonth(newMonth);
+			setSelectedYear(newYear);
+			setTempYear(newYear);
+
+			const startOfMonth = dayjs()
+				.year(newYear)
+				.month(newMonth)
+				.startOf("month");
+			const endOfMonth = dayjs().year(newYear).month(newMonth).endOf("month");
+			const timeRange: TimeRangeOptions = {
+				type: "month",
+				startDate: startOfMonth.format(),
+				endDate: endOfMonth.format(),
+			};
+			transactionsScreenModel$.obs.timeRange.set(timeRange);
+		};
+
 		return (
 			<XStack justifyContent={"space-between"} alignSelf={"stretch"}>
-				<Button icon={ChevronLeft} />
+				<Button icon={ChevronLeft} onPress={handlePreviousMonth} />
 				<Popover placement={"bottom"}>
 					<Popover.Trigger asChild>
 						<Button onPress={openPicker}>
@@ -57,7 +101,7 @@ export const MonthYearPicker = observer(
 					</Popover.Trigger>
 					<Popover.Content marginHorizontal={"$6"}>
 						<Popover.Arrow borderWidth={1} borderColor="$borderColor" />
-						<YStack>
+						<YStack gap={"$3"}>
 							{/* Year Row */}
 							<XStack justifyContent={"space-between"} alignItems={"center"}>
 								<Button
@@ -94,7 +138,7 @@ export const MonthYearPicker = observer(
 						</YStack>
 					</Popover.Content>
 				</Popover>
-				<Button icon={ChevronRight} />
+				<Button icon={ChevronRight} onPress={handleNextMonth} />
 			</XStack>
 		);
 	},
