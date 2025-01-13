@@ -5,7 +5,11 @@ import {
 	editStore,
 	getStores,
 } from "@/src/database/Stores/StoresRepo";
-import { type ObservableArray, observable } from "@legendapp/state";
+import {
+	type Observable,
+	type ObservableArray,
+	observable,
+} from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
@@ -15,8 +19,8 @@ export interface StoresListObservable
 
 export class StoreModel {
 	storesList: StoresListObservable;
-	storeDraft;
-	isSubmitting;
+	storeDraft: Observable<InsertStore>;
+	isSubmitting: Observable<boolean>;
 
 	constructor() {
 		this.storesList = observable([]);
@@ -24,7 +28,6 @@ export class StoreModel {
 			name: "",
 			location: "",
 		});
-		// State for loading spinner
 		this.isSubmitting = observable(false);
 	}
 
@@ -75,6 +78,7 @@ export class StoreModel {
 	};
 
 	deleteStore = (id: number) => {
+		this.isSubmitting.set(true);
 		Effect.runPromise(deleteStoreById(id))
 			.then((result) => {
 				Burnt.toast({ title: "Store deleted successfully" });
@@ -85,6 +89,9 @@ export class StoreModel {
 					title: "Failed to delete store",
 					message: error.message,
 				});
+			})
+			.finally(() => {
+				this.isSubmitting.set(false);
 			});
 	};
 

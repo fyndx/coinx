@@ -2,7 +2,7 @@ import { db as database } from "@/db/client";
 import { type insertStoreSchema, stores as storesRepo } from "@/db/schema";
 import type { Static } from "@sinclair/typebox";
 import { eq } from "drizzle-orm";
-import { Effect, pipe } from "effect";
+import { Effect, Predicate, pipe } from "effect";
 import { InvalidIdError } from "./StoresErrors";
 
 export const addStore = (store: Static<typeof insertStoreSchema>) =>
@@ -50,15 +50,17 @@ export const deleteStoreById = (id: number) => {
 	return pipe(
 		Effect.succeed(id),
 		// id validation
-		Effect.flatMap((value) =>
-			value > 0
-				? Effect.succeed(value)
-				: Effect.fail(new InvalidIdError({ message: "Invalid Store id" })),
+		Effect.filterOrFail(
+			(storeId) => storeId > 0,
+			() => new InvalidIdError({ message: "Invalid Store id" }),
 		),
 		// delete store
-		Effect.flatMap((validId) =>
+		Effect.flatMap((validStoreId) =>
 			Effect.tryPromise(() =>
-				database.delete(storesRepo).where(eq(storesRepo.id, validId)).execute(),
+				database
+					.delete(storesRepo)
+					.where(eq(storesRepo.id, validStoreId))
+					.execute(),
 			),
 		),
 		// Log Errors
