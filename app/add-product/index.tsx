@@ -1,23 +1,47 @@
 import { DefaultUnitSelect } from "@/src/Containers/AddProduct/Components/DefaultUnitSelect";
 import { rootStore } from "@/src/LegendState";
-import { observer } from "@legendapp/state/react";
+import { observer, useMount } from "@legendapp/state/react";
 import { Keyboard, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Input, YStack } from "tamagui";
+import { Button, Input, TextArea, YStack } from "tamagui";
 
 const AddProduct = observer(() => {
 	const addProductScreenModel$ = rootStore.addProductScreenModel;
+
+	const isAddProductInProgress = addProductScreenModel$.isLoading.get();
+
+	const {
+		id,
+		name,
+		notes = "",
+		defaultUnitCategory,
+	} = addProductScreenModel$.product.get();
+
+	useMount(() => {
+		() => {
+			addProductScreenModel$.resetProduct();
+		};
+	});
 
 	const handleProductNameChange = (value: string) => {
 		addProductScreenModel$.product.name.set(value.trim());
 	};
 
+	const handleProductNotesChange = (value: string) => {
+		addProductScreenModel$.product.notes.set(value.trim());
+	};
+
 	const handleUnitCategoryChange = (value: string) => {
-		// @ts-expect-error
 		addProductScreenModel$.product.defaultUnitCategory.set(value);
 	};
 
-	const isAddProductInProgress = addProductScreenModel$.isLoading.get();
+	const handleSubmit = () => {
+		if (id) {
+			addProductScreenModel$.editProduct();
+		} else {
+			addProductScreenModel$.addProduct();
+		}
+	};
 
 	return (
 		// TODO: Add error messages for input and select
@@ -30,20 +54,34 @@ const AddProduct = observer(() => {
 			>
 				<YStack gap={"$3"}>
 					<Input
-						placeholder={"Product Name"}
+						placeholder={"Product Name *"}
+						value={name}
 						onChangeText={handleProductNameChange}
 						disabled={isAddProductInProgress}
 						autoFocus
 					/>
+					<TextArea
+						placeholder={
+							"Notes\n(eg. Describe your expectations, quality, usage etc.)"
+						}
+						value={notes}
+						onChangeText={handleProductNotesChange}
+						disabled={isAddProductInProgress}
+						minHeight={"$12"}
+						textAlignVertical={"top"}
+					/>
 					{/* Default Unit Select */}
-					<DefaultUnitSelect onValueChange={handleUnitCategoryChange} />
+					<DefaultUnitSelect
+						value={defaultUnitCategory}
+						onValueChange={handleUnitCategoryChange}
+					/>
 				</YStack>
 				<Button
-					onPress={addProductScreenModel$.addProduct}
+					onPress={handleSubmit}
 					// TODO: Disable Button unless input and select is valid
 					disabled={isAddProductInProgress}
 				>
-					{"Add Product"}
+					{id ? "Edit Product" : "Add Product"}
 				</Button>
 			</YStack>
 		</SafeAreaView>

@@ -1,6 +1,10 @@
-import { Trash2 } from "@tamagui/lucide-icons";
 import { Component, type PropsWithChildren } from "react";
-import { type StyleProp, StyleSheet, type ViewStyle } from "react-native";
+import {
+	Pressable,
+	type StyleProp,
+	StyleSheet,
+	type ViewStyle,
+} from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable, {
 	type SwipeableMethods,
@@ -59,13 +63,24 @@ const ActionButton = ({
 	}));
 	return (
 		<RectButton
+			hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
 			style={[styles.actionButton, action.style]}
 			onPress={() => {
 				swipeable.close();
 				action.onPress();
 			}}
 		>
-			<Reanimated.View style={styleAnimation}>{action.content}</Reanimated.View>
+			<Pressable
+				onPress={(event) => {
+					// Hack to prevent the parent to trigger the onPress event
+					event.preventDefault();
+				}}
+				hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+			>
+				<Reanimated.View style={styleAnimation}>
+					{action.content}
+				</Reanimated.View>
+			</Pressable>
 		</RectButton>
 	);
 };
@@ -145,6 +160,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		width: 48,
+		zIndex: 1,
 	},
 	deleteButton: {
 		backgroundColor: "red",
