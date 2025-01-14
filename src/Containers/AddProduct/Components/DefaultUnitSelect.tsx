@@ -6,10 +6,12 @@ import { LinearGradient } from "tamagui/linear-gradient";
 
 interface DefaultUnitSelectProps {
 	onValueChange?: (value: (typeof MeasurementUnits)[number]) => void;
+	value?: string;
 }
 
 export const DefaultUnitSelect = ({
 	onValueChange,
+	value,
 }: DefaultUnitSelectProps) => {
 	return (
 		<Select
@@ -21,9 +23,10 @@ export const DefaultUnitSelect = ({
 					Keyboard.dismiss();
 				}
 			}}
+			value={value}
 		>
 			<Select.Trigger>
-				<Select.Value placeholder={"Select a Unit"} />
+				<Select.Value placeholder={"Select a Unit *"} />
 			</Select.Trigger>
 			<Adapt when="sm" platform="touch">
 				<Sheet

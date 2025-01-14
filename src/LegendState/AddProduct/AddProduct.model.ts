@@ -2,33 +2,28 @@ import type { InsertProduct } from "@/db/schema";
 import {
 	addProduct,
 	findProductByName,
+	updateProduct,
 } from "@/src/database/Products/ProductsRepo";
 import { type MeasurementUnits, isValidUnitCategory } from "@/src/utils/units";
-import { type ObservableObject, observable } from "@legendapp/state";
+import { observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
-interface AddProductDraft {
-	name: string;
-	defaultUnitCategory?: (typeof MeasurementUnits)[number];
-}
-
 export class AddProductScreenModel {
 	isLoading;
-	product: ObservableObject<AddProductDraft>;
+	product;
 
 	constructor() {
-		this.product = observable({
+		this.product = observable<InsertProduct>({
 			name: "",
-			defaultUnitCategory: undefined as
-				| (typeof MeasurementUnits)[number]
-				| undefined,
+			defaultUnitCategory: "" as (typeof MeasurementUnits)[number],
+			notes: "",
 		});
 		this.isLoading = observable(false);
 	}
 
-	private validateProduct(product: AddProductDraft) {
+	private validateProduct(product: InsertProduct) {
 		if (!product.name) {
 			return "Product name is required";
 		}
@@ -86,7 +81,7 @@ export class AddProductScreenModel {
 				Burnt.toast({ title: "Product added successfully" });
 				this.product.set({
 					name: "",
-					defaultUnitCategory: undefined,
+					defaultUnitCategory: "",
 				});
 				router.back();
 			}
@@ -99,5 +94,44 @@ export class AddProductScreenModel {
 		} finally {
 			this.isLoading.set(false);
 		}
+	};
+
+	editProduct = async () => {
+		if (this.isLoading.peek()) return;
+
+		const product = this.product.peek();
+		// product object checks
+		const validationError = this.validateProduct(product);
+		if (validationError) {
+			Burnt.toast({ title: validationError });
+			return;
+		}
+
+		this.isLoading.set(true);
+
+		Effect.runPromise(updateProduct(product))
+			.then((result) => {
+				Burnt.toast({ title: "Product updated successfully" });
+				this.resetProduct();
+				router.back();
+			})
+			.catch((error) => {
+				Burnt.toast({
+					title: "Failed to update product",
+					message: error instanceof Error ? error.message : "Unknown error",
+				});
+			})
+			.finally(() => {
+				this.isLoading.set(false);
+			});
+	};
+
+	resetProduct = () => {
+		this.product.delete();
+		this.product.set({
+			name: "",
+			defaultUnitCategory: "",
+			notes: "",
+		});
 	};
 }

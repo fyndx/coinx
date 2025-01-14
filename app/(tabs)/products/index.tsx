@@ -2,28 +2,25 @@ import type { SelectProduct } from "@/db/schema";
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
 import { rootStore } from "@/src/LegendState";
 import { WINDOW_HEIGHT } from "@gorhom/bottom-sheet";
-import { observer, useMount } from "@legendapp/state/react";
+import { observer } from "@legendapp/state/react";
 import { FlashList } from "@shopify/flash-list";
 import {
 	Box,
 	ChevronRight,
-	Construction,
+	FileEdit,
 	PlusCircle,
 	Trash2,
 } from "@tamagui/lucide-icons";
-import { Link, useFocusEffect } from "expo-router";
+import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	Circle,
-	H1,
 	H3,
-	Header,
 	ListItem,
 	Separator,
-	Text,
-	XStack,
+	Spinner,
 	YGroup,
 	YStack,
 } from "tamagui";
@@ -31,6 +28,7 @@ import {
 const Product = ({
 	product,
 }: { product: Omit<SelectProduct, "createdAt"> }) => {
+	const router = useRouter();
 	return (
 		<Link
 			href={{
@@ -44,10 +42,24 @@ const Product = ({
 					<SwipeableRow
 						rightActions={[
 							{
-								content: <Trash2 color={"$white5"} />,
-								style: { backgroundColor: "red" },
+								content: <Trash2 color={"red"} />,
+								style: { backgroundColor: "white" },
 								onPress: () => {
 									rootStore.productsModel.deleteProduct(product.id);
+								},
+							},
+						]}
+						leftActions={[
+							{
+								content: <FileEdit color={"$black5"} />,
+								style: { backgroundColor: "white" },
+								onPress: () => {
+									const addProductScreenModel$ =
+										rootStore.addProductScreenModel;
+									addProductScreenModel$.product.set(product);
+									router.push({
+										pathname: "/add-product",
+									});
 								},
 							},
 						]}
@@ -64,9 +76,10 @@ const Product = ({
  * Products List Screen
  */
 const Products = observer(() => {
+	const productsModel$ = rootStore.productsModel;
 	useFocusEffect(
 		useCallback(() => {
-			rootStore.productsModel.getProductsList();
+			productsModel$.getProductsList();
 		}, []),
 	);
 
@@ -75,9 +88,22 @@ const Products = observer(() => {
 			{/* TODO: Search */}
 			<YGroup flex={1} style={styles.container} padding={"$4"}>
 				<FlashList
-					data={rootStore.productsModel.products.get()}
+					data={productsModel$.products.get()}
 					renderItem={({ item }) => <Product product={item} />}
 					ListEmptyComponent={() => {
+						// TODO: .get() might not work here
+						if (productsModel$.isLoading.get()) {
+							return (
+								<YStack
+									height={WINDOW_HEIGHT - 100}
+									alignItems="center"
+									justifyContent="center"
+									padding={"$4"}
+								>
+									<Spinner size={"large"} />
+								</YStack>
+							);
+						}
 						return (
 							<YStack
 								height={WINDOW_HEIGHT - 100}
