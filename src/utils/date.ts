@@ -5,6 +5,7 @@ import isToday from "dayjs/plugin/isToday";
 import isTomorrow from "dayjs/plugin/isTomorrow";
 import isYesterday from "dayjs/plugin/isYesterday";
 import localeData from "dayjs/plugin/localeData";
+import minMax from "dayjs/plugin/minMax";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
@@ -15,6 +16,7 @@ dayjs.extend(customParseFormat);
 dayjs.extend(localeData);
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(minMax);
 
 /**
  * Create a range of Day.js dates between a start and end date.

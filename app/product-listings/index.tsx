@@ -45,6 +45,7 @@ const ProductListings = () => {
 				<Spacer size={"$6"} />
 				<ProductListingGraph
 					listingHistory={productListingHistoryModel$.productsListingHistory}
+					productListingHistoryModel$={productListingHistoryModel$}
 				/>
 			</YStack>
 			<Circle
