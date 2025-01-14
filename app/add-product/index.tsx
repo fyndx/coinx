@@ -18,7 +18,7 @@ const AddProduct = observer(() => {
 	} = addProductScreenModel$.product.get();
 
 	useMount(() => {
-		() => {
+		return () => {
 			addProductScreenModel$.resetProduct();
 		};
 	});
