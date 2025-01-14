@@ -21,6 +21,8 @@ import {
 	ListItem,
 	Separator,
 	Spinner,
+	Stack,
+	XStack,
 	YGroup,
 	YStack,
 } from "tamagui";
@@ -85,14 +87,29 @@ const Products = observer(() => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* TODO: Search */}
-			<YGroup flex={1} style={styles.container} padding={"$4"}>
-				<FlashList
-					data={productsModel$.products.get()}
-					renderItem={({ item }) => <Product product={item} />}
-					ListEmptyComponent={() => {
-						// TODO: .get() might not work here
-						if (productsModel$.isLoading.get()) {
+			<Stack flex={1}>
+				<XStack justifyContent={"center"} py={"$2"}>
+					<H3>{"Products"}</H3>
+				</XStack>
+				{/* TODO: Search */}
+				<YGroup flex={1} style={styles.container} padding={"$4"}>
+					<FlashList
+						data={productsModel$.products.get()}
+						renderItem={({ item }) => <Product product={item} />}
+						ListEmptyComponent={() => {
+							// TODO: .get() might not work here
+							if (productsModel$.isLoading.get()) {
+								return (
+									<YStack
+										height={WINDOW_HEIGHT - 100}
+										alignItems="center"
+										justifyContent="center"
+										padding={"$4"}
+									>
+										<Spinner size={"large"} />
+									</YStack>
+								);
+							}
 							return (
 								<YStack
 									height={WINDOW_HEIGHT - 100}
@@ -100,30 +117,20 @@ const Products = observer(() => {
 									justifyContent="center"
 									padding={"$4"}
 								>
-									<Spinner size={"large"} />
+									<Box size={"$8"} />
+									<H3 textAlign={"center"}>
+										{
+											"No products found.\nTap the + icon to add your first product!"
+										}
+									</H3>
 								</YStack>
 							);
-						}
-						return (
-							<YStack
-								height={WINDOW_HEIGHT - 100}
-								alignItems="center"
-								justifyContent="center"
-								padding={"$4"}
-							>
-								<Box size={"$8"} />
-								<H3 textAlign={"center"}>
-									{
-										"No products found.\nTap the + icon to add your first product!"
-									}
-								</H3>
-							</YStack>
-						);
-					}}
-					estimatedItemSize={100}
-					ItemSeparatorComponent={() => <Separator />}
-				/>
-			</YGroup>
+						}}
+						estimatedItemSize={100}
+						ItemSeparatorComponent={() => <Separator />}
+					/>
+				</YGroup>
+			</Stack>
 			<Circle
 				position="absolute"
 				right={"$6"}

@@ -24,12 +24,11 @@ export default function RootLayout() {
 			<Tabs.Screen
 				name={"products/index"}
 				options={{
-					// header: () => null,
-					headerTitle: "Products",
 					tabBarLabel: () => null,
 					tabBarIcon: ({ color, focused, size }) => (
 						<Package size={size} color={color} />
 					),
+					header: () => null,
 				}}
 			/>
 			<Tabs.Screen
