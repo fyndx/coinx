@@ -5,28 +5,28 @@ import { Button, Input, YStack } from "tamagui";
 
 const AddStore = observer(() => {
 	const { storeDraft } = storeModel$;
+	const { id, name, location } = storeDraft.get();
+	const isSubmitting = storeModel$.isSubmitting.get();
 
 	useUnmount(() => {
 		storeModel$.resetStoreDraft();
 	});
 
 	const handleStoreNameChange = (value: string) => {
-		storeModel$.storeDraft.name.set(value.trim());
+		storeModel$.storeDraft.name.set(value);
 	};
 
 	const handleStoreLocationChange = (value: string) => {
-		storeModel$.storeDraft.location.set(value.trim());
+		storeModel$.storeDraft.location.set(value);
 	};
 
 	const handleSubmit = () => {
-		if (storeDraft.id) {
+		if (id) {
 			storeModel$.editStore();
 		} else {
 			storeModel$.addStore();
 		}
 	};
-
-	const isSubmitting = storeModel$.isSubmitting.get();
 
 	return (
 		<YStack
@@ -39,21 +39,17 @@ const AddStore = observer(() => {
 				<Input
 					placeholder={"Store Name"}
 					onChangeText={handleStoreNameChange}
-					value={storeDraft.name.get()}
+					value={name}
 					autoFocus
 				/>
 				<Input
 					placeholder={"Store Location"}
 					onChangeText={handleStoreLocationChange}
-					value={storeDraft.location.get()}
+					value={location}
 				/>
 			</YStack>
 			<Button onPress={handleSubmit} disabled={isSubmitting}>
-				{isSubmitting
-					? "Saving..."
-					: storeDraft.id
-						? "Update Store"
-						: "Add Store"}
+				{isSubmitting ? "Saving..." : id ? "Update Store" : "Add Store"}
 			</Button>
 		</YStack>
 	);
