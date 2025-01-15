@@ -1,23 +1,21 @@
-import {
-	getInsights,
-	getTransactions,
-} from "@/src/database/Transactions/TransactionsRepo";
-import {
-	computed,
-	observable,
-	beginBatch,
-	endBatch,
-	type ObservableListenerDispose,
-} from "@legendapp/state";
-import dayjs from "dayjs";
-import type { Dayjs } from "dayjs";
-import { Effect } from "effect";
 import type {
 	FlashListTransactionsList,
 	TransactionGroup,
 } from "@/src/LegendState/TransactionsScreen.model";
-import { dayjsRange } from "@/src/utils/date";
 import { getCategories } from "@/src/database/Categories/CategoriesRepo";
+import {
+	getInsights,
+	getTransactions,
+} from "@/src/database/Transactions/TransactionsRepo";
+import { dayjsRange } from "@/src/utils/date";
+import {
+	type ObservableListenerDispose,
+	computed,
+	observable,
+} from "@legendapp/state";
+import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
+import { Effect } from "effect";
 
 type InsightsDurationType = "week" | "month" | "year";
 
@@ -134,7 +132,6 @@ export class InsightsModel {
 
 	private getTransactionsList = async () => {
 		const { startTime, endTime } = this.obs.duration.peek();
-		console.log({ startTime, endTime }, "getTransactionsList");
 		const groupedTransactions = await Effect.runPromise(
 			getTransactions({
 				startDate: startTime,
