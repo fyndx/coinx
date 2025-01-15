@@ -69,7 +69,6 @@ function ToolTip({
 }
 
 interface ProductListingGraphProps {
-	listingHistory: ProductsListingHistoryModel["productsListingHistory"];
 	productListingHistoryModel$: ProductsListingHistoryModel;
 }
 
@@ -77,10 +76,11 @@ export const ProductListingGraph = observer(
 	(props: ProductListingGraphProps) => {
 		const font = useFont(LatoRegular, 12);
 		const { data, graphData, productListingNames, colors } =
-			props.listingHistory;
+			props.productListingHistoryModel$.productsListingHistory;
 		const extractedGraphData = graphData.get();
 		const extractedProducts = productListingNames.get();
 		const extractedProductListingColors = colors.get();
+
 		const yState = extractedProducts?.reduce(
 			(acc: { [key: string]: number }, curVal: string) => {
 				acc[curVal] = 0;

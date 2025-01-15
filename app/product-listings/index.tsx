@@ -2,7 +2,7 @@ import { ProductListingGraph } from "@/src/Containers/ProductListings/Containers
 import { ProductListingTable } from "@/src/Containers/ProductListings/Containers/ProductListingTable";
 import { rootStore } from "@/src/LegendState";
 import { useMount } from "@legendapp/state/react";
-import { Construction, PlusCircle } from "@tamagui/lucide-icons";
+import { PlusCircle } from "@tamagui/lucide-icons";
 import { Link, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet } from "react-native";
@@ -44,7 +44,6 @@ const ProductListings = () => {
 				<ProductListingTable data={productListing$.productListingsTable} />
 				<Spacer size={"$6"} />
 				<ProductListingGraph
-					listingHistory={productListingHistoryModel$.productsListingHistory}
 					productListingHistoryModel$={productListingHistoryModel$}
 				/>
 			</YStack>
