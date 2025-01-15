@@ -1,6 +1,7 @@
 import type { ObservableComputed } from "@legendapp/state";
 import { Switch, observer } from "@legendapp/state/react";
 import { useMemo, useRef } from "react";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import {
 	Button,
 	ScrollView,
@@ -68,7 +69,9 @@ export const ProductListingTable = observer(
 			[head, data],
 		);
 
-		const handleStickyScroll = (event: any) => {
+		const handleStickyScroll = (
+			event: NativeSyntheticEvent<NativeScrollEvent>,
+		) => {
 			if (mainScrollRef.current && !isMainScrolling.current) {
 				mainScrollRef.current.scrollTo({
 					y: event.nativeEvent.contentOffset.y,
@@ -77,7 +80,9 @@ export const ProductListingTable = observer(
 			}
 		};
 
-		const handleMainScroll = (event: any) => {
+		const handleMainScroll = (
+			event: NativeSyntheticEvent<NativeScrollEvent>,
+		) => {
 			if (stickyScrollRef.current && !isStickyScrolling.current) {
 				stickyScrollRef.current.scrollTo({
 					y: event.nativeEvent.contentOffset.y,
@@ -99,7 +104,7 @@ export const ProductListingTable = observer(
 			);
 		}
 
-		const renderCell = (cell: (typeof data)[0][0], isSticky = false) => (
+		const renderCell = (cell: (typeof data)[0][0]) => (
 			<Switch value={cell.type}>
 				{{
 					text: () => <Text color={theme.color.val}>{cell.value}</Text>,
@@ -140,14 +145,14 @@ export const ProductListingTable = observer(
 						>
 							{data.map((row, rowIndex) => (
 								<YStack
-									key={`sticky-${rowIndex}`}
+									key={`sticky-${rowIndex}-${row[0].value}`}
 									padding={8}
 									borderColor={theme.borderColor.val}
 									borderWidth={"$0.5"}
 									width={columnWidths[0]}
 									height={"$6"}
 								>
-									{renderCell(row[0], true)}
+									{renderCell(row[0])}
 								</YStack>
 							))}
 						</ScrollView>
@@ -183,10 +188,10 @@ export const ProductListingTable = observer(
 								}}
 							>
 								{data.map((row, rowIndex) => (
-									<XStack key={rowIndex}>
+									<XStack key={`rowIndex-${rowIndex}`}>
 										{row.slice(1).map((cell, cellIndex) => (
 											<YStack
-												key={cellIndex}
+												key={`cellIndex-${cellIndex}-${cell.value}`}
 												padding={8}
 												borderColor={theme.borderColor.val}
 												borderWidth={"$0.5"}

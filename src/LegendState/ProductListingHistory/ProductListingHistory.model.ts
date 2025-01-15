@@ -147,8 +147,6 @@ export class ProductsListingHistoryModel {
 			}
 		}
 
-		console.log("min", minimum, "max", maximum);
-
 		// Add padding
 		const range = maximum - minimum;
 		const paddingPercent = 0.1; // 10% padding
