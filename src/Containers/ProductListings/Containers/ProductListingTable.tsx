@@ -1,7 +1,7 @@
-import type { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import type { ObservableComputed } from "@legendapp/state";
 import { Switch, observer } from "@legendapp/state/react";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import {
 	Button,
 	ScrollView,
@@ -58,11 +58,38 @@ export const ProductListingTable = observer(
 		const theme = useTheme();
 		const { head, data } = props.data.get();
 
+		const stickyScrollRef = useRef<ScrollView>(null);
+		const mainScrollRef = useRef<ScrollView>(null);
+		const isStickyScrolling = useRef(false);
+		const isMainScrolling = useRef(false);
+
 		// Calculate column widths once based on the data and headers
 		const columnWidths = useMemo(
 			() => calculateColumnWidths({ head, data }),
 			[head, data],
 		);
+
+		const handleStickyScroll = (
+			event: NativeSyntheticEvent<NativeScrollEvent>,
+		) => {
+			if (mainScrollRef.current && !isMainScrolling.current) {
+				mainScrollRef.current.scrollTo({
+					y: event.nativeEvent.contentOffset.y,
+					animated: false,
+				});
+			}
+		};
+
+		const handleMainScroll = (
+			event: NativeSyntheticEvent<NativeScrollEvent>,
+		) => {
+			if (stickyScrollRef.current && !isStickyScrolling.current) {
+				stickyScrollRef.current.scrollTo({
+					y: event.nativeEvent.contentOffset.y,
+					animated: false,
+				});
+			}
+		};
 
 		if (data?.length === 0) {
 			return (
@@ -77,60 +104,109 @@ export const ProductListingTable = observer(
 			);
 		}
 
+		const renderCell = (cell: (typeof data)[0][0]) => (
+			<Switch value={cell.type}>
+				{{
+					text: () => <Text color={theme.color.val}>{cell.value}</Text>,
+					button: () => (
+						<Button color={theme.color.val} onPress={cell.onPress}>
+							{cell.value}
+						</Button>
+					),
+					default: () => null,
+				}}
+			</Switch>
+		);
+
 		return (
-			<YStack>
-				{/* Horizontal and Vertical Scrolling Container */}
-				<ScrollView horizontal>
-					<ScrollView>
-						{/* Table Header */}
-						<XStack>
-							{head.map((header, index) => (
+			<YStack maxHeight={400}>
+				<XStack>
+					{/* Sticky First Column */}
+					<YStack zIndex={1} backgroundColor={"$background"}>
+						<YStack
+							padding={8}
+							borderColor={theme.borderColor.val}
+							borderWidth={"$0.5"}
+							width={columnWidths[0]}
+						>
+							<Text color={theme.color.val}>{head[0]}</Text>
+						</YStack>
+						<ScrollView
+							ref={stickyScrollRef}
+							onScrollBeginDrag={() => {
+								isStickyScrolling.current = true;
+							}}
+							onMomentumScrollEnd={() => {
+								isStickyScrolling.current = false;
+							}}
+							onScroll={handleStickyScroll}
+							scrollEventThrottle={16}
+							showsVerticalScrollIndicator={false}
+						>
+							{data.map((row, rowIndex) => (
 								<YStack
-									key={header}
+									key={`sticky-${rowIndex}-${row[0].value}`}
 									padding={8}
 									borderColor={theme.borderColor.val}
 									borderWidth={"$0.5"}
-									width={columnWidths[index]}
-									backgroundColor={"$background"}
+									width={columnWidths[0]}
+									height={"$6"}
 								>
-									<Text color={theme.color.val}>{header}</Text>
+									{renderCell(row[0])}
 								</YStack>
 							))}
-						</XStack>
+						</ScrollView>
+					</YStack>
 
-						{/* Table Rows */}
-						{data.map((row, rowIndex) => (
-							<XStack key={rowIndex}>
-								{row.map((cell, cellIndex) => (
+					{/* Scrollable Remaining Columns */}
+					<ScrollView horizontal>
+						<YStack>
+							<XStack>
+								{head.slice(1).map((header, index) => (
 									<YStack
-										key={cellIndex}
+										key={header}
 										padding={8}
 										borderColor={theme.borderColor.val}
 										borderWidth={"$0.5"}
-										width={columnWidths[cellIndex]}
+										width={columnWidths[index + 1]}
+										backgroundColor={"$background"}
 									>
-										<Switch value={cell.type}>
-											{{
-												text: () => (
-													<Text color={theme.color.val}>{cell.value}</Text>
-												),
-												button: () => (
-													<Button
-														color={theme.color.val}
-														onPress={cell.onPress}
-													>
-														{cell.value}
-													</Button>
-												),
-												default: () => null,
-											}}
-										</Switch>
+										<Text color={theme.color.val}>{header}</Text>
 									</YStack>
 								))}
 							</XStack>
-						))}
+							<ScrollView
+								ref={mainScrollRef}
+								onScroll={handleMainScroll}
+								scrollEventThrottle={16}
+								showsVerticalScrollIndicator={false}
+								onScrollBeginDrag={() => {
+									isMainScrolling.current = true;
+								}}
+								onMomentumScrollEnd={() => {
+									isMainScrolling.current = false;
+								}}
+							>
+								{data.map((row, rowIndex) => (
+									<XStack key={`rowIndex-${rowIndex}`}>
+										{row.slice(1).map((cell, cellIndex) => (
+											<YStack
+												key={`cellIndex-${cellIndex}-${cell.value}`}
+												padding={8}
+												borderColor={theme.borderColor.val}
+												borderWidth={"$0.5"}
+												width={columnWidths[cellIndex + 1]}
+												height={"$6"}
+											>
+												{renderCell(cell)}
+											</YStack>
+										))}
+									</XStack>
+								))}
+							</ScrollView>
+						</YStack>
 					</ScrollView>
-				</ScrollView>
+				</XStack>
 			</YStack>
 		);
 	},

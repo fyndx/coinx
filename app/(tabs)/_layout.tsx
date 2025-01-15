@@ -34,6 +34,7 @@ export default function RootLayout() {
 			<Tabs.Screen
 				name={"insights/index"}
 				options={{
+					href: null,
 					header: () => null,
 					tabBarLabel: () => null,
 					tabBarIcon: ({ color }) => (

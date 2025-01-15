@@ -1,11 +1,11 @@
 import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
-import { observer } from "@legendapp/state/react";
-import { Text, YStack } from "tamagui";
-import { Line, CartesianChart, useChartPressState } from "victory-native";
 import type { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
-import { Circle, useFont, Text as SkiaText } from "@shopify/react-native-skia";
-import { useDerivedValue, type SharedValue } from "react-native-reanimated";
+import { observer } from "@legendapp/state/react";
+import { Circle, Text as SkiaText, useFont } from "@shopify/react-native-skia";
 import { Fragment } from "react";
+import { type SharedValue, useDerivedValue } from "react-native-reanimated";
+import { Text, YStack } from "tamagui";
+import { CartesianChart, Line, useChartPressState } from "victory-native";
 
 function ToolTip({
 	x,
@@ -69,17 +69,18 @@ function ToolTip({
 }
 
 interface ProductListingGraphProps {
-	listingHistory: ProductsListingHistoryModel["productsListingHistory"];
+	productListingHistoryModel$: ProductsListingHistoryModel;
 }
 
 export const ProductListingGraph = observer(
 	(props: ProductListingGraphProps) => {
 		const font = useFont(LatoRegular, 12);
 		const { data, graphData, productListingNames, colors } =
-			props.listingHistory;
+			props.productListingHistoryModel$.productsListingHistory;
 		const extractedGraphData = graphData.get();
 		const extractedProducts = productListingNames.get();
 		const extractedProductListingColors = colors.get();
+
 		const yState = extractedProducts?.reduce(
 			(acc: { [key: string]: number }, curVal: string) => {
 				acc[curVal] = 0;
@@ -87,11 +88,15 @@ export const ProductListingGraph = observer(
 			},
 			{},
 		);
+
 		const { state, isActive } = useChartPressState({ x: 0, y: yState });
 
 		if (extractedGraphData?.length === 0) {
 			return <Text>No data available</Text>;
 		}
+
+		const { minimum: minPrice, maximum: maxPrice } =
+			props.productListingHistoryModel$.getMinMaxPrice.get();
 
 		return (
 			<YStack height={300}>
@@ -101,7 +106,8 @@ export const ProductListingGraph = observer(
 					xKey={"recordedAt"}
 					yKeys={extractedProducts}
 					chartPressState={state}
-					domainPadding={{ left: 10, right: 10, top: 30, bottom: 0 }}
+					domain={{ y: [minPrice, maxPrice] }}
+					domainPadding={{ right: 30, left: 30 }}
 					yAxis={[
 						{
 							font,

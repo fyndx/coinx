@@ -1,7 +1,7 @@
 import { getProductListingsHistoryByProductId } from "@/src/database/Products/ProductListingsHistoryRepo";
 import type { AsyncInterface } from "@/src/utils/async-interface";
 import Currency from "@coinify/currency";
-import { observable } from "@legendapp/state";
+import { computed, observable } from "@legendapp/state";
 import dayjs from "dayjs";
 import { Effect, pipe } from "effect";
 import { appModel } from "../AppState/App.model";
@@ -131,4 +131,34 @@ export class ProductsListingHistoryModel {
 			});
 		}
 	};
+
+	getMinMaxPrice = computed(() => {
+		const productListings = this.productsListingHistory?.data?.get();
+
+		// Find raw min/max
+		let minimum = Number.POSITIVE_INFINITY;
+		let maximum = Number.NEGATIVE_INFINITY;
+		for (const productListing of productListings) {
+			if (productListing.price < minimum) {
+				minimum = productListing.price;
+			}
+			if (productListing.price > maximum) {
+				maximum = productListing.price;
+			}
+		}
+
+		// Add padding
+		const range = maximum - minimum;
+		const paddingPercent = 0.1; // 10% padding
+
+		// Calculate padded values
+		const paddedMin = minimum - range * paddingPercent;
+		const paddedMax = maximum + range * paddingPercent;
+
+		// Get final values
+		const finalMin = paddedMin;
+		const finalMax = paddedMax;
+
+		return { minimum: finalMin, maximum: finalMax };
+	});
 }

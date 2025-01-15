@@ -3,6 +3,7 @@ import {
 	exportDataToCsv,
 } from "@/src/LegendState/Settings/Settings.model";
 import { ChevronRight } from "@tamagui/lucide-icons";
+import * as Application from "expo-application";
 import { Link } from "expo-router";
 import { Fragment } from "react";
 import { StyleSheet } from "react-native";
@@ -47,6 +48,14 @@ const Settings = () => {
 						</YGroup.Item>
 					</Fragment>
 				)}
+				<Separator />
+				{/* Version */}
+				<YGroup.Item>
+					<ListItem
+						title={"Version"}
+						subTitle={Application.nativeApplicationVersion}
+					/>
+				</YGroup.Item>
 			</YGroup>
 		</YStack>
 	);
