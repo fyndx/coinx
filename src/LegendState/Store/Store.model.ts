@@ -105,6 +105,10 @@ export class StoreModel {
 			location: "",
 		});
 	};
+
+	createDefaultStores = async () => {
+		await Effect.runPromise(addStore(DEFAULT_STORES));
+	};
 }
 
 export const storeModel$ = new StoreModel();
