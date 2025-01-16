@@ -100,7 +100,7 @@ const RootLayoutNav = () => {
 
 const RootLayout = observer(() => {
 	const isAppLoaded = appModel.obs.isAppLoaded.get();
-	if (!process.env.EXPO_PUBLIC_DISABLE_FEATURE) {
+	if (__DEV__) {
 		useDrizzleStudio(expoDb);
 	}
 
