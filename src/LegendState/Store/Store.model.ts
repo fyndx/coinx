@@ -13,6 +13,7 @@ import {
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
+import { DEFAULT_STORES } from "./stores-list";
 
 export interface StoresListObservable
 	extends ObservableArray<Array<SelectStore>> {}

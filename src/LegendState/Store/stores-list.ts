@@ -1,4 +1,4 @@
-const DEFAULT_STORES = [
+export const DEFAULT_STORES = [
 	{
 		name: "Amazon",
 		location: "Online",
