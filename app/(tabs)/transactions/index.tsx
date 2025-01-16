@@ -134,7 +134,7 @@ const Transactions = () => {
 				</XStack>
 				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
 				<TransactionsList
-					transactions={transactionsScreenModel$.groupedTransactions}
+					transactions$={transactionsScreenModel$.groupedTransactions}
 					onScroll={scrollHandler}
 				/>
 			</Stack>

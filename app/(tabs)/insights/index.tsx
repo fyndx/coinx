@@ -41,7 +41,7 @@ const Insights = () => {
 				<InsightsHeader insightsModel$={rootStore.insightsModel} />
 				<InsightsGraph insightsModel$={rootStore.insightsModel} />
 				<TransactionsList
-					transactions={rootStore.insightsModel.groupedTransactions}
+					transactions$={rootStore.insightsModel.groupedTransactions}
 				/>
 			</Stack>
 		</SafeAreaView>

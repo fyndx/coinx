@@ -1,4 +1,5 @@
 import { appModel } from "@/src/LegendState/AppState/App.model";
+import { observer } from "@legendapp/state/react";
 import { ChevronRightCircle } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
 import { useRef } from "react";
@@ -9,7 +10,7 @@ import {
 } from "rn-currency-picker";
 import { H4, YStack } from "tamagui";
 
-const CurrencySelect = () => {
+const CurrencySelect = observer(() => {
 	const currencyPickerRef = useRef<CurrencyPickerRef>();
 
 	const handleCurrencySelect = (data: CurrencyData) => {
@@ -51,6 +52,6 @@ const CurrencySelect = () => {
 			<YStack height={"$4"} />
 		</YStack>
 	);
-};
+});
 
 export default CurrencySelect;
