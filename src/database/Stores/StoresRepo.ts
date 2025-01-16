@@ -5,7 +5,9 @@ import { eq } from "drizzle-orm";
 import { Effect, Predicate, pipe } from "effect";
 import { InvalidIdError } from "./StoresErrors";
 
-export const addStore = (store: Static<typeof insertStoreSchema>) =>
+export const addStore = (
+	store: Static<typeof insertStoreSchema> | Static<typeof insertStoreSchema>[],
+) =>
 	Effect.promise(() => {
 		return database.insert(storesRepo).values(store).execute();
 	});

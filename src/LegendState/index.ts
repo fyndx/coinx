@@ -9,6 +9,7 @@ import { ProductsModel } from "@/src/LegendState/Products.model";
 import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import { TransactionModel } from "@/src/LegendState/Transaction.model";
 import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
+import { storeModel$ } from "./Store/Store.model";
 
 class RootStore {
 	// Database
@@ -42,6 +43,7 @@ class RootStore {
 		const isFirstLaunch = await appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
 			await this.categoryModel.createDefaultCategories();
+			await storeModel$.createDefaultStores();
 		}
 	};
 
