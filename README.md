@@ -8,3 +8,8 @@
 - `npx expo@next install --fix` run this
 - `npx expo prebuild --clean` clean the build
 - `yarn ios` run the iOS app
+
+# Build for Production
+
+- `eas build --platform ios --profile production --local` to build for iOS production
+- `eas build --platform android --profile production --local` to build for Android production

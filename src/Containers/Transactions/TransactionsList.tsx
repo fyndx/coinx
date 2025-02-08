@@ -30,7 +30,9 @@ export const TransactionsList = observer(
 				<YStack alignItems={"center"} justifyContent={"center"} flex={1}>
 					<Banknote size={"$6"} />
 					<H3 textAlign={"center"}>
-						{"No Transactions found\n Tap the + icon to add your first product"}
+						{
+							"No Transactions found\n Tap the + icon to add your first transaction"
+						}
 					</H3>
 				</YStack>
 			);
