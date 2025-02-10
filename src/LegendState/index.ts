@@ -5,7 +5,7 @@ import { CategoryModel } from "@/src/LegendState/Category.model";
 import { EditProductListing } from "@/src/LegendState/EditProductListing/EditProductListing.model";
 import { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
-import { ProductsModel } from "@/src/LegendState/Products.model";
+import { ProductsModel } from "@/src/LegendState/Products/Products.model";
 import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import { TransactionModel } from "@/src/LegendState/Transaction.model";
 import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
@@ -43,6 +43,7 @@ class RootStore {
 		const isFirstLaunch = await appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
 			await this.categoryModel.createDefaultCategories();
+			await this.productsModel.createDefaultProducts();
 			await storeModel$.createDefaultStores();
 		}
 	};

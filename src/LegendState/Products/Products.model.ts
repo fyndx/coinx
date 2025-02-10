@@ -11,8 +11,8 @@ import {
 	deleteAllProducts,
 	deleteProduct,
 	getProducts,
-} from "../database/Products/ProductsRepo";
-import { generateRandomProducts } from "../database/seeds/ProductSeeds";
+} from "../../database/Products/ProductsRepo";
+import { generateRandomProducts } from "../../database/seeds/ProductSeeds";
 
 export class ProductsModel {
 	isLoading;
@@ -78,5 +78,12 @@ export class ProductsModel {
 		} finally {
 			this.isLoading.set(false);
 		}
+	};
+
+	createDefaultProducts = async () => {
+		await Promise.all(
+			DEFAULT_PRODUCTS.map((product) => Effect.runPromise(addProduct(product))),
+		);
+		this.getProductsList();
 	};
 }
