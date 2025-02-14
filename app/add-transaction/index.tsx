@@ -19,13 +19,13 @@ import { useMemo, useRef } from "react";
 import {
 	Dimensions,
 	type GestureResponderEvent,
-	KeyboardAvoidingView,
+	StyleSheet,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
 import {
 	Button,
 	Input,
-	Popover,
 	SizableText,
 	Spacer,
 	Stack,
@@ -384,38 +384,49 @@ const AddTransaction = () => {
 	};
 
 	return (
-		<YStack
-			paddingHorizontal="$4"
-			flex={1}
-			justifyContent="space-between"
-			// The below is a workaround for the keyboard moving views up when the keyboard is open
-			// https://github.com/expo/expo/issues/7589#issuecomment-629863678
-			minHeight={Math.round(Dimensions.get("window").height)}
-		>
-			<TransactionType transactionModel$={transactionModel$} />
-			<Stack flex={1} justifyContent="center" gap="$4" alignItems="center">
-				<TransactionInput transactionModel$={transactionModel$} />
-				<Note transactionModel$={transactionModel$} />
-			</Stack>
-			<CategoryAndDateButtons
-				transactionModel$={transactionModel$}
-				dateSheetRef={dateSheetRef}
-				categorySheetRef={categorySheetRef}
-			/>
-			<Stack paddingVertical="$4">
-				<NumberKeypad onKeyPressed={handleKeyPressed} onSubmit={handleSubmit} />
-			</Stack>
-			<DatePicker
-				transactionModel$={transactionModel$}
-				dateSheetRef={dateSheetRef}
-			/>
-			<CategoryPicker
-				transactionModel$={transactionModel$}
-				categoryModel$={categoryModel$}
-				categorySheetRef={categorySheetRef}
-			/>
-		</YStack>
+		<SafeAreaView style={styles.container}>
+			<YStack
+				paddingHorizontal="$4"
+				flex={1}
+				justifyContent="space-between"
+				// The below is a workaround for the keyboard moving views up when the keyboard is open
+				// https://github.com/expo/expo/issues/7589#issuecomment-629863678
+				minHeight={Math.round(Dimensions.get("window").height)}
+			>
+				<TransactionType transactionModel$={transactionModel$} />
+				<Stack flex={1} justifyContent="center" gap="$4" alignItems="center">
+					<TransactionInput transactionModel$={transactionModel$} />
+					<Note transactionModel$={transactionModel$} />
+				</Stack>
+				<CategoryAndDateButtons
+					transactionModel$={transactionModel$}
+					dateSheetRef={dateSheetRef}
+					categorySheetRef={categorySheetRef}
+				/>
+				<Stack paddingVertical="$4">
+					<NumberKeypad
+						onKeyPressed={handleKeyPressed}
+						onSubmit={handleSubmit}
+					/>
+				</Stack>
+				<DatePicker
+					transactionModel$={transactionModel$}
+					dateSheetRef={dateSheetRef}
+				/>
+				<CategoryPicker
+					transactionModel$={transactionModel$}
+					categoryModel$={categoryModel$}
+					categorySheetRef={categorySheetRef}
+				/>
+			</YStack>
+		</SafeAreaView>
 	);
 };
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+});
 
 export default AddTransaction;
