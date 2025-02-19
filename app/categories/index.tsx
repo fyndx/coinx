@@ -4,7 +4,7 @@ import { PlusCircle } from "@tamagui/lucide-icons";
 import { Link } from "expo-router";
 import React, { Suspense } from "react";
 import { StyleSheet } from "react-native";
-import { Circle, Text, YStack } from "tamagui";
+import { Circle, ScrollView, Text, YStack } from "tamagui";
 import { CategoriesList } from "../../src/Components/CategoriesList";
 import { rootStore } from "../../src/LegendState";
 
@@ -20,11 +20,13 @@ const Categories = () => {
 	return (
 		<YStack flex={1}>
 			<Suspense fallback={<Text>Loading...</Text>}>
-				<CategoriesList
-					categories={rootStore.categoryModel.categories}
-					onCategoryPressed={() => null}
-					onCategoryDelete={handleCagtegoryDelete}
-				/>
+				<ScrollView>
+					<CategoriesList
+						categories={rootStore.categoryModel.categories}
+						onCategoryPressed={() => null}
+						onCategoryDelete={handleCagtegoryDelete}
+					/>
+				</ScrollView>
 			</Suspense>
 			<Circle
 				position="absolute"

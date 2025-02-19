@@ -1,6 +1,7 @@
 import type { ObservableObject } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
 import { Trash2 } from "@tamagui/lucide-icons";
+import { RectButton } from "react-native-gesture-handler";
 import { ListItem, Square, Text, XStack, YGroup, YStack } from "tamagui";
 import { rootStore } from "../LegendState";
 import type { ICategory } from "../LegendState/Category.model";
@@ -29,16 +30,15 @@ export const Category = observer(
 						},
 					]}
 				>
-					<ListItem
-						onPress={() => onCategoryPressed(categoryData)}
-						alignItems="center"
-					>
-						<XStack gap={"$4"}>
-							<Text fontSize={"$6"}>{category.icon}</Text>
-							<Text fontSize={"$6"}>{category.name}</Text>
-						</XStack>
-						<Square size={"$1"} backgroundColor={categoryData.color} />
-					</ListItem>
+					<RectButton onPress={() => onCategoryPressed(categoryData)}>
+						<ListItem alignItems="center">
+							<XStack gap={"$4"}>
+								<Text fontSize={"$6"}>{category.icon}</Text>
+								<Text fontSize={"$6"}>{category.name}</Text>
+							</XStack>
+							<Square size={"$1"} backgroundColor={categoryData.color} />
+						</ListItem>
+					</RectButton>
 				</SwipeableRow>
 			</YGroup.Item>
 		);

@@ -40,6 +40,7 @@ export const StoreItem = observer(({ store }: StoreItemProps) => {
 							pathname: "/add-store",
 						}}
 						onPress={handleStoreEdit}
+						asChild
 					>
 						<XStack flex={1} gap={"$4"} justifyContent={"space-between"}>
 							<Text fontSize={"$6"}>{storeData.name}</Text>

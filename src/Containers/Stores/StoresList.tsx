@@ -2,7 +2,7 @@ import type { StoresListObservable } from "@/src/LegendState/Store/Store.model";
 import { observer } from "@legendapp/state/react";
 import { Store } from "@tamagui/lucide-icons";
 import { Fragment } from "react";
-import { Text, YGroup, YStack } from "tamagui";
+import { ScrollView, Separator, Text, YGroup, YStack } from "tamagui";
 import { StoreItem } from "./StoreItem";
 
 interface StoresListProps {
@@ -27,10 +27,17 @@ export const StoresList = observer(({ stores }: StoresListProps) => {
 	}
 
 	return (
-		<YGroup padding={"$3"}>
-			{stores?.map((store) => {
-				return <StoreItem key={store.id.peek()} store={store} />;
-			})}
-		</YGroup>
+		<ScrollView>
+			<YGroup padding={"$3"}>
+				{stores?.map((store) => {
+					return (
+						<Fragment key={store.id.peek()}>
+							<StoreItem key={store.id.peek()} store={store} />
+							<Separator />
+						</Fragment>
+					);
+				})}
+			</YGroup>
+		</ScrollView>
 	);
 });

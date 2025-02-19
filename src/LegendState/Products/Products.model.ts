@@ -13,6 +13,7 @@ import {
 	getProducts,
 } from "../../database/Products/ProductsRepo";
 import { generateRandomProducts } from "../../database/seeds/ProductSeeds";
+import { DEFAULT_PRODUCTS } from "./DefaultProducts";
 
 export class ProductsModel {
 	isLoading;

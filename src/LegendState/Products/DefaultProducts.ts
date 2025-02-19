@@ -1,4 +1,4 @@
-const DEFAULT_PRODUCTS = [
+export const DEFAULT_PRODUCTS = [
 	{
 		name: "Milk",
 		defaultUnitCategory: "volume",
