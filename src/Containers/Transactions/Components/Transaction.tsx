@@ -49,7 +49,7 @@ export const Transaction = ({
 						paddingVertical={"$1.5"}
 					>
 						{/* Category Icon */}
-						<XStack gap={"$3"}>
+						<XStack gap={"$3"} flex={1}>
 							<XStack
 								backgroundColor={transaction.category_color}
 								alignSelf={"center"}
@@ -62,7 +62,7 @@ export const Transaction = ({
 								<Text fontSize={"$6"}>{transaction.category_icon}</Text>
 							</XStack>
 							{/* Transaction Details */}
-							<YStack>
+							<YStack flex={1}>
 								<Text>{transaction.note ?? transaction.category_name}</Text>
 								{/* Time with am and pm */}
 								<Text>
