@@ -58,7 +58,8 @@
           "launchMode": "most-recent"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-sqlite"
     ],
     "scheme": "coinx",
     "experiments": {
