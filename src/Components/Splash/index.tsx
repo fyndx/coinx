@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, View, Image } from "react-native";
 import Animated, {
 	cancelAnimation,
 	useAnimatedStyle,
@@ -7,7 +7,8 @@ import Animated, {
 	withRepeat,
 	withTiming,
 } from "react-native-reanimated";
-import { Image, YStack } from "tamagui";
+
+const SplashIcon = require("@/assets/icon.png");
 
 export const Splash = () => {
 	const scale = useSharedValue(0);
@@ -27,21 +28,24 @@ export const Splash = () => {
 	}));
 
 	return (
-		<YStack
-			flex={1}
-			justifyContent={"center"}
-			alignItems={"center"}
-			backgroundColor={"#def5f0"}
+		<View
+			style={styles.container}
 		>
 			<Animated.View style={animatedStyle}>
 				<Image
-					source={{
-						uri: require("@/assets/icon.png"),
-						width: 250,
-						height: 250,
-					}}
+					source={SplashIcon}
+					style={{ width: 250, height: 250 }}
 				/>
 			</Animated.View>
-		</YStack>
+		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#def5f0",
+	},
+});

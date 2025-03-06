@@ -318,7 +318,7 @@ const AddTransaction = () => {
 
 	// TODO: Fix multiplying time by 1000
 	const transactionTime = stringTransactionTime
-		? dayjs(Number.parseInt(stringTransactionTime) * 1000)
+		? dayjs(stringTransactionTime)
 		: dayjs();
 
 	const categoryId = Number.parseInt(stringCategoryId);
@@ -330,7 +330,6 @@ const AddTransaction = () => {
 			type: transactionModel$.transaction.transactionType.peek(),
 		});
 		transactionModel$.onMount({ categoryModel$ });
-		console.log("Transaction id", id);
 		// Set the transaction values from the URL params if there is transaction id
 		if (id) {
 			transactionModel$.transaction.set({

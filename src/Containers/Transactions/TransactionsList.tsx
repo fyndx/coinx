@@ -31,7 +31,7 @@ export const TransactionsList = observer(
 					<Banknote size={"$6"} />
 					<H3 textAlign={"center"}>
 						{
-							"No Transactions found\n Tap the + icon to add your first transaction"
+							"No Transactions found\n Tap the + icon to add a transaction"
 						}
 					</H3>
 				</YStack>
