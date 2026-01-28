@@ -5,16 +5,21 @@ import {
 	type InsertProductListingHistory,
 } from "@/db/schema";
 import { DrizzleError } from "@/src/utils/error";
+import { generateUUID } from "@/src/utils/uuid";
 import { asc, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const addProductListingsHistory = (
-	productListingHistory: InsertProductListingHistory,
+	productListingHistory: Omit<InsertProductListingHistory, "id">,
 ) => {
 	return Effect.promise(() => {
 		const query = database
 			.insert(productsListingsHistoryRepo)
-			.values(productListingHistory)
+			.values({
+				...productListingHistory,
+				id: generateUUID(),
+				syncStatus: "pending",
+			})
 			.returning();
 
 		return query.execute();
@@ -25,11 +30,11 @@ export const addProductListingsHistory = (
  * Retrieves the product listings history for a given product ID Grouped by Listing ID.
  *
  * @param {Object} params - The parameters for the function.
- * @param {number} params.productId - The ID of the product to retrieve the listings history for.
+ * @param {string} params.productId - The UUID of the product to retrieve the listings history for.
  */
 export const getProductListingsHistoryByProductId = ({
 	productId,
-}: { productId: number }) => {
+}: { productId: string }) => {
 	return Effect.tryPromise({
 		try: () => {
 			const query = database
@@ -69,7 +74,7 @@ export const getProductListingsHistoryByProductId = ({
 	});
 };
 
-export const deleteProductListingsByProductListingId = (id: number) => {
+export const deleteProductListingsByProductListingId = (id: string) => {
 	return Effect.promise(() => {
 		const query = database
 			.delete(productsListingsHistoryRepo)

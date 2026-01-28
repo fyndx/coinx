@@ -10,12 +10,15 @@ import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
+// Draft type for product form (id is optional for new products)
+type ProductDraft = Omit<InsertProduct, "id"> & { id?: string };
+
 export class AddProductScreenModel {
 	isLoading;
 	product;
 
 	constructor() {
-		this.product = observable<InsertProduct>({
+		this.product = observable<ProductDraft>({
 			name: "",
 			defaultUnitCategory: "" as (typeof MeasurementUnits)[number],
 			notes: "",
@@ -23,7 +26,7 @@ export class AddProductScreenModel {
 		this.isLoading = observable(false);
 	}
 
-	private validateProduct(product: InsertProduct) {
+	private validateProduct(product: ProductDraft) {
 		if (!product.name) {
 			return "Product name is required";
 		}
@@ -107,9 +110,14 @@ export class AddProductScreenModel {
 			return;
 		}
 
+		if (!product.id) {
+			Burnt.toast({ title: "Product ID is required for update" });
+			return;
+		}
+
 		this.isLoading.set(true);
 
-		Effect.runPromise(updateProduct(product))
+		Effect.runPromise(updateProduct({ ...product, id: product.id }))
 			.then((result) => {
 				Burnt.toast({ title: "Product updated successfully" });
 				this.resetProduct();

@@ -333,11 +333,11 @@ const AddTransaction = () => {
 		// Set the transaction values from the URL params if there is transaction id
 		if (id) {
 			transactionModel$.transaction.set({
-				id: Number.parseInt(id),
+				id: id as string,
 				amount,
 				transactionType: transactionType as "Expense" | "Income",
 				date: transactionTime,
-				categoryId,
+				categoryId: categoryId as string,
 				categoryName,
 				note,
 			});

@@ -16,7 +16,7 @@ export const getTransactions = ({
 	startDate?: string;
 	endDate?: string;
 	transactionType?: "Income" | "Expense";
-	categoryId?: number;
+	categoryId?: string; // UUID
 }) =>
 	Effect.promise(() => {
 		const query = database

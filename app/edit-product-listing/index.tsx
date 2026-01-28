@@ -8,13 +8,13 @@ import { Button, Input, Spinner, Text, XStack, YStack } from "tamagui";
 const EditProductListing = observer(() => {
 	const { listing_id, product_id } = useLocalSearchParams();
 
-	const listingId = Number(listing_id);
-	const productId = Number(product_id);
+	const listingId = listing_id as string;
+	const productId = product_id as string;
 
 	const { editProductListingModel } = rootStore;
 
 	useMount(() => {
-		if (Number.isNaN(listingId) || Number.isNaN(productId)) {
+		if (!listingId || !productId) {
 			return;
 		}
 

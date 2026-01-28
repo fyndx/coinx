@@ -4,6 +4,7 @@ import {
 	transactions as transactionsRepo,
 } from "@/db/schema";
 import { dayjsInstance as dayjs } from "@/src/utils/date";
+import { generateUUID } from "@/src/utils/uuid";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";
 import { eq } from "drizzle-orm";
@@ -12,10 +13,10 @@ import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 import type { CategoryModel } from "./Category.model";
 
 export interface ITransactionDraft {
-	id?: number;
+	id?: string; // UUID
 	amount: string;
 	date: DateType;
-	categoryId?: number;
+	categoryId?: string; // UUID
 	categoryName?: string;
 	note?: string;
 	transactionType: "Expense" | "Income";
@@ -93,16 +94,17 @@ export class TransactionModel {
 		note,
 		transactionTime,
 		transactionType,
-	}: InsertTransaction) {
+	}: Omit<InsertTransaction, "id">) {
 		return await database
 			.insert(transactionsRepo)
 			.values({
-				// @ts-ignore
+				id: generateUUID(),
 				amount: amount,
 				categoryId,
 				note,
 				transactionTime,
 				transactionType,
+				syncStatus: "pending",
 			})
 			.returning();
 	}
@@ -123,6 +125,8 @@ export class TransactionModel {
 				note,
 				transactionTime,
 				transactionType,
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
 			})
 			.where(eq(transactionsRepo.id, id))
 			.returning();
@@ -173,7 +177,7 @@ export class TransactionModel {
 		});
 	};
 
-	deleteTransaction = async (id: number) => {
+	deleteTransaction = async (id: string) => {
 		return await database
 			.delete(transactionsRepo)
 			.where(eq(transactionsRepo.id, id));

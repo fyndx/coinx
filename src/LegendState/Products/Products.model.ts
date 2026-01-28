@@ -38,7 +38,7 @@ export class ProductsModel {
 		}
 	};
 
-	deleteProduct = async (id: number) => {
+	deleteProduct = async (id: string) => {
 		await Effect.runPromise(deleteProduct({ id }));
 		const updatedProducts = this.products
 			.peek()

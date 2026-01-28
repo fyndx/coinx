@@ -15,8 +15,13 @@ import { Effect } from "effect";
 import { router } from "expo-router";
 import { appModel } from "../AppState/App.model";
 
+interface ProductListingData extends SelectProductListing {
+	storeName: string;
+	storeLocation: string | null;
+}
+
 interface ProductListing extends AsyncInterface {
-	data?: SelectProductListing & { storeName: string; storeLocation: string };
+	data?: ProductListingData;
 }
 
 interface EditProductDraft extends AsyncInterface {
@@ -42,7 +47,7 @@ export class EditProductListing {
 	}
 
 	// Actions
-	onMount({ listingId, productId }: { listingId: number; productId: number }) {
+	onMount({ listingId, productId }: { listingId: string; productId: string }) {
 		this.getProductListingById(listingId);
 	}
 
@@ -51,10 +56,19 @@ export class EditProductListing {
 		this.editProductDraft.data.price.set("");
 	}
 
-	getProductListingById = async (id: number) => {
+	getProductListingById = async (id: string) => {
 		this.productListing.set({ status: "pending" });
 		const productListing = await Effect.runPromise(getProductListingById(id));
-		this.productListing.set({ data: productListing[0], status: "success" });
+		if (productListing[0]) {
+			this.productListing.set({
+				data: {
+					...productListing[0],
+					syncStatus: productListing[0].syncStatus ?? null,
+					deletedAt: productListing[0].deletedAt ?? null,
+				} as ProductListingData,
+				status: "success",
+			});
+		}
 	};
 
 	modifyProductDraft = <K extends keyof EditProductDraft["data"]>(
@@ -68,6 +82,11 @@ export class EditProductListing {
 		try {
 			this.editProductDraft.status.set("pending");
 			const productListing = this.productListing.data.peek();
+			
+			if (!productListing) {
+				throw new Error("Product listing not found");
+			}
+			
 			const price = Currency.toSmallestSubunit(
 				Number(this.editProductDraft.data.price.peek()),
 				appModel.obs.currency.code.peek(),
@@ -84,7 +103,7 @@ export class EditProductListing {
 				}),
 			);
 
-			const productListingHistory: InsertProductListingHistory = {
+			const productListingHistory: Omit<InsertProductListingHistory, "id"> = {
 				productId: productListing.productId,
 				productListingId: productListing.id,
 				price: price,

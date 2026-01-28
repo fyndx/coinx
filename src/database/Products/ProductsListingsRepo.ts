@@ -5,6 +5,7 @@ import {
 	products as productsRepo,
 	stores as storesRepo,
 } from "@/db/schema";
+import { generateUUID } from "@/src/utils/uuid";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -29,8 +30,7 @@ export type GetProductListingsByProductId = ReturnType<
  * @param id - The ID of the product for which to retrieve listings.
  * @returns A promise that resolves to the product listings, including store name.
  */
-export const getProductListingsByProductId = (id: number) => {
-	// TODO: Join stores table to get store name
+export const getProductListingsByProductId = (id: string) => {
 	return Effect.promise(() => {
 		const query = database
 			.select({
@@ -55,7 +55,7 @@ export const getProductListingsByProductId = (id: number) => {
 };
 
 // Get a Product Listing by ID
-export const getProductListingById = (id: number) => {
+export const getProductListingById = (id: string) => {
 	return Effect.promise(() => {
 		const query = database
 			.select({
@@ -80,11 +80,15 @@ export const getProductListingById = (id: number) => {
 	});
 };
 
-export const addProductListing = (productListing: InsertProductListing) => {
+export const addProductListing = (productListing: Omit<InsertProductListing, "id">) => {
 	return Effect.promise(() => {
 		const query = database
 			.insert(productsListingsRepo)
-			.values(productListing)
+			.values({
+				...productListing,
+				id: generateUUID(),
+				syncStatus: "pending",
+			})
 			.returning();
 
 		return query.execute();
@@ -92,20 +96,25 @@ export const addProductListing = (productListing: InsertProductListing) => {
 };
 
 export const updateProductListingById = (
-	productListing: Partial<InsertProductListing>,
+	productListing: Partial<InsertProductListing> & { id: string },
 ) => {
 	return Effect.promise(() => {
+		const { id, ...rest } = productListing;
 		const query = database
 			.update(productsListingsRepo)
-			.set(productListing)
-			.where(eq(productsListingsRepo.id, productListing.id as number))
+			.set({
+				...rest,
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
+			.where(eq(productsListingsRepo.id, id))
 			.returning();
 
 		return query.execute();
 	});
 };
 
-export const deleteProductListingById = (id: number) => {
+export const deleteProductListingById = (id: string) => {
 	return Effect.promise(() => {
 		const query = database
 			.delete(productsListingsRepo)

@@ -1,22 +1,35 @@
 import { db as database } from "@/db/client";
 import { type InsertStore, stores as storesRepo } from "@/db/schema";
+import { generateUUID } from "@/src/utils/uuid";
 import { eq } from "drizzle-orm";
 import { Effect, Predicate, pipe } from "effect";
 import { InvalidIdError } from "./StoresErrors";
 
-export const addStore = (store: InsertStore | InsertStore[]) =>
+export const addStore = (store: Omit<InsertStore, "id"> | Omit<InsertStore, "id">[]) =>
 	Effect.promise(() => {
 		if (Array.isArray(store)) {
-			return database.insert(storesRepo).values(store).execute();
+			const storesWithIds = store.map((s) => ({
+				...s,
+				id: generateUUID(),
+				syncStatus: "pending" as const,
+			}));
+			return database.insert(storesRepo).values(storesWithIds).execute();
 		}
-		return database.insert(storesRepo).values(store).execute();
+		return database
+			.insert(storesRepo)
+			.values({
+				...store,
+				id: generateUUID(),
+				syncStatus: "pending",
+			})
+			.execute();
 	});
 
-export const editStore = (store: InsertStore, id: number) =>
+export const editStore = (store: Omit<InsertStore, "id">, id: string) =>
 	pipe(
 		Effect.succeed({ store, id }),
 		Effect.filterOrFail(
-			({ id }) => id > 0,
+			({ id }) => id.length > 0,
 			() => new InvalidIdError({ message: "Invalid store ID" }),
 		),
 		Effect.filterOrFail(
@@ -27,7 +40,11 @@ export const editStore = (store: InsertStore, id: number) =>
 			Effect.tryPromise(() => {
 				return database
 					.update(storesRepo)
-					.set(store)
+					.set({
+						...store,
+						updatedAt: new Date().toISOString(),
+						syncStatus: "pending",
+					})
 					.where(eq(storesRepo.id, id))
 					.execute();
 			}),
@@ -45,12 +62,12 @@ export const getStores = () =>
 		return database.select().from(storesRepo).execute();
 	});
 
-export const deleteStoreById = (id: number) => {
+export const deleteStoreById = (id: string) => {
 	return pipe(
 		Effect.succeed(id),
 		// id validation
 		Effect.filterOrFail(
-			(storeId) => storeId > 0,
+			(storeId) => storeId.length > 0,
 			() => new InvalidIdError({ message: "Invalid Store id" }),
 		),
 		// delete store

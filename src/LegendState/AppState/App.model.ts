@@ -1,5 +1,6 @@
 import { LatoRegular } from "@/assets/fonts";
-import { db } from "@/db/client";
+import { db, expoDb } from "@/db/client";
+import { runUUIDMigration } from "@/db/migrations/uuid-migration";
 import migrations from "@/drizzle/migrations";
 import { AppStorage } from "@/src/storage/mmkv";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -24,6 +25,11 @@ export class AppModel {
 
 	runDatabaseMigrations = async () => {
 		try {
+			// Run custom UUID migration first (converts integer IDs to UUIDs for existing users)
+			// This is a no-op for fresh installs
+			await runUUIDMigration(expoDb);
+			
+			// Then run Drizzle schema migrations
 			await migrate(db, migrations);
 			console.log("Database migrations ran successfully");
 		} catch (error) {
