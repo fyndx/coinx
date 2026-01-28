@@ -131,6 +131,9 @@ export class TransactionsScreenModel {
 				endDate = dayjs().format();
 		}
 
+		const startDateISO = new Date(startDate).toISOString();
+		const endDateISO = new Date(endDate).toISOString();
+
 		const totalExpense = await database
 			.select({
 				total: sum(transactionsRepo.amount),
@@ -138,11 +141,7 @@ export class TransactionsScreenModel {
 			.from(transactionsRepo)
 			.where(
 				and(
-					between(
-						transactionsRepo.transactionTime,
-						new Date(startDate),
-						new Date(endDate),
-					),
+					between(transactionsRepo.transactionTime, startDateISO, endDateISO),
 					eq(transactionsRepo.transactionType, "Expense"),
 				),
 			);
@@ -154,11 +153,7 @@ export class TransactionsScreenModel {
 			.from(transactionsRepo)
 			.where(
 				and(
-					between(
-						transactionsRepo.transactionTime,
-						new Date(startDate),
-						new Date(endDate),
-					),
+					between(transactionsRepo.transactionTime, startDateISO, endDateISO),
 					eq(transactionsRepo.transactionType, "Income"),
 				),
 			);

@@ -99,8 +99,8 @@ export const getInsights = ({
 					startDate && endDate
 						? between(
 								transactionsRepo.transactionTime,
-								new Date(startDate),
-								new Date(endDate),
+								new Date(startDate).toISOString(),
+								new Date(endDate).toISOString(),
 							)
 						: undefined,
 					eq(transactionsRepo.transactionType, transactionType),

@@ -5,7 +5,6 @@ import {
 	products as productsRepo,
 	stores as storesRepo,
 } from "@/db/schema";
-import { Value } from "@sinclair/typebox/value";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 

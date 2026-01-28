@@ -1,21 +1,18 @@
 import { db as database } from "@/db/client";
-import { type insertStoreSchema, stores as storesRepo } from "@/db/schema";
-import type { Static } from "@sinclair/typebox";
+import { type InsertStore, stores as storesRepo } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { Effect, Predicate, pipe } from "effect";
 import { InvalidIdError } from "./StoresErrors";
 
-export const addStore = (
-	store: Static<typeof insertStoreSchema> | Static<typeof insertStoreSchema>[],
-) =>
+export const addStore = (store: InsertStore | InsertStore[]) =>
 	Effect.promise(() => {
+		if (Array.isArray(store)) {
+			return database.insert(storesRepo).values(store).execute();
+		}
 		return database.insert(storesRepo).values(store).execute();
 	});
 
-export const editStore = (
-	store: Static<typeof insertStoreSchema>,
-	id: number,
-) =>
+export const editStore = (store: InsertStore, id: number) =>
 	pipe(
 		Effect.succeed({ store, id }),
 		Effect.filterOrFail(

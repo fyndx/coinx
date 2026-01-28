@@ -10,7 +10,6 @@ import { findProductById } from "@/src/database/Products/ProductsRepo";
 import { convert } from "@/src/utils/units";
 import Currency from "@coinify/currency";
 import { observable } from "@legendapp/state";
-import { Value } from "@sinclair/typebox/value";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
@@ -54,18 +53,16 @@ export class AddProductListingModel {
 				appModel.obs.currency.code.peek(),
 			);
 
-			const isProductListingValid = Value.Check(
-				insertProductListingSchema,
-				productListing,
-			);
+			const validationResult =
+				insertProductListingSchema.safeParse(productListing);
 
-			if (!isProductListingValid) {
+			if (!validationResult.success) {
 				Burnt.toast({ title: "Invalid product details" });
 				return;
 			}
 
 			const [createdProductListing] = await Effect.runPromise(
-				addProductListing(productListing),
+				addProductListing(validationResult.data as InsertProductListing),
 			);
 			await Effect.runPromise(
 				addProductListingsHistory({

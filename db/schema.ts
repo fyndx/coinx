@@ -8,7 +8,8 @@ import {
 	text,
 	unique,
 } from "drizzle-orm/sqlite-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const transactions = sqliteTable("coinx_transaction", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
