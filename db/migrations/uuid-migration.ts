@@ -9,12 +9,13 @@
  */
 
 import type { SQLiteDatabase } from "expo-sqlite";
+import * as Crypto from 'expo-crypto';
 
 /**
  * Generate a UUID v4
  */
 function generateUUID(): string {
-  return crypto.randomUUID();
+  return Crypto.randomUUID();
 }
 
 /**
