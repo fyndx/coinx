@@ -321,8 +321,6 @@ const AddTransaction = () => {
 		? dayjs(stringTransactionTime)
 		: dayjs();
 
-	const categoryId = Number.parseInt(stringCategoryId);
-
 	const toast = useToastController();
 
 	useMount(() => {
@@ -337,7 +335,7 @@ const AddTransaction = () => {
 				amount,
 				transactionType: transactionType as "Expense" | "Income",
 				date: transactionTime,
-				categoryId: categoryId as string,
+				categoryId: stringCategoryId as string,
 				categoryName,
 				note,
 			});

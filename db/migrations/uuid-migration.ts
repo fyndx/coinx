@@ -51,6 +51,9 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
   await db.execAsync("PRAGMA foreign_keys = OFF;");
   
   try {
+    // Wrap entire migration in a transaction for atomicity
+    await db.execAsync("BEGIN TRANSACTION;");
+    
     // Step 1: Create UUID mapping tables
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS _uuid_map_categories (old_id INTEGER PRIMARY KEY, new_id TEXT);
@@ -267,20 +270,27 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
     // The hash is derived from the migration file content
     const migrationHash = "0001_flaky_senator_kelly";
     const existingMigration = await db.getFirstAsync<{ hash: string }>(
-      `SELECT hash FROM __drizzle_migrations WHERE hash = ?`,
+      "SELECT hash FROM __drizzle_migrations WHERE hash = ?",
       [migrationHash]
     );
     
     if (!existingMigration) {
       await db.runAsync(
-        `INSERT INTO __drizzle_migrations (hash, created_at) VALUES (?, ?)`,
+        "INSERT INTO __drizzle_migrations (hash, created_at) VALUES (?, ?)",
         [migrationHash, Date.now()]
       );
       console.log("[UUID Migration] Marked Drizzle migration as applied");
     }
     
+    // Commit the transaction
+    await db.execAsync("COMMIT;");
     console.log("[UUID Migration] Migration completed successfully!");
     
+  } catch (error) {
+    // Rollback on any error
+    console.error("[UUID Migration] Migration failed, rolling back:", error);
+    await db.execAsync("ROLLBACK;");
+    throw error;
   } finally {
     await db.execAsync("PRAGMA foreign_keys = ON;");
   }

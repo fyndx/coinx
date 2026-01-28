@@ -12,84 +12,72 @@ import { colorKit } from "reanimated-color-picker";
 
 const DEFAULT_CATEGORIES = [
 	{
-		id: generateUUID(),
 		name: "Food",
 		color: "#FFC542",
 		icon: "🍔",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Transport",
 		color: "#FF565E",
 		icon: "🚕",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Shopping",
 		color: "#3CD3AD",
 		icon: "🛍️",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Groceries",
 		color: "#4CDA64",
 		icon: "🛒",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Rent",
 		color: "#279AF4",
 		icon: "🏠",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Subscriptions",
 		color: "#EC7A58",
 		icon: "🔒",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Family",
 		color: "#A6678A",
 		icon: "👨‍👩‍👧",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Healthcare",
 		color: "#C56AF7",
 		icon: "🏥",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Entertainment",
 		color: "#6E7BF1",
 		icon: "🎬",
 		type: "Expense" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Salary",
 		color: "#F3BF56",
 		icon: "💵",
 		type: "Income" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Investment",
 		color: "#ED80A2",
 		icon: "💰",
 		type: "Income" as const,
 	},
 	{
-		id: generateUUID(),
 		name: "Gifts",
 		color: "#F6D24A",
 		icon: "🎁",
@@ -160,9 +148,9 @@ export class CategoryModel {
 	};
 
 	getCategoriesList = async ({ type }: { type?: "Income" | "Expense" }) => {
-		const query = database.select().from(categoriesRepo);
+		let query = database.select().from(categoriesRepo);
 		if (type) {
-			query.where(eq(categoriesRepo.type, type));
+			query = query.where(eq(categoriesRepo.type, type));
 		}
 
 		const result = await query;

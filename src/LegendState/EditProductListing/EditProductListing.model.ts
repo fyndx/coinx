@@ -68,6 +68,10 @@ export class EditProductListing {
 				} as ProductListingData,
 				status: "success",
 			});
+		} else {
+			// Handle not found case
+			this.productListing.set({ status: "error", data: undefined });
+			Burnt.toast({ title: "Product listing not found" });
 		}
 	};
 
