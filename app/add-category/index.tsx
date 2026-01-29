@@ -1,8 +1,8 @@
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { observer } from "@legendapp/state/react";
-import { PlusSquare, Smile } from "@tamagui/lucide-icons";
+import { PlusSquare, Smile } from "lucide-react-native";
 import { useMemo, useRef } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import ColorPicker, {
 	BlueSlider,
 	GreenSlider,
@@ -11,67 +11,65 @@ import ColorPicker, {
 	Panel5,
 	RedSlider,
 	Swatches,
-	type returnedResults,
 } from "reanimated-color-picker";
 import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
-import {
-	Button,
-	Input,
-	Separator,
-	SizableText,
-	Square,
-	Tabs,
-	Text,
-	ToggleGroup,
-	XStack,
-	YStack,
-	styled,
-} from "tamagui";
 import { rootStore } from "../../src/LegendState";
+import { Button } from "heroui-native";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 
-const CategoryType = observer(({ state$ }) => {
-	const onCategoryChanged = (value) => {
+const CategoryType = observer(({ state$ }: { state$: any }) => {
+	const onCategoryChanged = (value: string) => {
 		console.log({ value });
 		state$.type.set(value);
 	};
 
+	const type = state$.type.get();
+
 	return (
-		<XStack justifyContent="center" py={"$2"} my={"$6"}>
-			<ToggleGroup
-				type="single"
-				defaultValue={"Expense"}
-				onValueChange={onCategoryChanged}
-				disableDeactivation
-			>
-				<ToggleGroup.Item value="Expense">
-					<Text>{"Expense"}</Text>
-				</ToggleGroup.Item>
-				<ToggleGroup.Item value="Income">
-					<Text>{"Income"}</Text>
-				</ToggleGroup.Item>
-			</ToggleGroup>
-		</XStack>
+		<View className="justify-center items-center py-6">
+			<View className="flex-row bg-muted rounded-md p-1">
+				{["Expense", "Income"].map((value) => (
+					<Pressable
+						key={value}
+						onPress={() => onCategoryChanged(value)}
+						className={`px-4 py-2 rounded-sm ${
+							type === value ? "bg-background shadow-sm" : ""
+						}`}
+					>
+						<Text
+							className={`${
+								type === value
+									? "font-medium text-foreground"
+									: "text-muted-foreground"
+							}`}
+						>
+							{value}
+						</Text>
+					</Pressable>
+				))}
+			</View>
+		</View>
 	);
 });
 
-const Emoji = observer(({ state$ }) => {
+const Emoji = observer(({ state$ }: { state$: any }) => {
 	const handlePickedEmoji = (val: EmojiType) => {
 		state$.icon.set(val.emoji);
 	};
 
 	return (
 		<>
-			<Square
-				size={"$6"}
-				backgroundColor={"$blue10Light"}
+			<Pressable
+				className="w-16 h-16 bg-blue-100 items-center justify-center rounded-lg"
 				onPress={state$.isEmojiPickerOpen.toggle}
 			>
 				{state$.icon.get().length === 0 ? (
-					<Smile size={"$4"} />
+					<Smile size={32} color="black" />
 				) : (
-					<Text fontSize={"$10"}>{state$.icon.get()}</Text>
+					<Text className="text-4xl">{state$.icon.get()}</Text>
 				)}
-			</Square>
+			</Pressable>
 			<EmojiPicker
 				onEmojiSelected={handlePickedEmoji}
 				open={state$.isEmojiPickerOpen.get()}
@@ -83,127 +81,99 @@ const Emoji = observer(({ state$ }) => {
 	);
 });
 
-const CategoryNameRow = observer(({ state$, colorSheetRef, addCategory }) => {
-	const openColorPicker = () => {
-		colorSheetRef.current.snapToIndex(0);
-	};
+const CategoryNameRow = observer(
+	({
+		state$,
+		colorSheetRef,
+		addCategory,
+	}: { state$: any; colorSheetRef: any; addCategory: any }) => {
+		const openColorPicker = () => {
+			colorSheetRef.current.snapToIndex(0);
+		};
 
-	const handleTextChange = (text: string) => {
-		state$.name.set(text);
-	};
+		const handleTextChange = (text: string) => {
+			state$.name.set(text);
+		};
 
-	return (
-		<XStack p={"$2"} alignSelf={"stretch"} space={"$2"} my={"$6"}>
-			<Square
-				size={"$4"}
-				backgroundColor={state$.color.get()}
-				onPress={openColorPicker}
-			/>
-			<Input
-				flex={1}
-				placeholder={"Category name"}
-				onChangeText={handleTextChange}
-			/>
-			<Square justifyContent="center" onPress={addCategory}>
-				<PlusSquare size={"$4"} />
-			</Square>
-		</XStack>
-	);
-});
+		return (
+			<View className="flex-row items-center p-2 self-stretch my-6 gap-2">
+				<Pressable
+					className="w-10 h-10 rounded-md border border-gray-300"
+					style={{ backgroundColor: state$.color.get() }}
+					onPress={openColorPicker}
+				/>
+				<Input
+					className="flex-1"
+					placeholder={"Category name"}
+					onChangeText={handleTextChange}
+				/>
+				<Pressable className="justify-center p-2" onPress={addCategory}>
+					<PlusSquare size={32} color="black" />
+				</Pressable>
+			</View>
+		);
+	},
+);
 
-const ColorPickerSheet = observer(({ state$, colorSheetRef, colors }) => {
-	const handleConfirm = () => {
-		colorSheetRef.current?.close?.();
-	};
+const ColorPickerSheet = observer(
+	({
+		state$,
+		colorSheetRef,
+		colors,
+	}: { state$: any; colorSheetRef: any; colors: string[] }) => {
+		const handleConfirm = () => {
+			colorSheetRef.current?.close?.();
+		};
 
-	const onColorSelected = ({ rgb }: returnedResults) => {
-		state$.color.set(rgb);
-	};
+		const onColorSelected = ({ rgb }: { rgb: string }) => {
+			state$.color.set(rgb);
+		};
 
-	return (
-		<BottomSheet
-			ref={colorSheetRef}
-			snapPoints={["75%"]}
-			index={-1}
-			bottomInset={46}
-			enablePanDownToClose
-		>
-			<BottomSheetView style={styles.flex}>
-				<YStack p={"$4"} flex={1} justifyContent="space-between">
-					<ColorPicker
-						sliderThickness={25}
-						thumbSize={24}
-						thumbShape="circle"
-						thumbAnimationDuration={100}
-						adaptSpectrum
-						boundedThumb
-						value={state$.color.get()}
-						onComplete={onColorSelected}
-					>
-						<Tabs
-							defaultValue="tab1"
-							orientation={"horizontal"}
-							flexDirection="column"
+		return (
+			<BottomSheet
+				ref={colorSheetRef}
+				snapPoints={["75%"]}
+				index={-1}
+				bottomInset={46}
+				enablePanDownToClose
+			>
+				<BottomSheetView style={styles.flex}>
+					<View className="p-4 flex-1 justify-between">
+						<ColorPicker
+							style={{ flex: 1 }}
+							sliderThickness={25}
+							thumbSize={24}
+							thumbShape="circle"
+							thumbAnimationDuration={100}
+							adaptSpectrum
+							boundedThumb
+							value={state$.color.get()}
+							onComplete={onColorSelected}
 						>
-							<Tabs.List>
-								<Tabs.Tab flex={1} value="tab1">
-									<SizableText fontFamily="$body">Grid</SizableText>
-								</Tabs.Tab>
-								<Tabs.Tab flex={1} value="tab2">
-									<SizableText fontFamily="$body">Spectrum</SizableText>
-								</Tabs.Tab>
-								<Tabs.Tab flex={1} value="tab3">
-									<SizableText fontFamily="$body">Sliders</SizableText>
-								</Tabs.Tab>
-							</Tabs.List>
-							<Separator py={"$2"} />
-							<Tabs.Content value="tab1">
-								<Panel5 />
-							</Tabs.Content>
-
-							<Tabs.Content value="tab2">
-								<Panel4 />
-							</Tabs.Content>
-
-							<Tabs.Content value="tab3">
-								<Text style={styles.sliderTitle}>Red</Text>
-								<RedSlider style={styles.sliderStyle} />
-
-								<Text style={styles.sliderTitle}>Green</Text>
-								<GreenSlider style={styles.sliderStyle} />
-
-								<Text style={styles.sliderTitle}>Blue</Text>
-								<BlueSlider style={styles.sliderStyle} />
-
-								<Text style={styles.sliderTitle}>Opacity</Text>
-								<OpacitySlider style={styles.sliderStyle} />
-
-								<Swatches
-									style={styles.swatchesContainer}
-									swatchStyle={styles.swatchStyle}
-									colors={colors}
-								/>
-							</Tabs.Content>
-						</Tabs>
-					</ColorPicker>
-					<Button
-						backgroundColor={"$color.green10Light"}
-						onPress={handleConfirm}
-					>
-						<Text color={"white"}>{"Pick"}</Text>
-					</Button>
-				</YStack>
-			</BottomSheetView>
-		</BottomSheet>
-	);
-});
+							<Panel5 style={styles.panelStyle} />
+							<Swatches
+								style={styles.swatchesContainer}
+								swatchStyle={styles.swatchStyle}
+								colors={colors}
+							/>
+							<OpacitySlider style={styles.sliderStyle} />
+						</ColorPicker>
+						<Button onPress={handleConfirm} className="bg-green-500">
+							<Text className="text-white">{"Pick"}</Text>
+						</Button>
+					</View>
+				</BottomSheetView>
+			</BottomSheet>
+		);
+	},
+);
 
 const AddCategory = () => {
 	const colorSheetRef = useRef<BottomSheet>(null);
 	const state$ = rootStore.categoryModel.category;
 
 	return (
-		<YStack flex={1} px={"$2"} alignItems="center">
+		<View className="flex-1 px-2 items-center">
 			<CategoryType state$={state$} />
 			<Emoji state$={state$} />
 			<CategoryNameRow
@@ -216,7 +186,7 @@ const AddCategory = () => {
 				state$={state$}
 				colors={rootStore.categoryModel.colors}
 			/>
-		</YStack>
+		</View>
 	);
 };
 
@@ -226,18 +196,14 @@ const styles = StyleSheet.create({
 	flex: {
 		flex: 1,
 	},
-	sheetContainer: {
-		// add horizontal space
-		marginHorizontal: 10,
-	},
-	sliderTitle: {
-		color: "#000",
-		fontWeight: "bold",
-		marginBottom: 5,
-		paddingHorizontal: 4,
+	panelStyle: {
+		borderRadius: 16,
+		height: 200,
+		marginBottom: 20,
 	},
 	sliderStyle: {
 		borderRadius: 20,
+		marginTop: 20,
 		marginBottom: 20,
 
 		shadowColor: "#000",

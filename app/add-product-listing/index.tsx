@@ -3,9 +3,11 @@ import { rootStore } from "@/src/LegendState";
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
 import { observer, useMount } from "@legendapp/state/react";
 import { useLocalSearchParams } from "expo-router";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Input, Spinner, Text, YStack } from "tamagui";
+import { Button } from "heroui-native";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 
 const AddProductListing = observer(() => {
 	const { id } = useLocalSearchParams();
@@ -49,21 +51,20 @@ const AddProductListing = observer(() => {
 	if (productModel$.product?.defaultUnitCategory?.get() === undefined) {
 		return (
 			<SafeAreaView>
-				<YStack padding={"$4"} gap={"$2"}>
+				<View className="p-4 gap-2">
 					<Text>Loading...</Text>
-					<Spinner />
-				</YStack>
+					<ActivityIndicator />
+				</View>
 			</SafeAreaView>
 		);
 	}
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<YStack flex={1} padding={"$4"} justifyContent={"space-between"}>
-				<YStack gap={"$2"}>
+			<View className="flex-1 p-4 justify-between">
+				<View className="gap-2">
 					<Input
 						placeholder="Product Name *"
-						size={"$5"}
 						aria-label={"Product Name"}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.name.set(text.trim())
@@ -71,7 +72,6 @@ const AddProductListing = observer(() => {
 					/>
 					<Input
 						placeholder="Price *"
-						size={"$5"}
 						keyboardType={"numeric"}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.price.set(Number(text.trim()))
@@ -79,7 +79,6 @@ const AddProductListing = observer(() => {
 					/>
 					<Input
 						placeholder="Quantity *"
-						size={"$5"}
 						keyboardType={"numeric"}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.quantity.set(
@@ -95,21 +94,22 @@ const AddProductListing = observer(() => {
 					<Select
 						placeholder={"Store *"}
 						data={storeModel$.storesList.get()}
-						displayField={(item) => `${item.name} - ${item.location}`}
+						displayField={(item: any) => `${item.name} - ${item.location}`}
 						onValueChange={handleStoreChange}
 					/>
 					<Input
 						placeholder="URL"
-						size={"$5"}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.url.set(text.trim())
 						}
 					/>
-				</YStack>
-				<YStack>
-					<Button onPress={addProductDetails}>Add</Button>
-				</YStack>
-			</YStack>
+				</View>
+				<View>
+					<Button onPress={addProductDetails}>
+						<Text>Add</Text>
+					</Button>
+				</View>
+			</View>
 		</SafeAreaView>
 	);
 });

@@ -1,11 +1,12 @@
 import type { SelectStore } from "@/db/schema";
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
+import { Text } from "@/src/Components/ui/Text";
 import type { ObservableObject } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
-import { Trash2 } from "@tamagui/lucide-icons";
+import { Trash2 } from "lucide-react-native";
 import { Link } from "expo-router";
-import { ListItem, Text, XStack, YGroup } from "tamagui";
+import { Pressable, View } from "react-native";
 
 interface StoreItemProps {
 	store: ObservableObject<SelectStore>;
@@ -23,32 +24,31 @@ export const StoreItem = observer(({ store }: StoreItemProps) => {
 	};
 
 	return (
-		<YGroup.Item key={storeData.id}>
+		<View key={storeData.id} className="border-b border-border">
 			<SwipeableRow
 				key={storeData.id}
 				rightActions={[
 					{
-						content: <Trash2 color={"$white5"} />,
+						content: <Trash2 color="white" />,
 						style: { backgroundColor: "red" },
 						onPress: handleStoreDelete,
 					},
 				]}
 			>
-				<ListItem alignItems="center">
-					<Link
-						href={{
-							pathname: "/add-store",
-						}}
-						onPress={handleStoreEdit}
-						asChild
-					>
-						<XStack flex={1} gap={"$4"} justifyContent={"space-between"}>
-							<Text fontSize={"$6"}>{storeData.name}</Text>
-							<Text fontSize={"$6"}>{storeData.location}</Text>
-						</XStack>
-					</Link>
-				</ListItem>
+				<Link
+					href={{
+						pathname: "/add-store",
+					}}
+					onPress={handleStoreEdit}
+					asChild
+				>
+					<Pressable className="flex-row flex-1 p-4 justify-between items-center bg-background">
+						<Text className="text-lg">{storeData.name}</Text>
+						<Text className="text-lg text-muted-foreground">{storeData.location}</Text>
+					</Pressable>
+				</Link>
 			</SwipeableRow>
-		</YGroup.Item>
+		</View>
 	);
 });
+

@@ -2,7 +2,7 @@ import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { LinearGradient, useFont, vec } from "@shopify/react-native-skia";
-import { YStack } from "tamagui";
+import { View } from "react-native";
 import { Bar, CartesianChart } from "victory-native";
 
 export const BarGraphView = observer(
@@ -10,7 +10,7 @@ export const BarGraphView = observer(
 		const font = useFont(LatoRegular, 12);
 		const graphData = insightsModel$.durationGraphData.get();
 		return (
-			<YStack height={275}>
+			<View style={{ height: 275 }}>
 				<CartesianChart
 					data={graphData}
 					xKey={"day"}
@@ -43,7 +43,8 @@ export const BarGraphView = observer(
 						</>
 					)}
 				</CartesianChart>
-			</YStack>
+			</View>
 		);
 	},
 );
+

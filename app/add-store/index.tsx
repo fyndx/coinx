@@ -1,7 +1,9 @@
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
 import { observer, useUnmount } from "@legendapp/state/react";
-import { Keyboard } from "react-native";
-import { Button, Input, YStack } from "tamagui";
+import { Keyboard, View } from "react-native";
+import { Button } from "heroui-native";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 
 const AddStore = observer(() => {
 	const { storeDraft } = storeModel$;
@@ -29,13 +31,8 @@ const AddStore = observer(() => {
 	};
 
 	return (
-		<YStack
-			flex={1}
-			padding={"$4"}
-			justifyContent={"space-between"}
-			onPress={Keyboard.dismiss}
-		>
-			<YStack gap={"$3"}>
+		<View className="flex-1 p-4 justify-between" onTouchEnd={Keyboard.dismiss}>
+			<View className="gap-3">
 				<Input
 					placeholder={"Store Name"}
 					onChangeText={handleStoreNameChange}
@@ -45,13 +42,15 @@ const AddStore = observer(() => {
 				<Input
 					placeholder={"Store Location"}
 					onChangeText={handleStoreLocationChange}
-					value={location}
+					value={location ?? ""}
 				/>
-			</YStack>
+			</View>
 			<Button onPress={handleSubmit} disabled={isSubmitting}>
-				{isSubmitting ? "Saving..." : id ? "Update Store" : "Add Store"}
+				<Text>
+					{isSubmitting ? "Saving..." : id ? "Update Store" : "Add Store"}
+				</Text>
 			</Button>
-		</YStack>
+		</View>
 	);
 });
 

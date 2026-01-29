@@ -1,11 +1,11 @@
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
 import { rootStore } from "@/src/LegendState";
 import type { TransactionItem } from "@/src/LegendState/TransactionsScreen.model";
-import { Trash2 } from "@tamagui/lucide-icons";
+import { Trash2 } from "lucide-react-native";
 import dayjs from "dayjs";
 import { Link } from "expo-router";
-import { Fragment } from "react";
-import { ListItem, Separator, Text, XStack, YGroup, YStack } from "tamagui";
+import { Pressable, View } from "react-native";
+import { Text } from "@/src/Components/ui/Text";
 
 export const Transaction = ({
 	transaction,
@@ -17,7 +17,7 @@ export const Transaction = ({
 			key={transaction.id}
 			rightActions={[
 				{
-					content: <Trash2 color={"$white5"} />,
+					content: <Trash2 color="white" />,
 					style: { backgroundColor: "red" },
 					onPress: async () => {
 						await rootStore.transactionModel.deleteTransaction(transaction.id);
@@ -26,7 +26,7 @@ export const Transaction = ({
 				},
 			]}
 		>
-			<ListItem padding={"$0"} backgroundColor={"rgb(242, 242, 242)"}>
+			<View className="bg-[#f2f2f2] border-b border-border">
 				<Link
 					href={{
 						pathname: "/add-transaction",
@@ -42,48 +42,38 @@ export const Transaction = ({
 					}}
 					asChild
 				>
-					<XStack
-						flex={1}
-						alignItems={"center"}
-						justifyContent={"space-between"}
-						paddingVertical={"$1.5"}
-					>
+					<Pressable className="flex-row justify-between items-center py-3 px-4">
 						{/* Category Icon */}
-						<XStack gap={"$3"} flex={1}>
-							<XStack
-								backgroundColor={transaction.category_color}
-								alignSelf={"center"}
-								alignItems={"center"}
-								justifyContent={"center"}
-								width={"$3"}
-								height={"$3"}
-								borderRadius={"$3"}
+						<View className="flex-row gap-3 flex-1 items-center">
+							<View
+								className="items-center justify-center w-8 h-8 rounded-full"
+								style={{ backgroundColor: transaction.category_color }}
 							>
-								<Text fontSize={"$6"}>{transaction.category_icon}</Text>
-							</XStack>
+								<Text className="text-lg">{transaction.category_icon}</Text>
+							</View>
 							{/* Transaction Details */}
-							<YStack flex={1}>
-								<Text>{transaction.note ?? transaction.category_name}</Text>
+							<View className="flex-1">
+								<Text className="font-medium">{transaction.note ?? transaction.category_name}</Text>
 								{/* Time with am and pm */}
-								<Text>
+								<Text className="text-sm text-muted-foreground">
 									{dayjs(transaction.transactionTime).format("h:mm A")}
 								</Text>
-							</YStack>
-						</XStack>
+							</View>
+						</View>
 						{/* Amount */}
-						<XStack alignItems={"center"} paddingHorizontal={"$3"}>
+						<View className="flex-row items-center px-3">
 							<Text
-								fontSize={"$6"}
-								color={
-									transaction.transactionType === "Income" ? "green" : "red"
-								}
+								className={`text-lg font-medium ${
+									transaction.transactionType === "Income" ? "text-green-600" : "text-red-600"
+								}`}
 							>
 								{transaction.amount}
 							</Text>
-						</XStack>
-					</XStack>
+						</View>
+					</Pressable>
 				</Link>
-			</ListItem>
+			</View>
 		</SwipeableRow>
 	);
 };
+

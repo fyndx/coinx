@@ -6,7 +6,6 @@ import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Animated from "react-native-reanimated";
 import { RectButton } from "react-native-gesture-handler";
-import { Stack, YStack } from "tamagui";
 import type { Animated as RNAnimated } from "react-native";
 import { LineGraphView } from "../Components/LineGraphView";
 
@@ -84,3 +83,4 @@ export const InsightsGraph = observer(
 		);
 	},
 );
+

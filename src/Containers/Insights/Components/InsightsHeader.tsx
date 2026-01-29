@@ -1,7 +1,9 @@
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { MenuView, type NativeActionEvent } from "@react-native-menu/menu";
-import { Button, Text, XStack } from "tamagui";
+import { View } from "react-native";
+import { Button } from "heroui-native";
+import { Text } from "@/src/Components/ui/Text";
 
 const ACTIONS = [
 	{
@@ -26,14 +28,14 @@ export const InsightsHeader = observer(
 			});
 		};
 		return (
-			<XStack justifyContent={"space-between"} alignItems={"center"}>
-				<Text fontSize={"$8"}>Insights</Text>
+			<View className="flex-row justify-between items-center">
+				<Text className="text-3xl font-bold">Insights</Text>
 				<MenuView actions={ACTIONS} onPressAction={handleOptionChange}>
-					<Button size={"$2"} variant={"outlined"}>
+					<Button size="sm" variant="outline">
 						<Text>{insightsModel$.obs.durationType.get()}</Text>
 					</Button>
 				</MenuView>
-			</XStack>
+			</View>
 		);
 	},
 );

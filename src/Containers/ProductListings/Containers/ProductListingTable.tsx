@@ -3,14 +3,11 @@ import { Switch, observer } from "@legendapp/state/react";
 import { useMemo, useRef } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import {
-	Button,
+	Pressable,
 	ScrollView,
-	Text,
-	XStack,
-	YStack,
-	getTokens,
-	useTheme,
-} from "tamagui";
+	View,
+} from "react-native";
+import { Text } from "@/src/Components/ui/Text";
 
 interface ProductListingTable {
 	head: string[];
@@ -55,7 +52,6 @@ const calculateColumnWidths = ({ head, data }: ProductListingTable) => {
 
 export const ProductListingTable = observer(
 	(props: ProductListingTableProps) => {
-		const theme = useTheme();
 		const { head, data } = props.data.get();
 
 		const stickyScrollRef = useRef<ScrollView>(null);
@@ -93,25 +89,24 @@ export const ProductListingTable = observer(
 
 		if (data?.length === 0) {
 			return (
-				<YStack
-					alignItems={"center"}
-					justifyContent={"center"}
+				<View
+					className="items-center justify-center p-4 border border-border rounded-md"
 					role="alert"
 					aria-label="No products available"
 				>
 					<Text>Add a few Listings</Text>
-				</YStack>
+				</View>
 			);
 		}
 
 		const renderCell = (cell: (typeof data)[0][0]) => (
 			<Switch value={cell.type}>
 				{{
-					text: () => <Text color={theme.color.val}>{cell.value}</Text>,
+					text: () => <Text>{cell.value}</Text>,
 					button: () => (
-						<Button color={theme.color.val} onPress={cell.onPress}>
-							{cell.value}
-						</Button>
+						<Pressable onPress={cell.onPress} className="bg-primary px-3 py-1 rounded-sm">
+							<Text className="text-primary-foreground text-xs">{cell?.value ?? ""}</Text>
+						</Pressable>
 					),
 					default: () => null,
 				}}
@@ -119,18 +114,16 @@ export const ProductListingTable = observer(
 		);
 
 		return (
-			<YStack maxHeight={400}>
-				<XStack>
+			<View className="max-h-[400px] border border-border rounded-md overflow-hidden">
+				<View className="flex-row">
 					{/* Sticky First Column */}
-					<YStack zIndex={1} backgroundColor={"$background"}>
-						<YStack
-							padding={8}
-							borderColor={theme.borderColor.val}
-							borderWidth={"$0.5"}
-							width={columnWidths[0]}
+					<View className="z-10 bg-background border-r border-border">
+						<View
+							className="p-2 border-b border-border bg-muted/20"
+							style={{ width: columnWidths[0] }}
 						>
-							<Text color={theme.color.val}>{head[0]}</Text>
-						</YStack>
+							<Text className="font-semibold">{head[0]}</Text>
+						</View>
 						<ScrollView
 							ref={stickyScrollRef}
 							onScrollBeginDrag={() => {
@@ -144,37 +137,31 @@ export const ProductListingTable = observer(
 							showsVerticalScrollIndicator={false}
 						>
 							{data.map((row, rowIndex) => (
-								<YStack
+								<View
 									key={`sticky-${rowIndex}-${row[0].value}`}
-									padding={8}
-									borderColor={theme.borderColor.val}
-									borderWidth={"$0.5"}
-									width={columnWidths[0]}
-									height={"$6"}
+									className="p-2 border-b border-border h-12 justify-center"
+									style={{ width: columnWidths[0] }}
 								>
 									{renderCell(row[0])}
-								</YStack>
+								</View>
 							))}
 						</ScrollView>
-					</YStack>
+					</View>
 
 					{/* Scrollable Remaining Columns */}
 					<ScrollView horizontal>
-						<YStack>
-							<XStack>
+						<View>
+							<View className="flex-row bg-muted/20">
 								{head.slice(1).map((header, index) => (
-									<YStack
+									<View
 										key={header}
-										padding={8}
-										borderColor={theme.borderColor.val}
-										borderWidth={"$0.5"}
-										width={columnWidths[index + 1]}
-										backgroundColor={"$background"}
+										className="p-2 border-r border-b border-border"
+										style={{ width: columnWidths[index + 1] }}
 									>
-										<Text color={theme.color.val}>{header}</Text>
-									</YStack>
+										<Text className="font-semibold">{header}</Text>
+									</View>
 								))}
-							</XStack>
+							</View>
 							<ScrollView
 								ref={mainScrollRef}
 								onScroll={handleMainScroll}
@@ -188,26 +175,24 @@ export const ProductListingTable = observer(
 								}}
 							>
 								{data.map((row, rowIndex) => (
-									<XStack key={`rowIndex-${rowIndex}`}>
+									<View key={`rowIndex-${rowIndex}`} className="flex-row">
 										{row.slice(1).map((cell, cellIndex) => (
-											<YStack
+											<View
 												key={`cellIndex-${cellIndex}-${cell.value}`}
-												padding={8}
-												borderColor={theme.borderColor.val}
-												borderWidth={"$0.5"}
-												width={columnWidths[cellIndex + 1]}
-												height={"$6"}
+												className="p-2 border-r border-b border-border h-12 justify-center"
+												style={{ width: columnWidths[cellIndex + 1] }}
 											>
 												{renderCell(cell)}
-											</YStack>
+											</View>
 										))}
-									</XStack>
+									</View>
 								))}
 							</ScrollView>
-						</YStack>
+						</View>
 					</ScrollView>
-				</XStack>
-			</YStack>
+				</View>
+			</View>
 		);
 	},
 );
+

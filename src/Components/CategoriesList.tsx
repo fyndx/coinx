@@ -4,7 +4,7 @@ import type {
 } from "@/src/LegendState/Category.model";
 import { observer, useMount } from "@legendapp/state/react";
 import React, { Fragment } from "react";
-import { Separator, YGroup } from "tamagui";
+import { View } from "react-native";
 import { Category } from "./Category";
 
 interface CategoriesListProps {
@@ -20,7 +20,7 @@ export const CategoriesList = observer(
 		onCategoryDelete,
 	}: CategoriesListProps) => {
 		return (
-			<YGroup padding={"$3"}>
+			<View className="p-4 rounded-lg bg-card">
 				{categories?.map((category) => {
 					return (
 						<Fragment key={category.id.peek()}>
@@ -29,11 +29,10 @@ export const CategoriesList = observer(
 								onCategoryPressed={onCategoryPressed}
 								onCategoryDelete={onCategoryDelete}
 							/>
-							<Separator />
 						</Fragment>
 					);
 				})}
-			</YGroup>
+			</View>
 		);
 	},
 );

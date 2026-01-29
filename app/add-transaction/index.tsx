@@ -11,52 +11,55 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { observer, useMount, useUnmount } from "@legendapp/state/react";
-import { CheckSquare, Delete } from "@tamagui/lucide-icons";
-import { Toast, useToastController } from "@tamagui/toast";
+import { CheckSquare, Delete } from "lucide-react-native";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useMemo, useRef } from "react";
 import {
+	Alert,
 	Dimensions,
 	type GestureResponderEvent,
 	StyleSheet,
+	View,
+	Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
-import {
-	Button,
-	Input,
-	SizableText,
-	Spacer,
-	Stack,
-	Text,
-	ToggleGroup,
-	XStack,
-	YStack,
-} from "tamagui";
+import { Button } from "heroui-native";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 
 const TransactionType = observer(
 	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
+		const type = transactionModel$.transaction.transactionType.get();
 		return (
-			<XStack justifyContent="center" py={"$6"}>
-				<ToggleGroup
-					type="single"
-					defaultValue={transactionModel$.transaction.transactionType.get()}
-					onValueChange={(value) => {
-						transactionModel$.transaction.transactionType.set(
-							value as "Expense" | "Income",
-						);
-					}}
-					disableDeactivation
-				>
-					<ToggleGroup.Item value="Expense">
-						<Text>{"Expense"}</Text>
-					</ToggleGroup.Item>
-					<ToggleGroup.Item value="Income">
-						<Text>{"Income"}</Text>
-					</ToggleGroup.Item>
-				</ToggleGroup>
-			</XStack>
+			<View className="justify-center items-center py-6">
+				<View className="flex-row bg-muted rounded-md p-1">
+					{["Expense", "Income"].map((value) => (
+						<Pressable
+							key={value}
+							onPress={() =>
+								transactionModel$.transaction.transactionType.set(
+									value as "Expense" | "Income",
+								)
+							}
+							className={`px-4 py-2 rounded-sm ${
+								type === value ? "bg-background shadow-sm" : ""
+							}`}
+						>
+							<Text
+								className={`${
+									type === value
+										? "font-medium text-foreground"
+										: "text-muted-foreground"
+								}`}
+							>
+								{value}
+							</Text>
+						</Pressable>
+					))}
+				</View>
+			</View>
 		);
 	},
 );
@@ -69,29 +72,23 @@ const NumberButton = ({
 	onPress: (event: GestureResponderEvent, text: number | string) => void;
 }) => {
 	return (
-		<Button
-			size={"$6"}
-			width={"$9"}
-			onPress={(_event) => onPress(_event, text)}
-			backgroundColor={"$color.green10Light"}
-			pressStyle={{ backgroundColor: "$color.green10Dark" }}
+		<Pressable
+			onPress={(event) => onPress(event, text)}
+			className="w-24 h-16 bg-green-500 active:bg-green-700 justify-center items-center rounded-md"
 		>
-			<Text color={"white"}>{text}</Text>
-		</Button>
+			<Text className="text-white text-xl font-bold">{String(text)}</Text>
+		</Pressable>
 	);
 };
 
 const SubmitButton = ({ onPress }: { onPress: () => void }) => {
 	return (
-		<Button
-			size={"$6"}
-			width={"$9"}
+		<Pressable
 			onPress={onPress}
-			icon={CheckSquare}
-			backgroundColor={"$color.green10Light"}
-			pressStyle={{ backgroundColor: "$color.green10Dark" }}
-			color={"white"}
-		/>
+			className="w-24 h-16 bg-green-500 active:bg-green-700 justify-center items-center rounded-md"
+		>
+			<CheckSquare size={24} color="white" />
+		</Pressable>
 	);
 };
 
@@ -107,28 +104,28 @@ const NumberKeypad = ({
 	};
 
 	return (
-		<YStack gap="$3">
-			<XStack justifyContent="space-around">
+		<View className="gap-3">
+			<View className="flex-row justify-around">
 				<NumberButton text={1} onPress={handleKeyPressed} />
 				<NumberButton text={2} onPress={handleKeyPressed} />
 				<NumberButton text={3} onPress={handleKeyPressed} />
-			</XStack>
-			<XStack justifyContent="space-around">
+			</View>
+			<View className="flex-row justify-around">
 				<NumberButton text={4} onPress={handleKeyPressed} />
 				<NumberButton text={5} onPress={handleKeyPressed} />
 				<NumberButton text={6} onPress={handleKeyPressed} />
-			</XStack>
-			<XStack justifyContent="space-around">
+			</View>
+			<View className="flex-row justify-around">
 				<NumberButton text={7} onPress={handleKeyPressed} />
 				<NumberButton text={8} onPress={handleKeyPressed} />
 				<NumberButton text={9} onPress={handleKeyPressed} />
-			</XStack>
-			<XStack justifyContent="space-around">
+			</View>
+			<View className="flex-row justify-around">
 				<NumberButton text={0} onPress={handleKeyPressed} />
 				<NumberButton text={"."} onPress={handleKeyPressed} />
 				<SubmitButton onPress={onSubmit} />
-			</XStack>
-		</YStack>
+			</View>
+		</View>
 	);
 };
 
@@ -155,30 +152,26 @@ const CategoryAndDateButtons = observer(
 		const category = rawCategory ? rawCategory : "Category";
 
 		return (
-			<XStack gap="$3">
+			<View className="flex-row gap-3 px-4">
 				<Button
-					flex={3}
-					variant="outlined"
-					backgroundColor={"$color.green10Light"}
-					pressStyle={{ backgroundColor: "$color.green10Dark" }}
+					variant="outline"
+					className="flex-3 bg-green-500 active:bg-green-700 border-0"
 					onPress={openDatepicker}
 				>
-					<SizableText color={"white"}>
+					<Text className="text-white">
 						{dayjs(transactionModel$.transaction.date.get()).format(
 							"ddd D MMM hh:mm a",
 						)}
-					</SizableText>
+					</Text>
 				</Button>
 				<Button
-					flex={2}
-					variant="outlined"
-					backgroundColor={"$color.green10Light"}
-					pressStyle={{ backgroundColor: "$color.green10Dark" }}
+					variant="outline"
+					className="flex-2 bg-green-500 active:bg-green-700 border-0"
 					onPress={openCategoryPicker}
 				>
-					<SizableText color={"white"}>{category}</SizableText>
+					<Text className="text-white">{category}</Text>
 				</Button>
-			</XStack>
+			</View>
 		);
 	},
 );
@@ -199,16 +192,15 @@ const DatePicker = observer(
 		return (
 			<BottomSheet ref={dateSheetRef} snapPoints={snapPoints} index={-1}>
 				<BottomSheetView>
-					<Stack>
+					<View>
 						<DateTimePicker
 							mode={"single"}
 							date={transactionModel$.transaction.date.get()}
 							onChange={handleValueChange}
 							timePicker
-							displayFullDays
 							locale={locale}
 						/>
-					</Stack>
+					</View>
 				</BottomSheetView>
 			</BottomSheet>
 		);
@@ -226,9 +218,6 @@ const CategoryPicker = observer(
 		categorySheetRef: any;
 	}) => {
 		const onCategoryPressed = async (category: ICategory) => {
-			// console.log("Pressed category", id);
-			// const category = await categoryModel$.getCategoryByIdAsync(id);
-			// transactionModel$.transaction.category.set(category);
 			transactionModel$.transaction.categoryId.set(category.id);
 			transactionModel$.transaction.categoryName.set(category.name);
 			categorySheetRef.current.close();
@@ -256,21 +245,18 @@ const CategoryPicker = observer(
 const TransactionInput = observer(
 	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
 		return (
-			<XStack>
-				<Spacer size={"$5"} />
-				<XStack flex={1} alignItems="center" justifyContent="center" space="$2">
-					<SizableText theme="alt1" size={"$4"}>
-						$
-					</SizableText>
-					<SizableText size={"$8"}>
+			<View className="flex-row items-center justify-between px-4">
+				<View className="w-5" />
+				<View className="flex-1 flex-row items-center justify-center gap-2">
+					<Text className="text-xl text-muted-foreground">$</Text>
+					<Text className="text-5xl font-bold">
 						{transactionModel$.transaction.amount.get()}
-					</SizableText>
-				</XStack>
-				<Button
-					icon={<Delete size={"$1"} />}
-					onPress={transactionModel$.clear}
-				/>
-			</XStack>
+					</Text>
+				</View>
+				<Pressable onPress={transactionModel$.clear} className="p-2">
+					<Delete size={24} color="gray" />
+				</Pressable>
+			</View>
 		);
 	},
 );
@@ -279,10 +265,8 @@ const Note = observer(
 	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
 		return (
 			<Input
-				size={"$5"}
 				placeholder={"Note"}
-				width={"$16"}
-				textAlign="center"
+				className="w-64 text-center text-lg"
 				value={transactionModel$.transaction.note.get()}
 				onChangeText={transactionModel$.transaction.note.set}
 			/>
@@ -346,35 +330,26 @@ const AddTransaction = () => {
 		transactionModel$.onUnmount();
 	});
 
-	const handleKeyPressed = (text) => {
-		transactionModel$.setAmount(text);
+	const handleKeyPressed = (text: number | string) => {
+		transactionModel$.setAmount(String(text));
 	};
 
 	const handleSubmit = async () => {
 		try {
 			if (transactionModel$.transaction.amount.peek() === "0") {
-				toast.show("Please enter an amount", {
-					native: true,
-				});
+				Alert.alert("Please enter an amount");
 				return;
 			}
 			if (!transactionModel$.transaction.categoryId.peek()) {
-				toast.show("Please select a category", {
-					native: true,
-				});
+				Alert.alert("Please select a category");
 				return;
 			}
 
 			await transactionModel$.createTransaction();
-			toast.show("Transaction created", {
-				native: true,
-			});
 			navigation.goBack();
 		} catch (error) {
 			console.log("Error", error);
-			toast.show("Failed to create transaction", {
-				native: true,
-			});
+			Alert.alert("Failed to create transaction");
 			// Optionally handle navigation error
 			navigation.goBack();
 		}
@@ -382,30 +357,23 @@ const AddTransaction = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<YStack
-				paddingHorizontal="$4"
-				flex={1}
-				justifyContent="space-between"
-				// The below is a workaround for the keyboard moving views up when the keyboard is open
-				// https://github.com/expo/expo/issues/7589#issuecomment-629863678
-				minHeight={Math.round(Dimensions.get("window").height)}
-			>
+			<View className="flex-1 px-4 justify-between">
 				<TransactionType transactionModel$={transactionModel$} />
-				<Stack flex={1} justifyContent="center" gap="$4" alignItems="center">
+				<View className="flex-1 justify-center gap-4 items-center">
 					<TransactionInput transactionModel$={transactionModel$} />
 					<Note transactionModel$={transactionModel$} />
-				</Stack>
+				</View>
 				<CategoryAndDateButtons
 					transactionModel$={transactionModel$}
 					dateSheetRef={dateSheetRef}
 					categorySheetRef={categorySheetRef}
 				/>
-				<Stack paddingVertical="$4">
+				<View className="py-4">
 					<NumberKeypad
 						onKeyPressed={handleKeyPressed}
 						onSubmit={handleSubmit}
 					/>
-				</Stack>
+				</View>
 				<DatePicker
 					transactionModel$={transactionModel$}
 					dateSheetRef={dateSheetRef}
@@ -415,7 +383,7 @@ const AddTransaction = () => {
 					categoryModel$={categoryModel$}
 					categorySheetRef={categorySheetRef}
 				/>
-			</YStack>
+			</View>
 		</SafeAreaView>
 	);
 };

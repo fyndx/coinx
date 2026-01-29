@@ -1,6 +1,6 @@
-import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
-import { Adapt, Sheet, Select as TamaguiSelect, YStack } from "tamagui";
-import { LinearGradient } from "tamagui/linear-gradient";
+import { StyleSheet, View } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { Text } from "./ui/Text";
 
 interface DefaultUnitSelectProps<T> {
 	placeholder: string;
@@ -22,103 +22,60 @@ export const Select = <T extends {}>({
 		if (typeof displayField === "function") {
 			return displayField(item);
 		}
-		console.log(String(item[displayField]), "item[displayField]");
-
 		return String(item[displayField]);
 	};
 
+	const formattedData = data.map((item) => {
+		const label = getDisplayValue(item);
+		return { label, value: label, original: item };
+	});
+
 	return (
-		<TamaguiSelect
-			onValueChange={(value) => {
-				onValueChange?.(value);
-			}}
-		>
-			<TamaguiSelect.Trigger size={"$4.5"} iconAfter={ChevronDown}>
-				<TamaguiSelect.Value placeholder={placeholder} />
-			</TamaguiSelect.Trigger>
-			<Adapt when="sm" platform="touch">
-				<Sheet
-					native={true}
-					modal
-					dismissOnSnapToBottom
-					animationConfig={{
-						type: "spring",
-						damping: 20,
-						mass: 1.2,
-						stiffness: 250,
-					}}
-				>
-					<Sheet.Frame>
-						<Sheet.ScrollView>
-							<Adapt.Contents />
-						</Sheet.ScrollView>
-					</Sheet.Frame>
-					<Sheet.Overlay
-						animation="lazy"
-						enterStyle={{ opacity: 0 }}
-						exitStyle={{ opacity: 0 }}
-					/>
-				</Sheet>
-			</Adapt>
-			<TamaguiSelect.Content>
-				<TamaguiSelect.ScrollUpButton
-					alignItems="center"
-					justifyContent="center"
-					position="relative"
-					width="100%"
-					height="$3"
-				>
-					<YStack zIndex={10}>
-						<ChevronUp size={20} />
-					</YStack>
-					<LinearGradient
-						start={[0, 0]}
-						end={[0, 1]}
-						fullscreen
-						colors={["$background", "transparent"]}
-						borderRadius="$4"
-					/>
-				</TamaguiSelect.ScrollUpButton>
-				<TamaguiSelect.Viewport
-					animation="quick"
-					animateOnly={["transform", "opacity"]}
-					enterStyle={{ o: 0, y: -10 }}
-					exitStyle={{ o: 0, y: 10 }}
-					minWidth={200}
-				>
-					<TamaguiSelect.Group>
-						{data.map((item, index) => {
-							const value = getDisplayValue(item);
-							return (
-								<TamaguiSelect.Item index={index} key={value} value={value}>
-									<TamaguiSelect.ItemText>{value}</TamaguiSelect.ItemText>
-									<TamaguiSelect.ItemIndicator marginLeft="auto">
-										<Check size={16} />
-									</TamaguiSelect.ItemIndicator>
-								</TamaguiSelect.Item>
-							);
-						})}
-					</TamaguiSelect.Group>
-				</TamaguiSelect.Viewport>
-				<TamaguiSelect.ScrollDownButton
-					alignItems="center"
-					justifyContent="center"
-					position="relative"
-					width="100%"
-					height="$3"
-				>
-					<YStack zIndex={10}>
-						<ChevronDown size={20} />
-					</YStack>
-					<LinearGradient
-						start={[0, 0]}
-						end={[0, 1]}
-						fullscreen
-						colors={["transparent", "$background"]}
-						borderRadius="$4"
-					/>
-				</TamaguiSelect.ScrollDownButton>
-			</TamaguiSelect.Content>
-		</TamaguiSelect>
+		<View className="w-full">
+			<Dropdown
+				style={styles.dropdown}
+				placeholderStyle={styles.placeholderStyle}
+				selectedTextStyle={styles.selectedTextStyle}
+				inputSearchStyle={styles.inputSearchStyle}
+				iconStyle={styles.iconStyle}
+				data={formattedData}
+				search
+				maxHeight={300}
+				labelField="label"
+				valueField="value"
+				placeholder={placeholder}
+				searchPlaceholder="Search..."
+				onChange={(item) => {
+					onValueChange?.(item.value);
+				}}
+			/>
+		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	dropdown: {
+		height: 50,
+		backgroundColor: 'transparent',
+		borderBottomColor: 'gray',
+		borderBottomWidth: 0.5,
+	},
+	icon: {
+		marginRight: 5,
+	},
+	placeholderStyle: {
+		fontSize: 16,
+	},
+	selectedTextStyle: {
+		fontSize: 16,
+	},
+	iconStyle: {
+		width: 20,
+		height: 20,
+	},
+	inputSearchStyle: {
+		height: 40,
+		fontSize: 16,
+	},
+});
+

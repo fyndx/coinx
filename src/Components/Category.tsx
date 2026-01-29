@@ -1,10 +1,10 @@
 import type { ObservableObject } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
-import { Trash2 } from "@tamagui/lucide-icons";
+import { Trash2 } from "lucide-react-native";
+import { View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
-import { ListItem, Square, Text, XStack, YGroup, YStack } from "tamagui";
-import { rootStore } from "../LegendState";
 import type { ICategory } from "../LegendState/Category.model";
+import { Text } from "./ui/Text";
 import { SwipeableRow } from "./SwipeableRow";
 
 interface CategoryProps {
@@ -17,12 +17,12 @@ export const Category = observer(
 	({ category, onCategoryPressed, onCategoryDelete }: CategoryProps) => {
 		const categoryData = category.peek();
 		return (
-			<YGroup.Item key={categoryData.id}>
+			<View key={categoryData.id} className="border-b border-border">
 				<SwipeableRow
 					key={categoryData.id}
 					rightActions={[
 						{
-							content: <Trash2 color={"$white5"} />,
+							content: <Trash2 color="white" />,
 							style: { backgroundColor: "red" },
 							onPress: () => {
 								onCategoryDelete(categoryData);
@@ -31,16 +31,23 @@ export const Category = observer(
 					]}
 				>
 					<RectButton onPress={() => onCategoryPressed(categoryData)}>
-						<ListItem alignItems="center">
-							<XStack gap={"$4"}>
-								<Text fontSize={"$6"}>{category.icon}</Text>
-								<Text fontSize={"$6"}>{category.name}</Text>
-							</XStack>
-							<Square size={"$1"} backgroundColor={categoryData.color} />
-						</ListItem>
+						<View className="flex-row items-center justify-between p-4 bg-background">
+							<View className="flex-row items-center gap-4">
+								<Text className="text-xl">{category.icon.get()}</Text>
+								<Text className="text-xl">{category.name.get()}</Text>
+							</View>
+							<View
+								style={{
+									width: 20,
+									height: 20,
+									backgroundColor: categoryData.color,
+								}}
+							/>
+						</View>
 					</RectButton>
 				</SwipeableRow>
-			</YGroup.Item>
+			</View>
 		);
 	},
 );
+

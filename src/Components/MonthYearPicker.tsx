@@ -3,19 +3,12 @@ import type {
 	TransactionsScreenModel,
 } from "@/src/LegendState/TransactionsScreen.model";
 import { observer } from "@legendapp/state/react";
-import { ChevronLeft, ChevronRight } from "@tamagui/lucide-icons";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import dayjs from "dayjs";
 import { useState } from "react";
-import {
-	Button,
-	Dialog,
-	Input,
-	Label,
-	Popover,
-	Text,
-	XStack,
-	YStack,
-} from "tamagui";
+import { Modal, Pressable, View } from "react-native";
+import { Button } from "./ui/Button";
+import { Text } from "./ui/Text";
 import { dayjsLocaleDataInstance } from "../utils/date";
 
 const MONTHS = dayjsLocaleDataInstance.monthsShort();
@@ -29,8 +22,11 @@ export const MonthYearPicker = observer(
 		const [selectedMonth, setSelectedMonth] = useState(dayjs().month());
 		const [selectedYear, setSelectedYear] = useState(dayjs().year());
 		const [tempYear, setTempYear] = useState(selectedYear);
+		const [modalVisible, setModalVisible] = useState(false);
 
-		const openPicker = () => {};
+		const openPicker = () => {
+			setModalVisible(true);
+		};
 
 		const handleMonthChange = ({
 			month,
@@ -46,6 +42,7 @@ export const MonthYearPicker = observer(
 				endDate: endOfMonth.format(),
 			};
 			transactionsScreenModel$.obs.timeRange.set(timeRange);
+			setModalVisible(false);
 		};
 
 		const handlePreviousMonth = () => {
@@ -91,55 +88,69 @@ export const MonthYearPicker = observer(
 		};
 
 		return (
-			<XStack justifyContent={"space-between"} alignSelf={"stretch"}>
-				<Button icon={ChevronLeft} onPress={handlePreviousMonth} />
-				<Popover placement={"bottom"}>
-					<Popover.Trigger asChild>
-						<Button onPress={openPicker}>
-							<Text>{transactionsScreenModel$.selectedTimeRange.get()}</Text>
-						</Button>
-					</Popover.Trigger>
-					<Popover.Content marginHorizontal={"$6"}>
-						<Popover.Arrow borderWidth={1} borderColor="$borderColor" />
-						<YStack gap={"$3"}>
+			<View className="flex-row justify-between items-center w-full">
+				<Button variant="ghost" size="icon" onPress={handlePreviousMonth}>
+					<ChevronLeft size={24} color="black" />
+				</Button>
+				
+				<Button variant="outline" onPress={openPicker}>
+					{transactionsScreenModel$.selectedTimeRange.get()}
+				</Button>
+
+				<Modal
+					animationType="slide"
+					transparent={true}
+					visible={modalVisible}
+					onRequestClose={() => setModalVisible(false)}
+				>
+					<View className="flex-1 justify-center items-center bg-black/50">
+						<View className="bg-background m-4 p-4 rounded-lg w-4/5 shadow-lg border border-border">
 							{/* Year Row */}
-							<XStack justifyContent={"space-between"} alignItems={"center"}>
+							<View className="flex-row justify-between items-center mb-4">
 								<Button
+									variant="ghost"
+									size="icon"
 									onPress={() => {
 										setTempYear(tempYear - 1);
 									}}
 								>
-									<ChevronLeft />
+									<ChevronLeft size={20} color="black" />
 								</Button>
-								<Text>{tempYear}</Text>
+								<Text className="text-lg font-bold">{tempYear}</Text>
 								<Button
+									variant="ghost"
+									size="icon"
 									onPress={() => {
 										setTempYear(tempYear + 1);
 									}}
 								>
-									<ChevronRight />
+									<ChevronRight size={20} color="black" />
 								</Button>
-							</XStack>
-							<XStack gap={"$2"} flexWrap={"wrap"} justifyContent={"center"}>
+							</View>
+							<View className="flex-row flex-wrap justify-center gap-2">
 								{MONTHS.map((month, index) => (
-									<Popover.Close asChild key={month}>
-										<Button
-											key={month}
-											onPress={() => handleMonthChange({ month, index })}
-											backgroundColor={
-												index === selectedMonth ? "$background" : "transparent"
-											}
-										>
-											<Text fontSize={"$5"}>{month}</Text>
-										</Button>
-									</Popover.Close>
+									<Button
+										key={month}
+										variant={index === selectedMonth ? "default" : "ghost"}
+										className="w-[30%] mb-2"
+										onPress={() => handleMonthChange({ month, index })}
+									>
+										{month}
+									</Button>
 								))}
-							</XStack>
-						</YStack>
-					</Popover.Content>
-				</Popover>
-				<Button icon={ChevronRight} onPress={handleNextMonth} />
-			</XStack>
+							</View>
+							<Button variant="outline" className="mt-4" onPress={() => setModalVisible(false)}>
+								Cancel
+							</Button>
+						</View>
+					</View>
+				</Modal>
+
+				<Button variant="ghost" size="icon" onPress={handleNextMonth}>
+					<ChevronRight size={24} color="black" />
+				</Button>
+			</View>
 		);
 	},
 );
+
