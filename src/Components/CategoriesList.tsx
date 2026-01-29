@@ -2,8 +2,8 @@ import type {
 	CategoriesListObservable,
 	ICategory,
 } from "@/src/LegendState/Category.model";
-import { observer, useMount } from "@legendapp/state/react";
-import React, { Fragment } from "react";
+import { observer } from "@legendapp/state/react";
+import React from "react";
 import { View } from "react-native";
 import { Category } from "./Category";
 
@@ -21,17 +21,14 @@ export const CategoriesList = observer(
 	}: CategoriesListProps) => {
 		return (
 			<View className="p-4 rounded-lg bg-card">
-				{categories?.map((category) => {
-					return (
-						<Fragment key={category.id.peek()}>
-							<Category
-								category={category}
-								onCategoryPressed={onCategoryPressed}
-								onCategoryDelete={onCategoryDelete}
-							/>
-						</Fragment>
-					);
-				})}
+				{categories?.map((category) => (
+					<Category
+						key={category.id.peek()}
+						category={category}
+						onCategoryPressed={onCategoryPressed}
+						onCategoryDelete={onCategoryDelete}
+					/>
+				))}
 			</View>
 		);
 	},

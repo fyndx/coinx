@@ -230,12 +230,14 @@ const CategoryPicker = observer(
 				index={-1}
 				enablePanDownToClose
 			>
-				<BottomSheetScrollView>
-					<CategoriesList
-						categories={rootStore.categoryModel.categories}
-						onCategoryPressed={onCategoryPressed}
-						onCategoryDelete={() => {}}
-					/>
+				<BottomSheetScrollView scrollEnabled={true}>
+					<View className="pb-8">
+						<CategoriesList
+							categories={rootStore.categoryModel.categories}
+							onCategoryPressed={onCategoryPressed}
+							onCategoryDelete={() => {}}
+						/>
+					</View>
 				</BottomSheetScrollView>
 			</BottomSheet>
 		);
