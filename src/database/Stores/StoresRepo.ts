@@ -1,7 +1,7 @@
 import { db as database } from "@/db/client";
 import { type InsertStore, stores as storesRepo } from "@/db/schema";
 import { generateUUID } from "@/src/utils/uuid";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { Effect, Predicate, pipe } from "effect";
 import { InvalidIdError } from "./StoresErrors";
 
@@ -59,7 +59,11 @@ export const editStore = (store: Omit<InsertStore, "id">, id: string) =>
 
 export const getStores = () =>
 	Effect.promise(() => {
-		return database.select().from(storesRepo).execute();
+		return database
+			.select()
+			.from(storesRepo)
+			.where(isNull(storesRepo.deletedAt))
+			.execute();
 	});
 
 export const deleteStoreById = (id: string) => {
@@ -70,11 +74,16 @@ export const deleteStoreById = (id: string) => {
 			(storeId) => storeId.length > 0,
 			() => new InvalidIdError({ message: "Invalid Store id" }),
 		),
-		// delete store
+		// soft delete store
 		Effect.flatMap((validStoreId) =>
 			Effect.tryPromise(() =>
 				database
-					.delete(storesRepo)
+					.update(storesRepo)
+					.set({
+						deletedAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+						syncStatus: "pending",
+					})
 					.where(eq(storesRepo.id, validStoreId))
 					.execute(),
 			),

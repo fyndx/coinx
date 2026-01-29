@@ -7,7 +7,7 @@ import {
 	computed,
 	observable,
 } from "@legendapp/state";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { colorKit } from "reanimated-color-picker";
 
 const DEFAULT_CATEGORIES = [
@@ -148,12 +148,14 @@ export class CategoryModel {
 	};
 
 	getCategoriesList = async ({ type }: { type?: "Income" | "Expense" }) => {
-		let query = database.select().from(categoriesRepo);
-		if (type) {
-			query = query.where(eq(categoriesRepo.type, type));
-		}
+		const whereConditions = type
+			? and(eq(categoriesRepo.type, type), isNull(categoriesRepo.deletedAt))
+			: isNull(categoriesRepo.deletedAt);
 
-		const result = await query;
+		const result = await database
+			.select()
+			.from(categoriesRepo)
+			.where(whereConditions);
 		this.categories.set(result);
 	};
 
@@ -161,7 +163,7 @@ export class CategoryModel {
 		const category = await database
 			.select()
 			.from(categoriesRepo)
-			.where(eq(categoriesRepo.id, id));
+			.where(and(eq(categoriesRepo.id, id), isNull(categoriesRepo.deletedAt)));
 
 		if (category?.length > 0) {
 			return category[0];
@@ -169,11 +171,24 @@ export class CategoryModel {
 	};
 
 	deleteAllCategories = async () => {
-		await database.delete(categoriesRepo);
+		await database
+			.update(categoriesRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			});
 	};
 
 	deleteCategoryById = async (id: string) => {
-		await database.delete(categoriesRepo).where(eq(categoriesRepo.id, id));
+		await database
+			.update(categoriesRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
+			.where(eq(categoriesRepo.id, id));
 	};
 
 	createDefaultCategories = async () => {

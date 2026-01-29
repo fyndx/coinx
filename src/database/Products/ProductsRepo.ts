@@ -1,13 +1,16 @@
 import { db as database } from "@/db/client";
 import { type InsertProduct, products as productsRepo } from "@/db/schema";
 import { generateUUID } from "@/src/utils/uuid";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { Effect, pipe } from "effect";
 import { InvalidIdError } from "../Stores/StoresErrors";
 
 export const getProducts = () => {
 	return Effect.promise(() => {
-		const query = database.select().from(productsRepo);
+		const query = database
+			.select()
+			.from(productsRepo)
+			.where(isNull(productsRepo.deletedAt));
 
 		return query.execute();
 	});
@@ -22,7 +25,7 @@ export const findProductById = ({ id }: { id: string }) => {
 				defaultUnitCategory: productsRepo.defaultUnitCategory,
 			})
 			.from(productsRepo)
-			.where(eq(productsRepo.id, id));
+			.where(and(eq(productsRepo.id, id), isNull(productsRepo.deletedAt)));
 
 		return query.execute();
 	});
@@ -37,7 +40,7 @@ export const findProductByName = ({ name }: { name: string }) => {
 				defaultUnitCategory: productsRepo.defaultUnitCategory,
 			})
 			.from(productsRepo)
-			.where(eq(productsRepo.name, name));
+			.where(and(eq(productsRepo.name, name), isNull(productsRepo.deletedAt)));
 
 		return query.execute();
 	});
@@ -97,7 +100,12 @@ export const updateProduct = (product: InsertProduct) => {
 export const deleteProduct = ({ id }: { id: string }) => {
 	return Effect.promise(() => {
 		const query = database
-			.delete(productsRepo)
+			.update(productsRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
 			.where(eq(productsRepo.id, id))
 			.returning();
 
@@ -107,7 +115,13 @@ export const deleteProduct = ({ id }: { id: string }) => {
 
 export const deleteAllProducts = () => {
 	return Effect.promise(() => {
-		const query = database.delete(productsRepo);
+		const query = database
+			.update(productsRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			});
 
 		return query.execute();
 	});

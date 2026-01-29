@@ -179,16 +179,27 @@ export class TransactionModel {
 
 	deleteTransaction = async (id: string) => {
 		return await database
-			.delete(transactionsRepo)
+			.update(transactionsRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
 			.where(eq(transactionsRepo.id, id));
 	};
 
 	/**
-	 * Deletes all transactions from the database.
-	 * @returns A promise that resolves when all transactions have been deleted.
+	 * Soft deletes all transactions from the database.
+	 * @returns A promise that resolves when all transactions have been soft-deleted.
 	 */
 	deleteAllTransactions = async () => {
-		return await database.delete(transactionsRepo).returning();
+		return await database
+			.update(transactionsRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			});
 	};
 
 	createRandomTransactions = () => {
