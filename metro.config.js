@@ -1,5 +1,14 @@
 const { getDefaultConfig } = require("expo/metro-config");
+const { withUniwindConfig } = require('uniwind/metro'); 
+
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 config.resolver.sourceExts.push("sql"); // <--- add this
-module.exports = config;
+module.exports = withUniwindConfig(config, { 
+  cssEntryFile: './global.css',
+  dtsFile: './src/uniwind-types.d.ts',
+  polyfills: { 
+    rem: 14,
+  },
+});
+

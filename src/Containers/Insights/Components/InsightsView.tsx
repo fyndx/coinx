@@ -1,24 +1,26 @@
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
-import { Text, XStack, YStack } from "tamagui";
+import { View } from "react-native";
+import { Text } from "@/src/Components/ui/Text";
 
 export const InsightsView = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
 		return (
-			<YStack>
-				<XStack justifyContent={"space-between"}>
-					<YStack>
+			<View>
+				<View className="flex-row justify-between">
+					<View>
 						<Text>{insightsModel$.insightsData.durationText.get()}</Text>
 						<Text>{insightsModel$.insightsData.netTotal.get()}</Text>
-					</YStack>
-					<YStack alignItems={"flex-end"}>
+					</View>
+					<View className="items-end">
 						<Text>
 							{insightsModel$.insightsData.spentDurationHeading.get()}
 						</Text>
 						<Text>{insightsModel$.insightsData.spentPerDuration.get()}</Text>
-					</YStack>
-				</XStack>
-			</YStack>
+					</View>
+				</View>
+			</View>
 		);
 	},
 );
+

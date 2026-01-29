@@ -1,9 +1,11 @@
 import { DefaultUnitSelect } from "@/src/Containers/AddProduct/Components/DefaultUnitSelect";
 import { rootStore } from "@/src/LegendState";
 import { observer, useMount } from "@legendapp/state/react";
-import { Keyboard, StyleSheet } from "react-native";
+import { Keyboard, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Input, TextArea, YStack } from "tamagui";
+import { Button } from "heroui-native";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 
 const AddProduct = observer(() => {
 	const addProductScreenModel$ = rootStore.addProductScreenModel;
@@ -46,44 +48,43 @@ const AddProduct = observer(() => {
 	return (
 		// TODO: Add error messages for input and select
 		<SafeAreaView style={styles.container}>
-			<YStack
-				flex={1}
-				padding={"$4"}
-				justifyContent={"space-between"}
-				onPress={Keyboard.dismiss}
+			<View
+				className="flex-1 p-4 justify-between"
+				onTouchEnd={Keyboard.dismiss}
 			>
-				<YStack gap={"$3"}>
+				<View className="gap-3">
 					<Input
 						placeholder={"Product Name *"}
 						value={name}
 						onChangeText={handleProductNameChange}
-						disabled={isAddProductInProgress}
+						editable={!isAddProductInProgress}
 						autoFocus
 					/>
-					<TextArea
+					<Input
 						placeholder={
 							"Notes\n(eg. Describe your expectations, quality, usage etc.)"
 						}
-						value={notes}
+						value={notes ?? ""}
 						onChangeText={handleProductNotesChange}
-						disabled={isAddProductInProgress}
-						minHeight={"$12"}
-						textAlignVertical={"top"}
+						editable={!isAddProductInProgress}
+						multiline
+						numberOfLines={4}
+						className="min-h-[100px] text-top"
 					/>
 					{/* Default Unit Select */}
 					<DefaultUnitSelect
 						value={defaultUnitCategory}
 						onValueChange={handleUnitCategoryChange}
 					/>
-				</YStack>
+				</View>
 				<Button
 					onPress={handleSubmit}
 					// TODO: Disable Button unless input and select is valid
 					disabled={isAddProductInProgress}
 				>
-					{id ? "Edit Product" : "Add Product"}
+					<Text>{id ? "Edit Product" : "Add Product"}</Text>
 				</Button>
-			</YStack>
+			</View>
 		</SafeAreaView>
 	);
 });

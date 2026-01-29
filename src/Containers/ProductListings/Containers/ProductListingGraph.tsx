@@ -4,7 +4,8 @@ import { observer } from "@legendapp/state/react";
 import { Circle, Text as SkiaText, useFont } from "@shopify/react-native-skia";
 import { Fragment } from "react";
 import { type SharedValue, useDerivedValue } from "react-native-reanimated";
-import { Text, YStack } from "tamagui";
+import { View } from "react-native";
+import { Text } from "@/src/Components/ui/Text";
 import { CartesianChart, Line, useChartPressState } from "victory-native";
 
 function ToolTip({
@@ -86,26 +87,29 @@ export const ProductListingGraph = observer(
 				acc[curVal] = 0;
 				return acc;
 			},
-			{},
+			{} as any,
 		);
 
-		const { state, isActive } = useChartPressState({ x: 0, y: yState });
+		const { state, isActive } = useChartPressState({ x: 0, y: yState } as any);
 
 		if (extractedGraphData?.length === 0) {
-			return <Text>No data available</Text>;
+			return (
+				<View className="items-center justify-center p-4">
+					<Text>No data available</Text>
+				</View>
+			);
 		}
 
 		const { minimum: minPrice, maximum: maxPrice } =
 			props.productListingHistoryModel$.getMinMaxPrice.get();
 
 		return (
-			<YStack height={300}>
-				{/* TODO: if data doesn't work use chart data */}
+			<View className="h-[300px] w-full">
 				<CartesianChart
 					data={extractedGraphData}
 					xKey={"recordedAt"}
-					yKeys={extractedProducts}
-					chartPressState={state}
+					yKeys={extractedProducts as any}
+					chartPressState={state as any}
 					domain={{ y: [minPrice, maxPrice] }}
 					domainPadding={{ right: 30, left: 30 }}
 					yAxis={[
@@ -133,7 +137,7 @@ export const ProductListingGraph = observer(
 								<Line
 									connectMissingData
 									key={key}
-									points={points[key]}
+									points={(points as any)[key]}
 									animate={{ type: "timing" }}
 									strokeWidth={2}
 									color={extractedProductListingColors[key]}
@@ -151,7 +155,8 @@ export const ProductListingGraph = observer(
 						));
 					}}
 				</CartesianChart>
-			</YStack>
+			</View>
 		);
 	},
 );
+

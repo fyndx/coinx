@@ -5,10 +5,10 @@ import type { TransactionsScreenModel } from "@/src/LegendState/TransactionsScre
 import { observer, useMount } from "@legendapp/state/react";
 import { MenuView } from "@react-native-menu/menu";
 import type { NativeActionEvent } from "@react-native-menu/menu";
-import { PlusCircle } from "@tamagui/lucide-icons";
+import { PlusCircle } from "lucide-react-native";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
 	useAnimatedScrollHandler,
 	useAnimatedStyle,
@@ -16,9 +16,10 @@ import Animated, {
 	withSpring,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Circle, H3, Stack, Text, XStack, YStack } from "tamagui";
+import { Button } from "heroui-native";
+import { Text } from "@/src/Components/ui/Text";
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedView = Animated.createAnimatedComponent(View);
 
 const ACTIONS = [
 	{
@@ -45,9 +46,6 @@ const ACTIONS = [
 
 /**
  * A React component that renders a menu for selecting the duration of transactions to display.
- * The component uses the `transactionsScreenModel$` prop to access the `duration` and `insights.totalExpense` observables from the `TransactionsScreenModel`.
- * The menu options are defined in the `ACTIONS` constant, and the `handleOptionChange` function is called when an option is selected, updating the `duration` observable.
- * The component also displays the total expense amount based on the selected duration.
  */
 const SpentMenuComponent = observer(
 	({
@@ -60,30 +58,28 @@ const SpentMenuComponent = observer(
 		};
 
 		return (
-			<YStack paddingVertical={"$6"}>
-				<XStack alignItems="center" justifyContent="center">
+			<View className="py-6">
+				<View className="flex-row items-center justify-center">
 					<Text>{"Spent "}</Text>
 					<MenuView actions={ACTIONS} onPressAction={handleOptionChange}>
-						<Button size={"$2"} variant="outlined">
+						<Button size="sm" variant="outline">
 							<Text>{transactionsScreenModel$.obs.duration.get()}</Text>
 						</Button>
 					</MenuView>
-				</XStack>
-				<XStack alignItems="center" justifyContent="center">
-					<Text fontSize={"$8"}>
+				</View>
+				<View className="flex-row items-center justify-center">
+					<Text className="text-3xl font-bold">
 						{/* TODO: Add Selected Currency */}
 						{transactionsScreenModel$.obs.insights.totalExpense.get()}
 					</Text>
-				</XStack>
-			</YStack>
+				</View>
+			</View>
 		);
 	},
 );
 
 /**
- * A React component that renders the main transactions screen, including a search bar, a menu for selecting the duration of transactions to display, and a list of transactions.
- * The component uses the `transactionsScreenModel` from the root store to access the necessary data and observables for the transactions screen.
- * The component is responsible for setting up the necessary lifecycle hooks and rendering the child components that make up the transactions screen.
+ * A React component that renders the main transactions screen.
  */
 const Transactions = () => {
 	const transactionsScreenModel$ = rootStore.transactionsScreenModel;
@@ -123,34 +119,32 @@ const Transactions = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Stack flex={1} paddingHorizontal={"$6"}>
+			<View style={styles.container} className="px-6">
 				{/* <XStack justifyContent="space-between" paddingVertical={"$2"}>
 				<Search />
 				<ChevronDownSquare />
 			</XStack> */}
 				{/* <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} /> */}
-				<XStack justifyContent={"center"} py={"$2"}>
-					<H3>{"Transactions"}</H3>
-				</XStack>
+				<View className="justify-center items-center py-2">
+					<Text className="text-xl font-bold">{"Transactions"}</Text>
+				</View>
 				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
 				<TransactionsList
 					transactions$={transactionsScreenModel$.groupedTransactions}
 					onScroll={scrollHandler}
 				/>
-			</Stack>
+			</View>
 
-			<AnimatedCircle
-				position="absolute"
-				right={"$6"}
-				bottom={"$6"}
-				backgroundColor={"$blue10Light"}
-				padding={"$1"}
+			<AnimatedView
+				className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full"
 				style={animatedFabStyle}
 			>
-				<Link href={{ pathname: "/add-transaction" }}>
-					<PlusCircle size={"$4"} color="white" />
+				<Link href={{ pathname: "/add-transaction" }} asChild>
+					<Pressable>
+						<PlusCircle size={32} color="#2563eb" />
+					</Pressable>
 				</Link>
-			</AnimatedCircle>
+			</AnimatedView>
 		</SafeAreaView>
 	);
 };

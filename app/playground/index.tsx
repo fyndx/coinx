@@ -1,17 +1,9 @@
 import { rootStore } from "@/src/LegendState";
 import { generateRandomTransactions } from "@/src/database/seeds/TransactionSeeds";
-import { Delete } from "@tamagui/lucide-icons";
+import { Delete } from "lucide-react-native";
 import { Link } from "expo-router";
-import {
-	Button,
-	H2,
-	H3,
-	ListItem,
-	Separator,
-	Text,
-	YGroup,
-	YStack,
-} from "tamagui";
+import { Pressable, View } from "react-native";
+import { Text } from "@/src/Components/ui/Text";
 
 const PlaygroundScreen = () => {
 	const clearTransactions = () => {
@@ -46,77 +38,72 @@ const PlaygroundScreen = () => {
 		rootStore.productsListingsModel.deleteAllProductListings();
 	};
 
+	const ListItem = ({ title, subTitle, onPress, icon: Icon, theme }: any) => (
+		<Pressable onPress={onPress} className="p-4 border-b border-gray-200 flex-row items-center justify-between">
+			<View className="flex-1">
+				<Text className="text-lg">{title}</Text>
+				{subTitle && <Text className="text-gray-500">{subTitle}</Text>}
+			</View>
+			{Icon && <Icon size={24} color={theme === "red" ? "red" : "black"} />}
+		</Pressable>
+	);
+
 	return (
-		<YStack padding={"$2"}>
-			<H3>{"Creation"}</H3>
-			<YGroup paddingVertical={"$2"}>
-				<YGroup.Item>
-					<ListItem
-						title={"Create Default Categories"}
-						onPress={createDefaultCategories}
-					/>
-				</YGroup.Item>
-				<Separator />
-				<YGroup.Item>
-					<ListItem
-						title={"Create Random Transactions"}
-						onPress={createRandomTransactions}
-					/>
-				</YGroup.Item>
-				<YGroup.Item>
-					<ListItem
-						title={"Create Random Products"}
-						onPress={createRandomProducts}
-					/>
-				</YGroup.Item>
-				<YGroup.Item>
-					<ListItem
-						title={"Create Random Product Listings"}
-						onPress={createRandomProductListings}
-					/>
-				</YGroup.Item>
-				<H3>{"Deletion"}</H3>
-				<YGroup.Item>
-					<ListItem
-						title={"Clear All Transactions"}
-						icon={Delete}
-						theme={"red"}
-						subTitle={"This action cannot be undone"}
-						onPress={clearTransactions}
-					/>
-				</YGroup.Item>
-				<Separator borderColor={"$color.gray8Light"} />
-				<YGroup.Item>
-					<ListItem
-						title={"Clear All Categories"}
-						icon={Delete}
-						theme={"red"}
-						subTitle={"This action cannot be undone"}
-						onPress={clearCategories}
-					/>
-				</YGroup.Item>
-				<Separator borderColor={"$color.gray8Light"} />
-				<YGroup.Item>
-					<ListItem
-						title={"Clear All Products"}
-						icon={Delete}
-						theme={"red"}
-						subTitle={"This action cannot be undone"}
-						onPress={clearProducts}
-					/>
-				</YGroup.Item>
-				<YGroup.Item>
-					<ListItem
-						title={"Clear All Product Listings"}
-						icon={Delete}
-						theme={"red"}
-						subTitle={"This action cannot be undone"}
-						onPress={clearProductListings}
-					/>
-				</YGroup.Item>
-			</YGroup>
-		</YStack>
+		<View className="flex-1 p-2">
+			<Text className="text-xl font-bold my-2">{"Creation"}</Text>
+			<View className="bg-white rounded-md mb-4">
+				<ListItem
+					title={"Create Default Categories"}
+					onPress={createDefaultCategories}
+				/>
+				<ListItem
+					title={"Create Random Transactions"}
+					onPress={createRandomTransactions}
+				/>
+				<ListItem
+					title={"Create Random Products"}
+					onPress={createRandomProducts}
+				/>
+				<ListItem
+					title={"Create Random Product Listings"}
+					onPress={createRandomProductListings}
+				/>
+			</View>
+			
+			<Text className="text-xl font-bold my-2">{"Deletion"}</Text>
+			<View className="bg-white rounded-md">
+				<ListItem
+					title={"Clear All Transactions"}
+					icon={Delete}
+					theme={"red"}
+					subTitle={"This action cannot be undone"}
+					onPress={clearTransactions}
+				/>
+				<ListItem
+					title={"Clear All Categories"}
+					icon={Delete}
+					theme={"red"}
+					subTitle={"This action cannot be undone"}
+					onPress={clearCategories}
+				/>
+				<ListItem
+					title={"Clear All Products"}
+					icon={Delete}
+					theme={"red"}
+					subTitle={"This action cannot be undone"}
+					onPress={clearProducts}
+				/>
+				<ListItem
+					title={"Clear All Product Listings"}
+					icon={Delete}
+					theme={"red"}
+					subTitle={"This action cannot be undone"}
+					onPress={clearProductListings}
+				/>
+			</View>
+		</View>
 	);
 };
 
 export default PlaygroundScreen;
+

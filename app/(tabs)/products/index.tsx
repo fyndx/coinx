@@ -10,22 +10,12 @@ import {
 	FileEdit,
 	PlusCircle,
 	Trash2,
-} from "@tamagui/lucide-icons";
+} from "lucide-react-native";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-	Circle,
-	H3,
-	ListItem,
-	Separator,
-	Spinner,
-	Stack,
-	XStack,
-	YGroup,
-	YStack,
-} from "tamagui";
+import { Text } from "@/src/Components/ui/Text";
 
 const Product = ({
 	product,
@@ -39,8 +29,8 @@ const Product = ({
 			}}
 			asChild
 		>
-			<YStack>
-				<YGroup.Item key={product.id}>
+			<Pressable>
+				<View key={product.id}>
 					<SwipeableRow
 						rightActions={[
 							{
@@ -53,7 +43,7 @@ const Product = ({
 						]}
 						leftActions={[
 							{
-								content: <FileEdit color={"$black5"} />,
+								content: <FileEdit color="gray" />,
 								style: { backgroundColor: "white" },
 								onPress: () => {
 									const addProductScreenModel$ =
@@ -66,10 +56,13 @@ const Product = ({
 							},
 						]}
 					>
-						<ListItem title={product.name} iconAfter={ChevronRight} />
+						<View className="flex-row justify-between items-center p-4 bg-background border-b border-border">
+							<Text className="text-lg">{product.name}</Text>
+							<ChevronRight size={20} color="gray" />
+						</View>
 					</SwipeableRow>
-				</YGroup.Item>
-			</YStack>
+				</View>
+			</Pressable>
 		</Link>
 	);
 };
@@ -87,64 +80,59 @@ const Products = observer(() => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Stack flex={1}>
-				<XStack justifyContent={"center"} py={"$2"}>
-					<H3>{"Products"}</H3>
-				</XStack>
+			<View className="flex-1">
+				<View className="justify-center items-center py-2">
+					<Text className="text-xl font-bold">{"Products"}</Text>
+				</View>
 				{/* TODO: Search */}
-				<YGroup flex={1} style={styles.container} padding={"$4"}>
+				<View className="flex-1 p-4">
 					<FlashList
-						data={productsModel$.products.get()}
-						renderItem={({ item }) => <Product product={item} />}
-						ListEmptyComponent={() => {
-							// TODO: .get() might not work here
-							if (productsModel$.isLoading.get()) {
-								return (
-									<YStack
-										height={WINDOW_HEIGHT - 100}
-										alignItems="center"
-										justifyContent="center"
-										padding={"$4"}
-									>
-										<Spinner size={"large"} />
-									</YStack>
-								);
-							}
+					data={productsModel$.products.get()}
+					renderItem={({ item }) => <Product product={item} />}
+					estimatedItemSize={100}
+					ListEmptyComponent={() => {
+						// TODO: .get() might not work here
+						if (productsModel$.isLoading.get()) {
 							return (
-								<YStack
-									height={WINDOW_HEIGHT - 100}
-									alignItems="center"
-									justifyContent="center"
-									padding={"$4"}
+								<View
+									style={{ height: WINDOW_HEIGHT - 100 }}
+									className="items-center justify-center p-4"
 								>
-									<Box size={"$8"} />
-									<H3 textAlign={"center"}>
-										{
-											"No products found.\nTap the + icon to add your first product!"
-										}
-									</H3>
-								</YStack>
+									<ActivityIndicator size={"large"} />
+								</View>
 							);
-						}}
-						estimatedItemSize={100}
-						ItemSeparatorComponent={() => <Separator />}
-					/>
-				</YGroup>
-			</Stack>
-			<Circle
-				position="absolute"
-				right={"$6"}
-				bottom={"$6"}
-				backgroundColor={"$blue10Light"}
-				padding={"$1"}
+						}
+						return (
+							<View
+								style={{ height: WINDOW_HEIGHT - 100 }}
+								className="items-center justify-center p-4"
+							>
+								<Box size={32} color="gray" />
+								<Text className="text-center font-bold text-lg mt-2">
+									{
+										"No products found.\nTap the + icon to add your first product!"
+									}
+								</Text>
+							</View>
+						);
+					}}
+					ItemSeparatorComponent={() => <View className="h-[1px] bg-border" />}
+				/>
+				</View>
+			</View>
+			<View
+				className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full"
 			>
-				<Link href={{ pathname: "/add-product" }}>
-					<PlusCircle size={"$4"} color="white" />
+				<Link href={{ pathname: "/add-product" }} asChild>
+					<Pressable>
+						<PlusCircle size={32} color="#2563eb" />
+					</Pressable>
 				</Link>
-			</Circle>
+			</View>
 		</SafeAreaView>
 	);
 });
+
 
 export default Products;
 

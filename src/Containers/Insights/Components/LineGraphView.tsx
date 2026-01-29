@@ -1,13 +1,14 @@
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
-import { ScrollView, Square, Stack, Text, YStack, XStack } from "tamagui";
+import { ScrollView, View } from "react-native";
+import { Text } from "@/src/Components/ui/Text";
 
 export const LineGraphView = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
 		const categoriesGraphData = insightsModel$.categoriesGraphData.get();
 		return (
-			<YStack>
-				<XStack>
+			<View>
+				<View className="flex-row">
 					{categoriesGraphData.map((category, index) => {
 						const padding = 1; // 1% padding
 						const adjustedWidth =
@@ -22,7 +23,7 @@ export const LineGraphView = observer(
 						}
 
 						return (
-							<Stack
+							<View
 								key={category.id}
 								style={{
 									backgroundColor: category.color,
@@ -37,22 +38,22 @@ export const LineGraphView = observer(
 							/>
 						);
 					})}
-				</XStack>
+				</View>
 
-				<ScrollView horizontal={true} contentContainerStyle={{ flexGrow: 1 }}>
+				<ScrollView horizontal={true} contentContainerStyle={{ flexGrow: 1 }} className="mt-2">
 					{categoriesGraphData.map((category) => (
-						<XStack
+						<View
 							key={category.id}
-							paddingHorizontal={"$2"}
-							alignItems={"center"}
+							className="flex-row items-center px-2"
 						>
-							<Square backgroundColor={category.color} size={"$0.75"} />
-							<Text paddingLeft={"$2"}>{category.name}</Text>
-							<Text paddingHorizontal={"$2"}>{category.percentage}</Text>
-						</XStack>
+							<View style={{ backgroundColor: category.color, width: 8, height: 8 }} />
+							<Text className="pl-2">{category.name}</Text>
+							<Text className="px-2">{category.percentage}</Text>
+						</View>
 					))}
 				</ScrollView>
-			</YStack>
+			</View>
 		);
 	},
 );
+

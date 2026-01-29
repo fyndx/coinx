@@ -1,9 +1,11 @@
 import { rootStore } from "@/src/LegendState";
 import { observer, useMount } from "@legendapp/state/react";
 import { useLocalSearchParams } from "expo-router";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Input, Spinner, Text, XStack, YStack } from "tamagui";
+import { Button } from "heroui-native";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 
 const EditProductListing = observer(() => {
 	const { listing_id, product_id } = useLocalSearchParams();
@@ -34,24 +36,19 @@ const EditProductListing = observer(() => {
 
 	if (productListing$.status === "pending") {
 		return (
-			<YStack
-				flex={1}
-				padding={"$4"}
-				justifyContent={"center"}
-				alignItems={"center"}
-			>
-				<XStack>
-					<Spinner />
+			<View className="flex-1 justify-center items-center p-4">
+				<View className="flex-row items-center gap-2">
+					<ActivityIndicator />
 					<Text>Loading...</Text>
-				</XStack>
-			</YStack>
+				</View>
+			</View>
 		);
 	}
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<YStack flex={1} padding={"$4"}>
-				<YStack flex={1} gap={"$2"}>
+			<View className="flex-1 p-4 gap-4">
+				<View className="flex-1 gap-2">
 					<Text>{`Name: ${productListing$.data?.name}`}</Text>
 					<Text>{`Store: ${productListing$.data?.storeName}`}</Text>
 					<Text>{`Location: ${productListing$.data?.storeLocation ?? "---"}`}</Text>
@@ -59,14 +56,14 @@ const EditProductListing = observer(() => {
 						placeholder="Enter New Price"
 						onChangeText={handlePriceChange}
 					/>
-				</YStack>
+				</View>
 				<Button
 					onPress={editProductListingModel.updateProductListing}
 					disabled={editProductListingModel.views.isButtonDisabled.get()}
 				>
-					Update Price
+					<Text>Update Price</Text>
 				</Button>
-			</YStack>
+			</View>
 		</SafeAreaView>
 	);
 });

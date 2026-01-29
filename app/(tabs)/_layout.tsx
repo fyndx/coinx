@@ -1,7 +1,6 @@
-import { Notebook, Package } from "@tamagui/lucide-icons";
+import { Notebook, Package } from "lucide-react-native";
 import { Tabs } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Image } from "tamagui";
+import { Image } from "react-native";
 
 export default function RootLayout() {
 	return (
@@ -13,9 +12,7 @@ export default function RootLayout() {
 					tabBarIcon: ({ color, focused, size }) => (
 						<Image
 							source={require("../../assets/icons/transactions-list.png")}
-							width={24}
-							height={24}
-							tintColor={color}
+							style={{ width: 24, height: 24, tintColor: color }}
 						/>
 					),
 					header: () => null,
@@ -39,10 +36,8 @@ export default function RootLayout() {
 					tabBarLabel: () => null,
 					tabBarIcon: ({ color }) => (
 						<Image
-							tintColor={color}
+							style={{ width: 24, height: 24, tintColor: color }}
 							source={require("../../assets/icons/insights.png")}
-							width={24}
-							height={24}
 						/>
 					),
 				}}
@@ -55,9 +50,7 @@ export default function RootLayout() {
 					tabBarIcon: ({ color }) => (
 						<Image
 							source={require("../../assets/icons/budgets.png")}
-							width={24}
-							height={24}
-							tintColor={color}
+							style={{ width: 24, height: 24, tintColor: color }}
 						/>
 					),
 				}}
@@ -70,9 +63,7 @@ export default function RootLayout() {
 					tabBarIcon: ({ color }) => (
 						<Image
 							source={require("../../assets/icons/settings.png")}
-							width={24}
-							height={24}
-							tintColor={color}
+							style={{ width: 24, height: 24, tintColor: color }}
 						/>
 					),
 				}}
@@ -80,3 +71,4 @@ export default function RootLayout() {
 		</Tabs>
 	);
 }
+

@@ -4,10 +4,11 @@ import type { FlashListTransactionsList } from "@/src/LegendState/TransactionsSc
 import type { ObservableComputed } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
 import { FlashList, type FlashListProps } from "@shopify/flash-list";
-import { Banknote } from "@tamagui/lucide-icons";
+import { Banknote } from "lucide-react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import { H1, H2, H3, H4, Text, YStack } from "tamagui";
+import { Text } from "@/src/Components/ui/Text";
 
 const AnimatedFlashList =
 	Animated.createAnimatedComponent<FlashListProps<FlashListTransactionsList>>(
@@ -20,21 +21,21 @@ export const TransactionsList = observer(
 		onScroll,
 	}: {
 		transactions$: ObservableComputed<FlashListTransactionsList[]>;
-		onScroll:
+		onScroll?:
 			| ((event: NativeSyntheticEvent<NativeScrollEvent>) => void)
 			| undefined;
 	}) => {
 		const transactions = transactions$.get();
 		if (transactions.length === 0) {
 			return (
-				<YStack alignItems={"center"} justifyContent={"center"} flex={1}>
-					<Banknote size={"$6"} />
-					<H3 textAlign={"center"}>
+				<View className="flex-1 items-center justify-center">
+					<Banknote size={32} color="gray" />
+					<Text className="text-center font-medium mt-2 text-lg">
 						{
 							"No Transactions found\n Tap the + icon to add a transaction"
 						}
-					</H3>
-				</YStack>
+					</Text>
+				</View>
 			);
 		}
 		return (
@@ -59,3 +60,4 @@ export const TransactionsList = observer(
 		);
 	},
 );
+

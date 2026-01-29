@@ -1,22 +1,21 @@
-import { Construction } from "@tamagui/lucide-icons";
-import { StyleSheet } from "react-native";
+import { Construction } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { H1, Text, YStack } from "tamagui";
+import { Text } from "@/src/Components/ui/Text";
 
 const Budgets = () => {
 	return (
 		<SafeAreaView style={styles.container}>
-			<YStack flex={1} justifyContent={"center"}>
+			<View className="flex-1 justify-center items-center">
 				<Construction
-					alignSelf={"center"}
-					size={"$4"}
-					color={"$color.yellow8Light"}
+					size={32}
+					color="#d97706"
 				/>
-				<H1 textAlign={"center"}>{"Budgets Coming Soon"}</H1>
-				<Text textAlign={"center"}>
+				<Text className="text-3xl font-bold text-center mt-4">{"Budgets Coming Soon"}</Text>
+				<Text className="text-center mt-2">
 					{"This feature is currently in development"}
 				</Text>
-			</YStack>
+			</View>
 		</SafeAreaView>
 	);
 };
@@ -28,3 +27,4 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 });
+
