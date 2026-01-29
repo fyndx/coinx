@@ -1,8 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
-	check,
 	index,
-	integer,
 	real,
 	sqliteTable,
 	text,
@@ -11,20 +9,51 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// ─── Sync Status Enum ────────────────────────────────────────
+export const syncStatusEnum = ["pending", "synced"] as const;
+export type SyncStatus = (typeof syncStatusEnum)[number];
+
+// ─── Categories ──────────────────────────────────────────────
+
+export const categories = sqliteTable("coinx_category", {
+	id: text("id").primaryKey(), // UUID
+	name: text("name").notNull().unique(),
+	icon: text("icon").notNull().unique(),
+	color: text("color").notNull().unique(),
+	type: text("type", { enum: ["Income", "Expense"] }).notNull(),
+
+	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: text("updated_at"),
+
+	// Sync fields
+	syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+	deletedAt: text("deleted_at"),
+});
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+	transactions: many(transactions),
+}));
+
+// ─── Transactions ────────────────────────────────────────────
+
 export const transactions = sqliteTable("coinx_transaction", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	id: text("id").primaryKey(), // UUID
 	transactionTime: text("transaction_time").notNull(),
 	amount: real("amount").notNull(),
 	note: text("note"),
 	transactionType: text("transaction_type", {
 		enum: ["Income", "Expense"],
 	}).notNull(),
-	categoryId: integer("category_id")
+	categoryId: text("category_id") // UUID reference
 		.notNull()
 		.references(() => categories.id),
 
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: text("updated_at"),
+
+	// Sync fields
+	syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+	deletedAt: text("deleted_at"),
 });
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
@@ -34,28 +63,21 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 	}),
 }));
 
-export const categories = sqliteTable("coinx_category", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	name: text("name").notNull().unique(),
-	icon: text("icon").notNull().unique(),
-	color: text("color").notNull().unique(),
-	type: text("type", { enum: ["Income", "Expense"] }).notNull(),
-
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: text("updated_at"),
-});
-
-export const categoriesRelations = relations(categories, ({ many }) => ({
-	transactions: many(transactions),
-}));
+// ─── Products ────────────────────────────────────────────────
 
 export const products = sqliteTable("coinx_product", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	id: text("id").primaryKey(), // UUID
 	name: text("name").notNull(),
 	image: text("image"),
 	notes: text("notes"),
-	defaultUnitCategory: text("default_unit_category").notNull(), // from UnitCategory enum in units.ts
+	defaultUnitCategory: text("default_unit_category").notNull(),
+
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: text("updated_at"),
+
+	// Sync fields
+	syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+	deletedAt: text("deleted_at"),
 });
 
 export const productsRelations = relations(products, ({ many }) => ({
@@ -63,16 +85,21 @@ export const productsRelations = relations(products, ({ many }) => ({
 	product_listings_history: many(product_listings_history),
 }));
 
+// ─── Stores ──────────────────────────────────────────────────
+
 export const stores = sqliteTable(
 	"coinx_store",
 	{
-		id: integer("id", { mode: "number" })
-			.primaryKey({ autoIncrement: true })
-			.notNull(),
-		name: text("name").notNull().unique(),
+		id: text("id").primaryKey(), // UUID
+		name: text("name").notNull(),
 		location: text("location"),
+
 		createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 		updatedAt: text("updated_at"),
+
+		// Sync fields
+		syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+		deletedAt: text("deleted_at"),
 	},
 	(table) => ({
 		uniqueNameAndLocation: unique("unique_store_name_location").on(
@@ -86,30 +113,30 @@ export const storesRelations = relations(stores, ({ many }) => ({
 	product_listings: many(product_listings),
 }));
 
-// TODO: Add constraints if needed
-// TODO: Add indexes if needed
+// ─── Product Listings ────────────────────────────────────────
+
 export const product_listings = sqliteTable(
 	"coinx_product_listing",
 	{
-		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-		productId: integer("product_id")
-			.references(() => products.id, {
-				onDelete: "cascade",
-			})
+		id: text("id").primaryKey(), // UUID
+		productId: text("product_id") // UUID reference
+			.references(() => products.id, { onDelete: "cascade" })
 			.notNull(),
-		name: text("name").notNull(), // name of the product (Colgate Strong Teeth)
-		storeId: integer("store_id")
-			.references(() => stores.id, {
-				onDelete: "cascade",
-			})
+		name: text("name").notNull(),
+		storeId: text("store_id") // UUID reference
+			.references(() => stores.id, { onDelete: "cascade" })
 			.notNull(),
 		url: text("url"),
-		price: integer("price").notNull(),
+		price: real("price").notNull(), // Changed from integer to real for decimals
 		quantity: real("quantity").notNull(),
-		unit: text("unit").notNull(), // actual unit used (kg, l, pc, etc.)
+		unit: text("unit").notNull(),
 
 		createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 		updatedAt: text("updated_at"),
+
+		// Sync fields
+		syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+		deletedAt: text("deleted_at"),
 	},
 	(table) => ({
 		productIdIdx: index("idx_product_listings_product_id").on(table.productId),
@@ -132,46 +159,37 @@ export const productListingsRelations = relations(
 	}),
 );
 
+// ─── Product Listings History ────────────────────────────────
+
 export const product_listings_history = sqliteTable(
 	"coinx_product_listing_history",
 	{
-		id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-		productId: integer("product_id")
-			.references(() => products.id, {
-				onDelete: "cascade",
-			})
+		id: text("id").primaryKey(), // UUID
+		productId: text("product_id") // UUID reference
+			.references(() => products.id, { onDelete: "cascade" })
 			.notNull(),
-		productListingId: integer("product_listing_id")
-			.references(() => product_listings.id, {
-				onDelete: "cascade",
-			})
+		productListingId: text("product_listing_id") // UUID reference
+			.references(() => product_listings.id, { onDelete: "cascade" })
 			.notNull(),
-		price: integer("price").notNull(),
-		// quantity: real("quantity").notNull(),
-		// unit: text("unit").notNull(),
+		price: real("price").notNull(), // Changed from integer to real
 		recordedAt: text("recorded_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: text("updated_at"),
+
+		// Sync fields
+		syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+		deletedAt: text("deleted_at"),
 	},
-	(table) => {
-		return {
-			productIdIdx: index("idx_product_listings_history_product_id").on(
-				table.productId,
-			),
-			productListingIdIdx: index(
-				"idx_product_listings_history_product_listing_id",
-			).on(table.productListingId),
-			recordedAtIdx: index("idx_product_listings_history_recorded_at").on(
-				table.recordedAt,
-			),
-			// TODO: Composite Index if needed for performance improvement
-			// compositeIdx: index("idx_product_listings_history_product_id_recorded_at").on(
-			// 	table.productId,
-			// 	table.recordedAt,
-			// ),
-			// TODO: Add Constraints if needed
-			// checkPrice: check("price_check", sql`${table.price} >= 0`),
-			// checkQuantity: check("quantity_check", sql`${table.quantity} >= 0`),
-		};
-	},
+	(table) => ({
+		productIdIdx: index("idx_product_listings_history_product_id").on(
+			table.productId,
+		),
+		productListingIdIdx: index(
+			"idx_product_listings_history_product_listing_id",
+		).on(table.productListingId),
+		recordedAtIdx: index("idx_product_listings_history_recorded_at").on(
+			table.recordedAt,
+		),
+	}),
 );
 
 export const productListingHistoryRelations = relations(
@@ -188,7 +206,8 @@ export const productListingHistoryRelations = relations(
 	}),
 );
 
-// Types
+// ─── Types ───────────────────────────────────────────────────
+
 // Transaction Types
 export type SelectTransaction = typeof transactions.$inferSelect;
 export type InsertTransaction = typeof transactions.$inferInsert;

@@ -1,5 +1,6 @@
 import { db as database } from "@/db/client";
 import { type InsertProduct, products as productsRepo } from "@/db/schema";
+import { generateUUID } from "@/src/utils/uuid";
 import { eq } from "drizzle-orm";
 import { Effect, pipe } from "effect";
 import { InvalidIdError } from "../Stores/StoresErrors";
@@ -12,7 +13,7 @@ export const getProducts = () => {
 	});
 };
 
-export const findProductById = ({ id }: { id: number }) => {
+export const findProductById = ({ id }: { id: string }) => {
 	return Effect.promise(() => {
 		const query = database
 			.select({
@@ -42,14 +43,15 @@ export const findProductByName = ({ name }: { name: string }) => {
 	});
 };
 
-export const addProduct = ({ name, defaultUnitCategory }: InsertProduct) => {
-	// TODO: check if the product already exists by using name
+export const addProduct = ({ name, defaultUnitCategory }: Omit<InsertProduct, "id">) => {
 	return Effect.promise(() => {
 		const query = database
 			.insert(productsRepo)
 			.values({
+				id: generateUUID(),
 				name,
 				defaultUnitCategory,
+				syncStatus: "pending",
 			})
 			.returning();
 
@@ -61,7 +63,7 @@ export const updateProduct = (product: InsertProduct) => {
 	return pipe(
 		Effect.succeed(product),
 		Effect.filterOrFail(
-			(val) => val.id !== undefined && val.id > 0,
+			(val) => val.id !== undefined && val.id.length > 0,
 			() => new InvalidIdError({ message: "Invalid Product ID" }),
 		),
 		Effect.flatMap((validatedProduct) => {
@@ -74,8 +76,10 @@ export const updateProduct = (product: InsertProduct) => {
 						defaultUnitCategory,
 						notes,
 						image,
+						updatedAt: new Date().toISOString(),
+						syncStatus: "pending",
 					})
-					.where(eq(productsRepo.id, id as number))
+					.where(eq(productsRepo.id, id as string))
 					.returning();
 
 				return query.execute();
@@ -90,7 +94,7 @@ export const updateProduct = (product: InsertProduct) => {
 	);
 };
 
-export const deleteProduct = ({ id }: { id: number }) => {
+export const deleteProduct = ({ id }: { id: string }) => {
 	return Effect.promise(() => {
 		const query = database
 			.delete(productsRepo)

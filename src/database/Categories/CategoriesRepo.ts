@@ -15,7 +15,7 @@ export const getCategories = ({
 	startDate?: string;
 	endDate?: string;
 	transactionType?: "Income" | "Expense";
-	categoryId?: number;
+	categoryId?: string; // UUID
 }) =>
 	Effect.promise(() => {
 		const query = database
@@ -44,8 +44,8 @@ export const getCategories = ({
 			whereQueries.push(
 				between(
 					transactionsRepo.transactionTime,
-					new Date(startDate),
-					new Date(endDate),
+					new Date(startDate).toISOString(),
+					new Date(endDate).toISOString(),
 				),
 			);
 		}

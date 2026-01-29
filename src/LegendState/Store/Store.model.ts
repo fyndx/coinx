@@ -78,7 +78,7 @@ export class StoreModel {
 		this.storesList.set(stores);
 	};
 
-	deleteStore = (id: number) => {
+	deleteStore = (id: string) => {
 		this.isSubmitting.set(true);
 		Effect.runPromise(deleteStoreById(id))
 			.then((result) => {

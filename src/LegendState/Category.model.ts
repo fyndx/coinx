@@ -1,5 +1,6 @@
 import { db as database } from "@/db/client";
 import { categories as categoriesRepo } from "@/db/schema";
+import { generateUUID } from "@/src/utils/uuid";
 import {
 	type ObservableArray,
 	type ObservableObject,
@@ -14,82 +15,82 @@ const DEFAULT_CATEGORIES = [
 		name: "Food",
 		color: "#FFC542",
 		icon: "🍔",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Transport",
 		color: "#FF565E",
 		icon: "🚕",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Shopping",
 		color: "#3CD3AD",
 		icon: "🛍️",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Groceries",
 		color: "#4CDA64",
 		icon: "🛒",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Rent",
 		color: "#279AF4",
 		icon: "🏠",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Subscriptions",
 		color: "#EC7A58",
 		icon: "🔒",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Family",
 		color: "#A6678A",
 		icon: "👨‍👩‍👧",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Healthcare",
 		color: "#C56AF7",
 		icon: "🏥",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Entertainment",
 		color: "#6E7BF1",
 		icon: "🎬",
-		type: "Expense",
+		type: "Expense" as const,
 	},
 	{
 		name: "Salary",
 		color: "#F3BF56",
 		icon: "💵",
-		type: "Income",
+		type: "Income" as const,
 	},
 	{
 		name: "Investment",
 		color: "#ED80A2",
 		icon: "💰",
-		type: "Income",
+		type: "Income" as const,
 	},
 	{
 		name: "Gifts",
 		color: "#F6D24A",
 		icon: "🎁",
-		type: "Income",
+		type: "Income" as const,
 	},
 ];
 
 export interface ICategory {
-	id: number;
+	id: string; // UUID
 	name: string;
 	color: string;
 	icon: string;
-	type: string;
+	type: "Income" | "Expense";
 }
 
 interface ICategoryDraft extends Omit<ICategory, "id"> {
@@ -105,11 +106,11 @@ export class CategoryModel {
 	colors = new Array(6).fill("#fff").map(() => colorKit.randomRgbColor().hex());
 
 	constructor() {
-		this.category = observable({
+		this.category = observable<ICategoryDraft>({
 			name: "",
 			color: colorKit.randomRgbColor().hex(),
 			icon: "",
-			type: "Expense",
+			type: "Expense" as const,
 			isEmojiPickerOpen: false,
 		});
 
@@ -133,23 +134,30 @@ export class CategoryModel {
 		const { name, color, icon, type } = this.category.peek();
 		const newCategory = await database
 			.insert(categoriesRepo)
-			.values({ name, color, icon, type })
+			.values({
+				id: generateUUID(),
+				name,
+				color,
+				icon,
+				type,
+				syncStatus: "pending",
+			})
 			.returning();
 		await this.getCategoriesList({});
 		return newCategory;
 	};
 
 	getCategoriesList = async ({ type }: { type?: "Income" | "Expense" }) => {
-		const query = database.select().from(categoriesRepo);
+		let query = database.select().from(categoriesRepo);
 		if (type) {
-			query.where(eq(categoriesRepo.type, type));
+			query = query.where(eq(categoriesRepo.type, type));
 		}
 
 		const result = await query;
 		this.categories.set(result);
 	};
 
-	getCategoryByIdAsync = async (id: number) => {
+	getCategoryByIdAsync = async (id: string) => {
 		const category = await database
 			.select()
 			.from(categoriesRepo)
@@ -164,14 +172,21 @@ export class CategoryModel {
 		await database.delete(categoriesRepo);
 	};
 
-	deleteCategoryById = async (id: number) => {
+	deleteCategoryById = async (id: string) => {
 		await database.delete(categoriesRepo).where(eq(categoriesRepo.id, id));
 	};
 
 	createDefaultCategories = async () => {
+		// Generate fresh UUIDs for each category at insert time
+		const categoriesWithIds = DEFAULT_CATEGORIES.map((cat) => ({
+			...cat,
+			id: generateUUID(),
+			syncStatus: "pending" as const,
+		}));
+
 		await database
 			.insert(categoriesRepo)
-			.values(DEFAULT_CATEGORIES)
+			.values(categoriesWithIds)
 			.onConflictDoNothing({ target: categoriesRepo.name })
 			.returning();
 	};

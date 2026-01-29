@@ -32,14 +32,14 @@ interface InsightsObservable {
 		netTotal: number;
 	};
 	categories: {
-		id: number;
+		id: string; // UUID
 		name: string;
 		icon: string;
 		type: "Income" | "Expense";
 		total: number;
 		color: string;
 	}[];
-	categoryId?: number;
+	categoryId?: string; // UUID
 }
 
 export class InsightsModel {
