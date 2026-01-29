@@ -1,8 +1,7 @@
 import type { ObservableObject } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
 import { Trash2 } from "lucide-react-native";
-import { View } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
+import { Pressable, View } from "react-native";
 import type { ICategory } from "../LegendState/Category.model";
 import { Text } from "./ui/Text";
 import { SwipeableRow } from "./SwipeableRow";
@@ -30,7 +29,7 @@ export const Category = observer(
 						},
 					]}
 				>
-					<RectButton onPress={() => onCategoryPressed(categoryData)}>
+					<Pressable onPress={() => onCategoryPressed(categoryData)}>
 						<View className="flex-row items-center justify-between p-4 bg-background">
 							<View className="flex-row items-center gap-4">
 								<Text className="text-xl">{category.icon.get()}</Text>
@@ -44,7 +43,7 @@ export const Category = observer(
 								}}
 							/>
 						</View>
-					</RectButton>
+					</Pressable>
 				</SwipeableRow>
 			</View>
 		);
