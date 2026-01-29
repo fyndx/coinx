@@ -357,10 +357,7 @@ const AddTransaction = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View
-				className="flex-1 px-4 justify-between"
-				style={{ minHeight: Math.round(Dimensions.get("window").height) }}
-			>
+			<View className="flex-1 px-4 justify-between">
 				<TransactionType transactionModel$={transactionModel$} />
 				<View className="flex-1 justify-center gap-4 items-center">
 					<TransactionInput transactionModel$={transactionModel$} />
