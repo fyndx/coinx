@@ -305,8 +305,6 @@ const AddTransaction = () => {
 		? dayjs(stringTransactionTime)
 		: dayjs();
 
-	const toast = useToastController();
-
 	useMount(() => {
 		categoryModel$.getCategoriesList({
 			type: transactionModel$.transaction.transactionType.peek(),
