@@ -177,7 +177,8 @@ export class CategoryModel {
 				deletedAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 				syncStatus: "pending",
-			});
+			})
+			.where(isNull(categoriesRepo.deletedAt));
 	};
 
 	deleteCategoryById = async (id: string) => {

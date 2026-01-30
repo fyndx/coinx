@@ -7,7 +7,7 @@ import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { generateUUID } from "@/src/utils/uuid";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import type { DateType } from "react-native-ui-datepicker";
 import { generateRandomTransactions } from "../database/seeds/TransactionSeeds";
 import type { CategoryModel } from "./Category.model";
@@ -199,7 +199,8 @@ export class TransactionModel {
 				deletedAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 				syncStatus: "pending",
-			});
+			})
+			.where(isNull(transactionsRepo.deletedAt));
 	};
 
 	createRandomTransactions = () => {

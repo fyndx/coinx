@@ -140,7 +140,8 @@ export const deleteAllProductListings = () => {
 				deletedAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 				syncStatus: "pending",
-			});
+			})
+			.where(isNull(productsListingsRepo.deletedAt));
 
 		return query.execute();
 	});

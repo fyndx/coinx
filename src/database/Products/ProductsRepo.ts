@@ -121,7 +121,8 @@ export const deleteAllProducts = () => {
 				deletedAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 				syncStatus: "pending",
-			});
+			})
+			.where(isNull(productsRepo.deletedAt));
 
 		return query.execute();
 	});
