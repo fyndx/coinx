@@ -1,6 +1,12 @@
 import { supabase } from "./supabase";
 
-const BACKEND_URL = "https://coinx-staging.coolify.fyndx.io";
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
+
+if (!BACKEND_URL) {
+	throw new Error(
+		"Missing EXPO_PUBLIC_BACKEND_URL. Copy .env.example to .env and fill in values.",
+	);
+}
 
 type RequestOptions = {
 	method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -38,7 +44,9 @@ export async function apiClient<T = unknown>(
 	});
 
 	if (!response.ok) {
-		const error = await response.json().catch(() => ({ message: response.statusText }));
+		const error = await response
+			.json()
+			.catch(() => ({ message: response.statusText }));
 		throw new Error(error.message || `API error: ${response.status}`);
 	}
 
@@ -57,5 +65,6 @@ export const api = {
 	put: <T = unknown>(path: string, body?: unknown) =>
 		apiClient<T>(path, { method: "PUT", body }),
 
-	delete: <T = unknown>(path: string) => apiClient<T>(path, { method: "DELETE" }),
+	delete: <T = unknown>(path: string) =>
+		apiClient<T>(path, { method: "DELETE" }),
 };
