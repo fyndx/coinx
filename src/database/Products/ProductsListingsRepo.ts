@@ -6,7 +6,7 @@ import {
 	stores as storesRepo,
 } from "@/db/schema";
 import { generateUUID } from "@/src/utils/uuid";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const getProductsListings = () => {
@@ -51,7 +51,13 @@ export const getProductListingsByProductId = (id: string) => {
 			})
 			.from(productsListingsRepo)
 			.innerJoin(storesRepo, eq(productsListingsRepo.storeId, storesRepo.id))
-			.where(and(eq(productsListingsRepo.productId, id), isNull(productsListingsRepo.deletedAt)));
+			.where(
+				and(
+					eq(productsListingsRepo.productId, id),
+					isNull(productsListingsRepo.deletedAt),
+					isNull(storesRepo.deletedAt),
+				),
+			);
 
 		return query.execute();
 	});
@@ -77,7 +83,13 @@ export const getProductListingById = (id: string) => {
 			})
 			.from(productsListingsRepo)
 			.innerJoin(storesRepo, eq(productsListingsRepo.storeId, storesRepo.id))
-			.where(and(eq(productsListingsRepo.id, id), isNull(productsListingsRepo.deletedAt)));
+			.where(
+				and(
+					eq(productsListingsRepo.id, id),
+					isNull(productsListingsRepo.deletedAt),
+					isNull(storesRepo.deletedAt),
+				),
+			);
 
 		return query.execute();
 	});
