@@ -4,7 +4,7 @@ import {
 	transactions as transactionsRepo,
 	categories as categoriesRepo,
 } from "@/db/schema";
-import { and, between, desc, eq, sql, sum } from "drizzle-orm";
+import { and, between, desc, eq, isNull, sql, sum } from "drizzle-orm";
 
 export const getCategories = ({
 	startDate,
@@ -40,6 +40,9 @@ export const getCategories = ({
 
 		const whereQueries = [];
 
+		// Always exclude soft-deleted records
+		whereQueries.push(isNull(categoriesRepo.deletedAt));
+
 		if (startDate && endDate) {
 			whereQueries.push(
 				between(
@@ -58,9 +61,7 @@ export const getCategories = ({
 			whereQueries.push(eq(categoriesRepo.id, categoryId));
 		}
 
-		if (whereQueries.length > 0) {
-			query.where(and(...whereQueries));
-		}
+		query.where(and(...whereQueries));
 
 		return query.execute();
 	});

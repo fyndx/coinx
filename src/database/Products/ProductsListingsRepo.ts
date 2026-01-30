@@ -6,12 +6,15 @@ import {
 	stores as storesRepo,
 } from "@/db/schema";
 import { generateUUID } from "@/src/utils/uuid";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const getProductsListings = () => {
 	return Effect.promise(() => {
-		const query = database.select().from(productsListingsRepo);
+		const query = database
+			.select()
+			.from(productsListingsRepo)
+			.where(isNull(productsListingsRepo.deletedAt));
 
 		return query.execute();
 	});
@@ -48,7 +51,13 @@ export const getProductListingsByProductId = (id: string) => {
 			})
 			.from(productsListingsRepo)
 			.innerJoin(storesRepo, eq(productsListingsRepo.storeId, storesRepo.id))
-			.where(eq(productsListingsRepo.productId, id));
+			.where(
+				and(
+					eq(productsListingsRepo.productId, id),
+					isNull(productsListingsRepo.deletedAt),
+					isNull(storesRepo.deletedAt),
+				),
+			);
 
 		return query.execute();
 	});
@@ -74,7 +83,13 @@ export const getProductListingById = (id: string) => {
 			})
 			.from(productsListingsRepo)
 			.innerJoin(storesRepo, eq(productsListingsRepo.storeId, storesRepo.id))
-			.where(eq(productsListingsRepo.id, id));
+			.where(
+				and(
+					eq(productsListingsRepo.id, id),
+					isNull(productsListingsRepo.deletedAt),
+					isNull(storesRepo.deletedAt),
+				),
+			);
 
 		return query.execute();
 	});
@@ -117,7 +132,12 @@ export const updateProductListingById = (
 export const deleteProductListingById = (id: string) => {
 	return Effect.promise(() => {
 		const query = database
-			.delete(productsListingsRepo)
+			.update(productsListingsRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
 			.where(eq(productsListingsRepo.id, id));
 
 		return query.execute();
@@ -126,7 +146,14 @@ export const deleteProductListingById = (id: string) => {
 
 export const deleteAllProductListings = () => {
 	return Effect.promise(() => {
-		const query = database.delete(productsListingsRepo);
+		const query = database
+			.update(productsListingsRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
+			.where(isNull(productsListingsRepo.deletedAt));
 
 		return query.execute();
 	});

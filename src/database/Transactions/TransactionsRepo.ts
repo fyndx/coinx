@@ -4,7 +4,7 @@ import {
 	transactions as transactionsRepo,
 } from "@/db/schema";
 import dayjs from "dayjs";
-import { and, between, eq, sql, sum } from "drizzle-orm";
+import { and, between, eq, isNull, sql, sum } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const getTransactions = ({
@@ -53,6 +53,9 @@ export const getTransactions = ({
 
 		const whereQueries = [];
 
+		// Always exclude soft-deleted records
+		whereQueries.push(isNull(transactionsRepo.deletedAt));
+
 		if (startDate && endDate) {
 			whereQueries.push(
 				between(
@@ -71,9 +74,7 @@ export const getTransactions = ({
 			whereQueries.push(eq(transactionsRepo.categoryId, categoryId));
 		}
 
-		if (whereQueries.length > 0) {
-			query.where(and(...whereQueries));
-		}
+		query.where(and(...whereQueries));
 
 		const groupedTransactions = query.execute();
 		return groupedTransactions;
@@ -96,6 +97,7 @@ export const getInsights = ({
 			.from(transactionsRepo)
 			.where(
 				and(
+					isNull(transactionsRepo.deletedAt),
 					startDate && endDate
 						? between(
 								transactionsRepo.transactionTime,

@@ -6,7 +6,7 @@ import {
 } from "@/db/schema";
 import { DrizzleError } from "@/src/utils/error";
 import { generateUUID } from "@/src/utils/uuid";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const addProductListingsHistory = (
@@ -52,7 +52,7 @@ export const getProductListingsHistoryByProductId = ({
 						productListingsRepo.id,
 					),
 				)
-				.where(eq(productsListingsHistoryRepo.productId, productId))
+				.where(and(eq(productsListingsHistoryRepo.productId, productId), isNull(productsListingsHistoryRepo.deletedAt)))
 				.orderBy(asc(productsListingsHistoryRepo.recordedAt));
 
 			return query.execute();
@@ -77,7 +77,12 @@ export const getProductListingsHistoryByProductId = ({
 export const deleteProductListingsByProductListingId = (id: string) => {
 	return Effect.promise(() => {
 		const query = database
-			.delete(productsListingsHistoryRepo)
+			.update(productsListingsHistoryRepo)
+			.set({
+				deletedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				syncStatus: "pending",
+			})
 			.where(eq(productsListingsHistoryRepo.productListingId, id));
 
 		return query.execute();
