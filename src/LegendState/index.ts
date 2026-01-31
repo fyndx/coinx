@@ -1,6 +1,7 @@
 import { AddProductScreenModel } from "@/src/LegendState/AddProduct/AddProduct.model";
 import { AddProductListingModel } from "@/src/LegendState/AddProductListing/AddProductListing.model";
 import { appModel } from "@/src/LegendState/AppState/App.model";
+import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import { CategoryModel } from "@/src/LegendState/Category.model";
 import { EditProductListing } from "@/src/LegendState/EditProductListing/EditProductListing.model";
 import { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
@@ -40,6 +41,10 @@ class RootStore {
 
 	private startServices = async () => {
 		await appModel.actions.startServices();
+
+		// Initialize auth (restore session, start listener)
+		await authModel.actions.initialize();
+
 		const isFirstLaunch = await appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
 			await this.categoryModel.createDefaultCategories();
