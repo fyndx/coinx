@@ -1,12 +1,5 @@
+import { env } from "./env";
 import { supabase } from "./supabase";
-
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
-
-if (!BACKEND_URL) {
-	throw new Error(
-		"Missing EXPO_PUBLIC_BACKEND_URL. Copy .env.example to .env and fill in values.",
-	);
-}
 
 type RequestOptions = {
 	method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -24,7 +17,6 @@ export async function apiClient<T = unknown>(
 ): Promise<T> {
 	const { method = "GET", body, headers = {} } = options;
 
-	// Get current session token
 	const {
 		data: { session },
 	} = await supabase.auth.getSession();
@@ -33,7 +25,7 @@ export async function apiClient<T = unknown>(
 		throw new Error("Not authenticated");
 	}
 
-	const response = await fetch(`${BACKEND_URL}${path}`, {
+	const response = await fetch(`${env.EXPO_PUBLIC_BACKEND_URL}${path}`, {
 		method,
 		headers: {
 			"Content-Type": "application/json",
@@ -49,12 +41,8 @@ export async function apiClient<T = unknown>(
 			.catch(() => ({ message: response.statusText }));
 		throw new Error(error.message || `API error: ${response.status}`);
 	}
-	// Handle empty responses (204 No Content, etc.)
-	const text = await response.text();
-	if (!text) {
-		return undefined as T;
-	}
-	return JSON.parse(text) as T;
+
+	return response.json() as Promise<T>;
 }
 
 /**

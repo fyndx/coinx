@@ -2,10 +2,11 @@ import { expoDb } from "@/db/client";
 import { Splash } from "@/src/Components/Splash";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
+import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { observer, useMount } from "@legendapp/state/react";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
-import { SplashScreen } from "expo-router";
+import { SplashScreen, useRouter, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -19,16 +20,41 @@ export {
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-	// Ensure that reloading on `/modal` keeps a back button present.
 	initialRouteName: "index",
 };
 
+/**
+ * Auth navigation guard.
+ * Redirects unauthenticated users to sign-in when they try to access
+ * protected routes. Auth is optional — users can skip.
+ */
+const useProtectedRoute = () => {
+	const segments = useSegments();
+	const router = useRouter();
+	const isAuthenticated = authModel.obs.isAuthenticated.get();
+	const isAuthLoading = authModel.obs.isLoading.get();
+
+	useEffect(() => {
+		if (isAuthLoading) return;
+
+		const inAuthGroup = segments[0] === "(auth)";
+
+		// If user just signed in and is still on auth screens, redirect to app
+		if (isAuthenticated && inAuthGroup) {
+			router.replace("/(tabs)");
+		}
+	}, [isAuthenticated, isAuthLoading, segments]);
+};
+
 const RootLayoutNav = () => {
+	useProtectedRoute();
+
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<RootProvider>
 				<Stack screenOptions={{ statusBarStyle: "dark" }}>
 					<Stack.Screen name="index" options={{ headerShown: false }} />
+					<Stack.Screen name="(auth)" options={{ headerShown: false }} />
 					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 					<Stack.Screen
 						name="add-category/index"
@@ -116,7 +142,6 @@ const RootLayout = observer(() => {
 		return <Splash />;
 	}
 
-	// TODO: Pass the initial route to the RootLayoutNav component.
 	return <RootLayoutNav />;
 });
 
