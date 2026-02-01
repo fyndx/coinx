@@ -49,8 +49,12 @@ export async function apiClient<T = unknown>(
 			.catch(() => ({ message: response.statusText }));
 		throw new Error(error.message || `API error: ${response.status}`);
 	}
-
-	return response.json() as Promise<T>;
+	// Handle empty responses (204 No Content, etc.)
+	const text = await response.text();
+	if (!text) {
+		return undefined as T;
+	}
+	return JSON.parse(text) as T;
 }
 
 /**
