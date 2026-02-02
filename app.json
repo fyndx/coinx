@@ -59,7 +59,8 @@
         }
       ],
       "expo-localization",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-updates"
     ],
     "scheme": "coinx",
     "experiments": {
@@ -73,6 +74,12 @@
         "projectId": "53bbeb96-179b-4605-8e69-a5639caa179f"
       }
     },
-    "owner": "fyndx"
+    "owner": "fyndx",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/53bbeb96-179b-4605-8e69-a5639caa179f"
+    }
   }
 }
