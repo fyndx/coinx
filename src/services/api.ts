@@ -14,35 +14,55 @@ type RequestOptions = {
 export async function apiClient<T = unknown>(
 	path: string,
 	options: RequestOptions = {},
-): Promise<T> {
+): Promise<T | undefined> {
 	const { method = "GET", body, headers = {} } = options;
 
-	const {
+	let {
 		data: { session },
+		error,
 	} = await supabase.auth.getSession();
 
-	if (!session?.access_token) {
-		throw new Error("Not authenticated");
+	if (error || !session?.access_token) {
+		const { data } = await supabase.auth.refreshSession();
+		if (data.session?.access_token) {
+			throw new Error("Not authenticated");
+		}
+		session = data.session;
 	}
 
-	const response = await fetch(`${env.EXPO_PUBLIC_BACKEND_URL}${path}`, {
-		method,
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${session.access_token}`,
-			...headers,
-		},
-		body: body ? JSON.stringify(body) : undefined,
-	});
+	try {
+		const response = await fetch(`${env.EXPO_PUBLIC_BACKEND_URL}${path}`, {
+			method,
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${session.access_token}`,
+				...headers,
+			},
+			body: body ? JSON.stringify(body) : undefined,
+		});
 
-	if (!response.ok) {
-		const error = await response
-			.json()
-			.catch(() => ({ message: response.statusText }));
-		throw new Error(error.message || `API error: ${response.status}`);
+		if (!response.ok) {
+			const error = await response
+				.json()
+				.catch(() => ({ message: response.statusText }));
+			throw new Error(
+				`API error [${method} ${path}]: ${error.message || response.statusText} (${response.status})`,
+			);
+		}
+
+		// Check if response has content before parsing JSON
+		const text = await response.text();
+		if (!text || text.trim() === "") {
+			return undefined as T;
+		}
+
+		return JSON.parse(text) as T;
+	} catch (err) {
+		if (err instanceof TypeError) {
+			throw new Error(`Network error [${method} ${path}]: ${err.message}`);
+		}
+		throw err;
 	}
-
-	return response.json() as Promise<T>;
 }
 
 /**

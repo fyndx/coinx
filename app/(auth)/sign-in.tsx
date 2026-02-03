@@ -23,7 +23,7 @@ const SignIn = observer(() => {
 
 		const result = await authModel.actions.signIn(email.trim(), password);
 		if (result.success) {
-			router.replace("/(tabs)");
+			router.replace("/");
 		}
 	};
 

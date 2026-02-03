@@ -43,10 +43,10 @@ const useProtectedRoute = () => {
 		if (isAuthenticated && inAuthGroup) {
 			router.replace("/(tabs)");
 		}
-	}, [isAuthenticated, isAuthLoading, segments]);
+	}, [isAuthenticated, isAuthLoading, segments, router]);
 };
 
-const RootLayoutNav = () => {
+const RootLayoutNav = observer(() => {
 	useProtectedRoute();
 
 	return (
@@ -120,7 +120,7 @@ const RootLayoutNav = () => {
 			</RootProvider>
 		</GestureHandlerRootView>
 	);
-};
+});
 
 const RootLayout = observer(() => {
 	const isAppLoaded = appModel.obs.isAppLoaded.get();
