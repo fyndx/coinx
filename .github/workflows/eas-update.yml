@@ -15,6 +15,8 @@ jobs:
   update:
     name: EAS Update
     runs-on: ubuntu-latest
+    environment:
+      name: staging
     steps:
       - name: Checkout
         uses: actions/checkout@v4
