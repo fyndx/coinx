@@ -43,5 +43,11 @@ jobs:
             echo "channel=development" >> $GITHUB_OUTPUT
           fi
 
+      - name: Create .env file
+        run: |
+          echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
+          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
+          echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
+
       - name: Publish update
         run: eas update --branch ${{ steps.channel.outputs.channel }} --message "${{ github.event.head_commit.message }}" --non-interactive
