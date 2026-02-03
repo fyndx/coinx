@@ -1,0 +1,45 @@
+name: EAS Update
+
+on:
+  push:
+    branches:
+      - "**"
+    paths-ignore:
+      - "**.md"
+      - ".github/workflows/compress-images.yml"
+      - ".github/workflows/lint-ts.yml"
+      - ".github/workflows/typecheck.yml"
+      - ".github/workflows/expo-doctor.yml"
+
+jobs:
+  update:
+    name: EAS Update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node + Bun + Install Dependencies
+        uses: ./.github/actions/setup-node-bun-install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Determine channel
+        id: channel
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "channel=production" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "channel=staging" >> $GITHUB_OUTPUT
+          else
+            echo "channel=development" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish update
+        run: eas update --branch ${{ steps.channel.outputs.channel }} --message "${{ github.event.head_commit.message }}" --non-interactive
