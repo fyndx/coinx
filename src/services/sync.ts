@@ -120,12 +120,15 @@ class SyncManager {
 
 	/**
 	 * Ensure this device is registered with the backend.
-	 * Creates a new device if no deviceId is stored locally.
+	 * Creates profile (if needed) and device if no deviceId is stored locally.
 	 */
 	async ensureDevice(): Promise<string> {
 		if (this.state.deviceId) {
 			return this.state.deviceId;
 		}
+
+		// Ensure profile exists before registering device
+		await api.post("/api/auth/register", {});
 
 		const response = await api.post<{ data: { id: string } }>("/api/auth/device", {
 			platform: Platform.OS as "ios" | "android",
