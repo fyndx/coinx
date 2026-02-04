@@ -309,14 +309,22 @@ class SyncManager {
 			} else {
 				// Strip local-only fields
 				const { syncStatus, deletedAt, ...rest } = record;
-				// Convert amount from number to string for backend compatibility
+				// Convert amount/price from number to string for backend compatibility
 				if (typeof rest.amount === "number") {
 					rest.amount = String(rest.amount);
 				}
 				if (typeof rest.price === "number") {
 					rest.price = String(rest.price);
 				}
-				upserted.push(rest);
+				// Strip null/undefined values — backend uses t.Optional(t.String())
+				// which accepts absent fields but rejects null
+				const cleaned: Record<string, unknown> = {};
+				for (const [key, value] of Object.entries(rest)) {
+					if (value !== null && value !== undefined) {
+						cleaned[key] = value;
+					}
+				}
+				upserted.push(cleaned);
 			}
 		}
 
