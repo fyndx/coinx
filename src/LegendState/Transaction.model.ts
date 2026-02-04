@@ -4,6 +4,7 @@ import {
 	transactions as transactionsRepo,
 } from "@/db/schema";
 import { dayjsInstance as dayjs } from "@/src/utils/date";
+import { syncManager } from "@/src/services/sync";
 import { generateUUID } from "@/src/utils/uuid";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";
@@ -165,7 +166,6 @@ export class TransactionModel {
 			});
 		}
 		// Reset the transaction to its initial state
-
 		this.transaction.set({
 			...this.transaction.peek(),
 			amount: "0",
@@ -175,10 +175,13 @@ export class TransactionModel {
 			note: "",
 			id: undefined,
 		});
+
+		// Schedule sync after change
+		syncManager.scheduleSyncAfterChange();
 	};
 
 	deleteTransaction = async (id: string) => {
-		return await database
+		const result = await database
 			.update(transactionsRepo)
 			.set({
 				deletedAt: new Date().toISOString(),
@@ -186,6 +189,9 @@ export class TransactionModel {
 				syncStatus: "pending",
 			})
 			.where(eq(transactionsRepo.id, id));
+
+		syncManager.scheduleSyncAfterChange();
+		return result;
 	};
 
 	/**

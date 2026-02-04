@@ -1,5 +1,6 @@
 import { api } from "@/src/services/api";
 import { supabase } from "@/src/services/supabase";
+import { syncManager } from "@/src/services/sync";
 import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
 
@@ -81,6 +82,9 @@ export class AuthModel {
 					console.warn("Backend profile registration failed:", e);
 					// Don't block auth — backend profile can be created later
 				}
+
+				// Trigger initial sync after sign up
+				syncManager.syncIfAuthenticated();
 			}
 
 			return { success: true, needsConfirmation: !data.session };
@@ -120,6 +124,9 @@ export class AuthModel {
 				console.warn("Backend profile registration failed:", e);
 			}
 
+			// Trigger sync after sign in
+			syncManager.syncIfAuthenticated();
+
 			return { success: true };
 		} catch (error) {
 			const message =
@@ -133,10 +140,12 @@ export class AuthModel {
 
 	/**
 	 * Sign out and clear session.
+	 * Also resets sync state (deviceId, lastSyncedAt).
 	 */
 	signOut = async () => {
 		this.obs.isLoading.set(true);
 		try {
+			await syncManager.reset();
 			await supabase.auth.signOut();
 		} catch (error) {
 			console.error("Sign out error:", error);
