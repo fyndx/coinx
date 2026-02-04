@@ -1,9 +1,24 @@
 {
-  "staging": {
-    "env": {
-      "EXPO_PUBLIC_SUPABASE_URL": "https://staging.example.com",
-      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "anon-key",
-      "EXPO_PUBLIC_BACKEND_URL": "https://backend.staging.example.com"
+  "cli": {
+    "version": ">= 10.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "staging"
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production"
     }
+  },
+  "submit": {
+    "production": {}
   }
 }
