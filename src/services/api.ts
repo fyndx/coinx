@@ -49,9 +49,13 @@ export async function apiClient<T = unknown>(
 			const errorBody = await response
 				.json()
 				.catch(() => ({ message: response.statusText }));
-			// Backend returns { error: { code, message, status } }
+			// Backend returns { error: { code, message, status, details? } }
+			// Elysia validation errors return { type, ... } or similar
 			const errorMessage =
-				errorBody?.error?.message || errorBody?.message || response.statusText;
+				errorBody?.error?.message ||
+				errorBody?.message ||
+				(typeof errorBody === "string" ? errorBody : JSON.stringify(errorBody)) ||
+				response.statusText;
 			throw new Error(
 				`API error [${method} ${path}]: ${errorMessage} (${response.status})`,
 			);

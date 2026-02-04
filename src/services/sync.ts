@@ -228,6 +228,27 @@ class SyncManager {
 			return { upserted: 0, deleted: 0 };
 		}
 
+		if (__DEV__) {
+			console.log("[Sync Push] Payload:", JSON.stringify({
+				deviceId,
+				lastSyncedAt: this.state.lastSyncedAt,
+				changes: {
+					transactions: { upserted: changes.transactions.upserted.length, deleted: changes.transactions.deleted.length },
+					categories: { upserted: changes.categories.upserted.length, deleted: changes.categories.deleted.length },
+					products: { upserted: changes.products.upserted.length, deleted: changes.products.deleted.length },
+					stores: { upserted: changes.stores.upserted.length, deleted: changes.stores.deleted.length },
+					productListings: { upserted: changes.productListings.upserted.length, deleted: changes.productListings.deleted.length },
+					productListingHistory: { upserted: changes.productListingHistory.upserted.length, deleted: changes.productListingHistory.deleted.length },
+				},
+			}));
+			// Log first record of each non-empty table for debugging
+			for (const [table, cs] of Object.entries(changes)) {
+				if (cs.upserted.length > 0) {
+					console.log(`[Sync Push] Sample ${table}:`, JSON.stringify(cs.upserted[0]));
+				}
+			}
+		}
+
 		const response = await api.post<SyncPushResponse>("/api/sync/push", {
 			deviceId,
 			lastSyncedAt: this.state.lastSyncedAt,
