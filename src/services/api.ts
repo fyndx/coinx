@@ -24,7 +24,7 @@ export async function apiClient<T = unknown>(
 
 	if (error || !session?.access_token) {
 		const { data } = await supabase.auth.refreshSession();
-		if (data.session?.access_token) {
+		if (!data.session?.access_token) {
 			throw new Error("Not authenticated");
 		}
 		session = data.session;

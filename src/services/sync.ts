@@ -151,7 +151,7 @@ class SyncManager {
 	 */
 	async syncIfAuthenticated(): Promise<void> {
 		const { data: { session } } = await supabase.auth.getSession();
-		if (!session) return;
+		if (!session?.access_token) return;
 
 		await this.sync();
 	}
