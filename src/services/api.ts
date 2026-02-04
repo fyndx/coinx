@@ -22,7 +22,11 @@ export async function apiClient<T = unknown>(
 		error,
 	} = await supabase.auth.getSession();
 
-	if (error || !session?.access_token) {
+	// Check if session exists and token isn't expired
+	const isExpired =
+		session?.expires_at && session.expires_at * 1000 < Date.now();
+
+	if (error || !session?.access_token || isExpired) {
 		const { data } = await supabase.auth.refreshSession();
 		if (!data.session?.access_token) {
 			throw new Error("Not authenticated");
@@ -42,11 +46,14 @@ export async function apiClient<T = unknown>(
 		});
 
 		if (!response.ok) {
-			const error = await response
+			const errorBody = await response
 				.json()
 				.catch(() => ({ message: response.statusText }));
+			// Backend returns { error: { code, message, status } }
+			const errorMessage =
+				errorBody?.error?.message || errorBody?.message || response.statusText;
 			throw new Error(
-				`API error [${method} ${path}]: ${error.message || response.statusText} (${response.status})`,
+				`API error [${method} ${path}]: ${errorMessage} (${response.status})`,
 			);
 		}
 
