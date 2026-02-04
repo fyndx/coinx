@@ -17,8 +17,5 @@
       "autoIncrement": true,
       "channel": "production"
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
