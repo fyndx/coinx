@@ -3,6 +3,7 @@ import {
 	exportDataToCsv,
 } from "@/src/LegendState/Settings/Settings.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
+import { SyncSection } from "@/src/Components/SyncSection";
 import { ChevronRight, LogIn, LogOut, User } from "lucide-react-native";
 import * as Application from "expo-application";
 import { Link, router } from "expo-router";
@@ -84,6 +85,8 @@ const AccountSection = observer(() => {
 });
 
 const Settings = observer(() => {
+	const isAuthenticated = authModel.obs.isAuthenticated.get();
+
 	return (
 		<View className="p-2 flex-1">
 			<Text className="text-xl font-bold text-center mb-4">{"Settings"}</Text>
@@ -91,6 +94,14 @@ const Settings = observer(() => {
 				{/* Account */}
 				<AccountSection />
 				<View className="h-[1px] bg-border my-1" />
+
+				{/* Sync - only show when authenticated */}
+				{isAuthenticated && (
+					<>
+						<SyncSection />
+						<View className="h-[1px] bg-border my-1" />
+					</>
+				)}
 
 				<Link href={"/categories"} asChild>
 					<Pressable>
