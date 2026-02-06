@@ -14,21 +14,39 @@ import { supabase } from "./supabase";
 import { eq, inArray } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
+import type { SQLiteColumn } from "drizzle-orm/sqlite-core";
 
 // ─── Types ───────────────────────────────────────────────────
 
 /**
- * Helper type for tables with typed id, syncStatus, and deletedAt columns.
- * Reduces unsafe any casts in dynamic table operations.
+ * Type-safe column accessors for syncable tables.
+ * These helpers eliminate unsafe any casts by leveraging TypeScript's structural typing.
  */
-type TableWithSyncColumns = SQLiteTable & {
-	// biome-ignore lint/suspicious/noExplicitAny: Dynamic table column access requires any
-	id: any;
-	// biome-ignore lint/suspicious/noExplicitAny: Dynamic table column access requires any
-	syncStatus: any;
-	// biome-ignore lint/suspicious/noExplicitAny: Dynamic table column access requires any
-	deletedAt: any;
-};
+
+/**
+ * Get the id column from a syncable table.
+ * Returns a properly typed Drizzle column that can be used in queries.
+ */
+function getIdColumn(table: SQLiteTable): SQLiteColumn {
+	// All our syncable tables have an 'id' column of type text
+	return (table as unknown as Record<string, SQLiteColumn>).id;
+}
+
+/**
+ * Get the syncStatus column from a syncable table.
+ * Returns a properly typed Drizzle column that can be used in queries.
+ */
+function getSyncStatusColumn(table: SQLiteTable): SQLiteColumn {
+	return (table as unknown as Record<string, SQLiteColumn>).syncStatus;
+}
+
+/**
+ * Get the deletedAt column from a syncable table.
+ * Returns a properly typed Drizzle column that can be used in queries.
+ */
+function getDeletedAtColumn(table: SQLiteTable): SQLiteColumn {
+	return (table as unknown as Record<string, SQLiteColumn>).deletedAt;
+}
 
 /**
  * Base interface for all syncable records.
@@ -577,8 +595,10 @@ class SyncManager {
 			return 0;
 		}
 
-		// Cast table once for type-safe column access
-		const typedTable = table as TableWithSyncColumns;
+		// Get typed column accessors
+		const idColumn = getIdColumn(table);
+		const syncStatusColumn = getSyncStatusColumn(table);
+		const deletedAtColumn = getDeletedAtColumn(table);
 
 		// Process all changes within a single transaction for atomicity
 		await database.transaction(async (tx) => {
@@ -586,13 +606,12 @@ class SyncManager {
 			if (changeSet.upserted.length > 0) {
 				for (const record of changeSet.upserted) {
 					// Convert string amounts back to numbers for local storage
-					// biome-ignore lint/suspicious/noExplicitAny: Record shape is dynamic based on table
-					const localRecord: any = { ...record };
+					const localRecord: Record<string, unknown> = { ...record };
 					if (typeof localRecord.amount === "string") {
-						localRecord.amount = Number.parseFloat(localRecord.amount as string);
+						localRecord.amount = Number.parseFloat(localRecord.amount);
 					}
 					if (typeof localRecord.price === "string") {
-						localRecord.price = Number.parseFloat(localRecord.price as string);
+						localRecord.price = Number.parseFloat(localRecord.price);
 					}
 					localRecord.syncStatus = "synced";
 
@@ -600,7 +619,7 @@ class SyncManager {
 						.insert(table)
 						.values(localRecord)
 						.onConflictDoUpdate({
-							target: typedTable.id,
+							target: idColumn,
 							set: localRecord,
 						});
 					count++;
@@ -610,16 +629,19 @@ class SyncManager {
 			// Soft-delete records
 			if (changeSet.deleted.length > 0) {
 				const deletedAt = new Date().toISOString();
+				const syncStatus = "synced" as const;
 				
 				for (const id of changeSet.deleted) {
+					// Build update payload with proper typing
+					const updatePayload: Record<string, unknown> = {
+						deletedAt,
+						syncStatus,
+					};
+
 					await tx
 						.update(table)
-					.set({
-						deletedAt,
-						syncStatus: "synced" as const,
-					// biome-ignore lint/suspicious/noExplicitAny: Dynamic table set payload
-						} as any)
-						.where(eq(typedTable.id, id));
+						.set(updatePayload)
+						.where(eq(idColumn, id));
 					count++;
 				}
 			}
