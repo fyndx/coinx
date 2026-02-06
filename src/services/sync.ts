@@ -11,10 +11,24 @@ import {
 } from "@/db/schema";
 import { api } from "./api";
 import { supabase } from "./supabase";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 
 // ─── Types ───────────────────────────────────────────────────
+
+/**
+ * Helper type for tables with typed id, syncStatus, and deletedAt columns.
+ * Reduces unsafe any casts in dynamic table operations.
+ */
+type TableWithSyncColumns = SQLiteTable & {
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic table column access requires any
+	id: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic table column access requires any
+	syncStatus: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Dynamic table column access requires any
+	deletedAt: any;
+};
 
 /**
  * Base interface for all syncable records.
@@ -36,6 +50,11 @@ interface ChangeSet<T extends SyncableRecord> {
 	deleted: string[];
 }
 
+interface ChangeSetWithIds<T extends SyncableRecord> extends ChangeSet<T> {
+	/** IDs of all records (both upserted and deleted) for tracking */
+	ids: string[];
+}
+
 interface SyncChanges {
 	transactions: ChangeSet<SyncableRecord>;
 	categories: ChangeSet<SyncableRecord>;
@@ -43,6 +62,24 @@ interface SyncChanges {
 	stores: ChangeSet<SyncableRecord>;
 	productListings: ChangeSet<SyncableRecord>;
 	productListingHistory: ChangeSet<SyncableRecord>;
+}
+
+interface SyncChangesWithIds {
+	transactions: ChangeSetWithIds<SyncableRecord>;
+	categories: ChangeSetWithIds<SyncableRecord>;
+	products: ChangeSetWithIds<SyncableRecord>;
+	stores: ChangeSetWithIds<SyncableRecord>;
+	productListings: ChangeSetWithIds<SyncableRecord>;
+	productListingHistory: ChangeSetWithIds<SyncableRecord>;
+}
+
+interface PushedIds {
+	transactions: string[];
+	categories: string[];
+	products: string[];
+	stores: string[];
+	product_listings: string[];
+	product_listings_history: string[];
 }
 
 interface SyncPushResponse {
@@ -137,17 +174,28 @@ class SyncManager {
 	/**
 	 * Ensure this device is registered with the backend.
 	 * Creates profile (if needed) and device if no deviceId is stored locally.
+	 * For web platform, skips device registration (web not supported by backend).
 	 */
 	async ensureDevice(): Promise<string> {
 		if (this.state.deviceId) {
 			return this.state.deviceId;
 		}
 
+		// Skip device registration for web platform
+		if (Platform.OS === "web") {
+			// Generate a pseudo device ID for web that won't be sent to backend
+			const webDeviceId = `web-session-${Date.now()}`;
+			this.state.deviceId = webDeviceId;
+			return webDeviceId;
+		}
+
 		// Ensure profile exists before registering device
 		await api.post("/api/auth/register", {});
 
+		// Only send ios or android platform values
+		const platform = Platform.OS === "ios" || Platform.OS === "android" ? Platform.OS : "android";
 		const response = await api.post<{ data: { id: string } }>("/api/auth/device", {
-			platform: Platform.OS as "ios" | "android",
+			platform,
 			deviceName: `${Platform.OS} device`,
 		});
 
@@ -222,7 +270,7 @@ class SyncManager {
 				return;
 			}
 
-			// 1. Push local changes
+			// 1. Push local changes (stages only, doesn't mark as synced yet)
 			const pushResult = await this.push(deviceId);
 
 			if (this.syncCancelled) {
@@ -239,8 +287,10 @@ class SyncManager {
 				return;
 			}
 
-			// 3. Update last synced timestamp
+			// 3. Atomic commit: mark pushed records as synced and update timestamp
+			// Only happens after pull succeeds to avoid inconsistent state
 			const syncedAt = pullResult.syncedAt;
+			await this.markRecordsSynced(pushResult.pushedIds);
 			await AsyncStorage.setItem(STORAGE_KEYS.LAST_SYNCED_AT, syncedAt);
 
 			this.updateState({
@@ -268,18 +318,38 @@ class SyncManager {
 
 	// ─── Push ────────────────────────────────────────────────
 
-	private async push(deviceId: string): Promise<{ upserted: number; deleted: number }> {
-		const changes = await this.collectLocalChanges();
+	private async push(deviceId: string): Promise<{ upserted: number; deleted: number; pushedIds: PushedIds }> {
+		const changesWithIds = await this.collectLocalChanges();
+
+		// Extract pushed IDs for later marking as synced
+		const pushedIds: PushedIds = {
+			transactions: changesWithIds.transactions.ids,
+			categories: changesWithIds.categories.ids,
+			products: changesWithIds.products.ids,
+			stores: changesWithIds.stores.ids,
+			product_listings: changesWithIds.productListings.ids,
+			product_listings_history: changesWithIds.productListingHistory.ids,
+		};
 
 		// Check if there's anything to push
-		const totalChanges = Object.values(changes).reduce(
+		const totalChanges = Object.values(changesWithIds).reduce(
 			(sum, cs) => sum + cs.upserted.length + cs.deleted.length,
 			0,
 		);
 
 		if (totalChanges === 0) {
-			return { upserted: 0, deleted: 0 };
+			return { upserted: 0, deleted: 0, pushedIds };
 		}
+
+		// Strip ids from changes before sending to backend
+		const changes: SyncChanges = {
+			transactions: { upserted: changesWithIds.transactions.upserted, deleted: changesWithIds.transactions.deleted },
+			categories: { upserted: changesWithIds.categories.upserted, deleted: changesWithIds.categories.deleted },
+			products: { upserted: changesWithIds.products.upserted, deleted: changesWithIds.products.deleted },
+			stores: { upserted: changesWithIds.stores.upserted, deleted: changesWithIds.stores.deleted },
+			productListings: { upserted: changesWithIds.productListings.upserted, deleted: changesWithIds.productListings.deleted },
+			productListingHistory: { upserted: changesWithIds.productListingHistory.upserted, deleted: changesWithIds.productListingHistory.deleted },
+		};
 
 		if (__DEV__) {
 			console.log("[Sync Push] Payload:", JSON.stringify({
@@ -312,16 +382,16 @@ class SyncManager {
 			throw new Error("Push failed: no response");
 		}
 
-		// Mark pushed records as synced
-		await this.markRecordsSynced();
+		// Don't mark as synced yet — wait for pull() to succeed (atomic commit)
 
-		return response.data.counts;
+		return { ...response.data.counts, pushedIds };
 	}
 
 	/**
 	 * Collect all local records with syncStatus = 'pending'.
+	 * Returns changes with ID tracking for later selective marking as synced.
 	 */
-	private async collectLocalChanges(): Promise<SyncChanges> {
+	private async collectLocalChanges(): Promise<SyncChangesWithIds> {
 		const [
 			pendingTransactions,
 			pendingCategories,
@@ -351,12 +421,15 @@ class SyncManager {
 	/**
 	 * Split records into upserted (active) and deleted (soft-deleted) sets.
 	 * Strips sync-only fields before sending to backend.
+	 * Also tracks all IDs for selective marking as synced later.
 	 */
-	private splitChanges(records: SyncableRecord[]): ChangeSet<SyncableRecord> {
+	private splitChanges(records: SyncableRecord[]): ChangeSetWithIds<SyncableRecord> {
 		const upserted: SyncableRecord[] = [];
 		const deleted: string[] = [];
+		const ids: string[] = [];
 
 		for (const record of records) {
+			ids.push(record.id);
 			if (record.deletedAt) {
 				deleted.push(record.id);
 			} else {
@@ -381,30 +454,73 @@ class SyncManager {
 			}
 		}
 
-		return { upserted, deleted };
+		return { upserted, deleted, ids };
 	}
 
 	/**
-	 * After successful push, mark all pending records as synced.
+	 * Mark only the specified records as synced.
+	 * Uses WHERE id IN (...) to avoid marking records created during push.
+	 * @param pushedIds Per-table arrays of IDs that were successfully pushed
 	 */
-	private async markRecordsSynced(): Promise<void> {
-		const tables = [
-			transactions,
-			categories,
-			products,
-			stores,
-			product_listings,
-			product_listings_history,
-		];
+	private async markRecordsSynced(pushedIds: PushedIds): Promise<void> {
+		const updates: Promise<unknown>[] = [];
 
-		await Promise.all(
-			tables.map((table) =>
+		// Only update tables with IDs to mark
+		if (pushedIds.transactions.length > 0) {
+			updates.push(
 				database
-					.update(table)
+					.update(transactions)
 					.set({ syncStatus: "synced" as const })
-					.where(eq(table.syncStatus, "pending")),
-			),
-		);
+					.where(inArray(transactions.id, pushedIds.transactions)),
+			);
+		}
+
+		if (pushedIds.categories.length > 0) {
+			updates.push(
+				database
+					.update(categories)
+					.set({ syncStatus: "synced" as const })
+					.where(inArray(categories.id, pushedIds.categories)),
+			);
+		}
+
+		if (pushedIds.products.length > 0) {
+			updates.push(
+				database
+					.update(products)
+					.set({ syncStatus: "synced" as const })
+					.where(inArray(products.id, pushedIds.products)),
+			);
+		}
+
+		if (pushedIds.stores.length > 0) {
+			updates.push(
+				database
+					.update(stores)
+					.set({ syncStatus: "synced" as const })
+					.where(inArray(stores.id, pushedIds.stores)),
+			);
+		}
+
+		if (pushedIds.product_listings.length > 0) {
+			updates.push(
+				database
+					.update(product_listings)
+					.set({ syncStatus: "synced" as const })
+					.where(inArray(product_listings.id, pushedIds.product_listings)),
+			);
+		}
+
+		if (pushedIds.product_listings_history.length > 0) {
+			updates.push(
+				database
+					.update(product_listings_history)
+					.set({ syncStatus: "synced" as const })
+					.where(inArray(product_listings_history.id, pushedIds.product_listings_history)),
+			);
+		}
+
+		await Promise.all(updates);
 	}
 
 	// ─── Pull ────────────────────────────────────────────────
@@ -447,7 +563,7 @@ class SyncManager {
 
 	/**
 	 * Apply changes for a single table.
-	 * Uses batch operations within a transaction for better performance.
+	 * Uses transaction for atomicity and type-safe table access.
 	 * Upserts active records and soft-deletes removed ones.
 	 */
 	private async applyTableChanges(
@@ -461,60 +577,50 @@ class SyncManager {
 			return 0;
 		}
 
-		// Process in batches within a transaction
-		await database.transaction(async (tx) => {
-			// Batch upsert records
-			if (changeSet.upserted.length > 0) {
-				const BATCH_SIZE = 100;
-				for (let i = 0; i < changeSet.upserted.length; i += BATCH_SIZE) {
-					const batch = changeSet.upserted.slice(i, i + BATCH_SIZE);
-					
-					for (const record of batch) {
-						// Convert string amounts back to numbers for local storage
-						const localRecord = { ...record };
-						if (typeof localRecord.amount === "string") {
-							localRecord.amount = Number.parseFloat(localRecord.amount as string);
-						}
-						if (typeof localRecord.price === "string") {
-							localRecord.price = Number.parseFloat(localRecord.price as string);
-						}
-						localRecord.syncStatus = "synced";
+		// Cast table once for type-safe column access
+		const typedTable = table as TableWithSyncColumns;
 
-						await tx
-							.insert(table)
-							// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
-							.values(localRecord as any)
-							.onConflictDoUpdate({
-								// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
-								target: (table as any).id,
-								// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
-								set: localRecord as any,
-							});
-						count++;
+		// Process all changes within a single transaction for atomicity
+		await database.transaction(async (tx) => {
+			// Upsert records (per-record loop wrapped in transaction)
+			if (changeSet.upserted.length > 0) {
+				for (const record of changeSet.upserted) {
+					// Convert string amounts back to numbers for local storage
+					// biome-ignore lint/suspicious/noExplicitAny: Record shape is dynamic based on table
+					const localRecord: any = { ...record };
+					if (typeof localRecord.amount === "string") {
+						localRecord.amount = Number.parseFloat(localRecord.amount as string);
 					}
+					if (typeof localRecord.price === "string") {
+						localRecord.price = Number.parseFloat(localRecord.price as string);
+					}
+					localRecord.syncStatus = "synced";
+
+					await tx
+						.insert(table)
+						.values(localRecord)
+						.onConflictDoUpdate({
+							target: typedTable.id,
+							set: localRecord,
+						});
+					count++;
 				}
 			}
 
-			// Batch soft-delete records
+			// Soft-delete records
 			if (changeSet.deleted.length > 0) {
-				const BATCH_SIZE = 100;
 				const deletedAt = new Date().toISOString();
 				
-				for (let i = 0; i < changeSet.deleted.length; i += BATCH_SIZE) {
-					const batch = changeSet.deleted.slice(i, i + BATCH_SIZE);
-					
-					for (const id of batch) {
-						await tx
-							.update(table)
-							.set({
-								deletedAt,
-								syncStatus: "synced" as const,
-								// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
-							} as any)
-							// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
-							.where(eq((table as any).id, id));
-						count++;
-					}
+				for (const id of changeSet.deleted) {
+					await tx
+						.update(table)
+					.set({
+						deletedAt,
+						syncStatus: "synced" as const,
+					// biome-ignore lint/suspicious/noExplicitAny: Dynamic table set payload
+						} as any)
+						.where(eq(typedTable.id, id));
+					count++;
 				}
 			}
 		});
