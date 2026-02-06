@@ -89,8 +89,7 @@ export class AuthModel {
 
 			return { success: true, needsConfirmation: !data.session };
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Sign up failed";
+			const message = error instanceof Error ? error.message : "Sign up failed";
 			this.obs.error.set(message);
 			return { success: false, error: message };
 		} finally {
@@ -129,8 +128,7 @@ export class AuthModel {
 
 			return { success: true };
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Sign in failed";
+			const message = error instanceof Error ? error.message : "Sign in failed";
 			this.obs.error.set(message);
 			return { success: false, error: message };
 		} finally {
@@ -145,8 +143,8 @@ export class AuthModel {
 	signOut = async () => {
 		this.obs.isLoading.set(true);
 		try {
-			await syncManager.reset();
 			await supabase.auth.signOut();
+			await syncManager.reset();
 		} catch (error) {
 			console.error("Sign out error:", error);
 		} finally {

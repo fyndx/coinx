@@ -16,18 +16,33 @@ import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 
 // ─── Types ───────────────────────────────────────────────────
 
-interface ChangeSet<T> {
+/**
+ * Base interface for all syncable records.
+ * Ensures type safety when accessing common sync fields.
+ */
+interface SyncableRecord {
+	id: string;
+	deletedAt: string | null;
+	syncStatus: "pending" | "synced" | null;
+	// Optional fields for financial records
+	amount?: number | string;
+	price?: number | string;
+	// Allow other properties
+	[key: string]: unknown;
+}
+
+interface ChangeSet<T extends SyncableRecord> {
 	upserted: T[];
 	deleted: string[];
 }
 
 interface SyncChanges {
-	transactions: ChangeSet<Record<string, unknown>>;
-	categories: ChangeSet<Record<string, unknown>>;
-	products: ChangeSet<Record<string, unknown>>;
-	stores: ChangeSet<Record<string, unknown>>;
-	productListings: ChangeSet<Record<string, unknown>>;
-	productListingHistory: ChangeSet<Record<string, unknown>>;
+	transactions: ChangeSet<SyncableRecord>;
+	categories: ChangeSet<SyncableRecord>;
+	products: ChangeSet<SyncableRecord>;
+	stores: ChangeSet<SyncableRecord>;
+	productListings: ChangeSet<SyncableRecord>;
+	productListingHistory: ChangeSet<SyncableRecord>;
 }
 
 interface SyncPushResponse {
@@ -78,6 +93,8 @@ class SyncManager {
 	};
 
 	private syncInProgress = false;
+	private syncCancelled = false;
+	private hasPendingSync = false;
 	private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 	private listeners: Set<(state: SyncState) => void> = new Set();
 	private appStateSubscription: ReturnType<typeof AppState.addEventListener> | null = null;
@@ -94,8 +111,7 @@ class SyncManager {
 			AsyncStorage.getItem(STORAGE_KEYS.LAST_SYNCED_AT),
 		]);
 
-		this.state.deviceId = deviceId;
-		this.state.lastSyncedAt = lastSyncedAt;
+		this.updateState({ deviceId, lastSyncedAt });
 
 		// Auto-sync on app foreground
 		this.appStateSubscription = AppState.addEventListener("change", (nextState) => {
@@ -162,36 +178,66 @@ class SyncManager {
 	/**
 	 * Debounced sync — call after local changes.
 	 * Waits 2 seconds after last call before syncing.
+	 * Coalesces multiple rapid changes to avoid redundant syncs.
 	 */
 	scheduleSyncAfterChange(): void {
 		if (this.debounceTimer) {
 			clearTimeout(this.debounceTimer);
 		}
 
+		// Mark that we have pending changes
+		this.hasPendingSync = true;
+
 		this.debounceTimer = setTimeout(() => {
-			this.syncIfAuthenticated();
+			// Only sync if there are still pending changes and no sync in progress
+			if (this.hasPendingSync && !this.syncInProgress) {
+				this.hasPendingSync = false;
+				this.syncIfAuthenticated();
+			}
 		}, 2000);
 	}
 
 	/**
 	 * Full sync: push local changes, then pull remote changes.
 	 * Returns silently if sync is already in progress.
+	 * Queues another sync if changes occur during current sync.
 	 */
 	async sync(): Promise<void> {
-		if (this.syncInProgress) return;
+		if (this.syncInProgress) {
+			// Mark that another sync is needed after current one completes
+			this.hasPendingSync = true;
+			return;
+		}
 
 		this.syncInProgress = true;
+		this.syncCancelled = false;
 		this.updateState({ status: "pushing", error: null });
 
 		try {
 			const deviceId = await this.ensureDevice();
 
+			// Check for cancellation
+			if (this.syncCancelled) {
+				this.updateState({ status: "idle", error: null });
+				return;
+			}
+
 			// 1. Push local changes
 			const pushResult = await this.push(deviceId);
+
+			if (this.syncCancelled) {
+				this.updateState({ status: "idle", error: null });
+				return;
+			}
 
 			// 2. Pull remote changes
 			this.updateState({ status: "pulling" });
 			const pullResult = await this.pull(deviceId);
+
+			if (this.syncCancelled) {
+				this.updateState({ status: "idle", error: null });
+				return;
+			}
 
 			// 3. Update last synced timestamp
 			const syncedAt = pullResult.syncedAt;
@@ -207,9 +253,16 @@ class SyncManager {
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "Sync failed";
 			console.error("Sync error:", message);
-			this.updateState({ status: "error", error: message });
+			if (!this.syncCancelled) {
+				this.updateState({ status: "error", error: message });
+			}
 		} finally {
 			this.syncInProgress = false;
+			// If changes occurred during sync, schedule another sync
+			if (this.hasPendingSync && !this.syncCancelled) {
+				this.hasPendingSync = false;
+				setTimeout(() => this.syncIfAuthenticated(), 0);
+			}
 		}
 	}
 
@@ -299,13 +352,13 @@ class SyncManager {
 	 * Split records into upserted (active) and deleted (soft-deleted) sets.
 	 * Strips sync-only fields before sending to backend.
 	 */
-	private splitChanges(records: Record<string, unknown>[]): ChangeSet<Record<string, unknown>> {
-		const upserted: Record<string, unknown>[] = [];
+	private splitChanges(records: SyncableRecord[]): ChangeSet<SyncableRecord> {
+		const upserted: SyncableRecord[] = [];
 		const deleted: string[] = [];
 
 		for (const record of records) {
 			if (record.deletedAt) {
-				deleted.push(record.id as string);
+				deleted.push(record.id);
 			} else {
 				// Strip local-only fields
 				const { syncStatus, deletedAt, ...rest } = record;
@@ -324,7 +377,7 @@ class SyncManager {
 						cleaned[key] = value;
 					}
 				}
-				upserted.push(cleaned);
+				upserted.push(cleaned as SyncableRecord);
 			}
 		}
 
@@ -394,47 +447,77 @@ class SyncManager {
 
 	/**
 	 * Apply changes for a single table.
+	 * Uses batch operations within a transaction for better performance.
 	 * Upserts active records and soft-deletes removed ones.
 	 */
 	private async applyTableChanges(
 		table: SQLiteTable,
-		changeSet: ChangeSet<Record<string, unknown>>,
+		changeSet: ChangeSet<SyncableRecord>,
 	): Promise<number> {
 		let count = 0;
 
-		// Upsert records
-		for (const record of changeSet.upserted) {
-			// Convert string amounts back to numbers for local storage
-			const localRecord = { ...record };
-			if (typeof localRecord.amount === "string") {
-				localRecord.amount = Number.parseFloat(localRecord.amount);
-			}
-			if (typeof localRecord.price === "string") {
-				localRecord.price = Number.parseFloat(localRecord.price);
-			}
-			localRecord.syncStatus = "synced";
-
-			await database
-				.insert(table)
-				.values(localRecord)
-				.onConflictDoUpdate({
-					target: (table as any).id,
-					set: localRecord,
-				});
-			count++;
+		// Skip if no changes
+		if (changeSet.upserted.length === 0 && changeSet.deleted.length === 0) {
+			return 0;
 		}
 
-		// Soft-delete records
-		for (const id of changeSet.deleted) {
-			await database
-				.update(table)
-				.set({
-					deletedAt: new Date().toISOString(),
-					syncStatus: "synced" as const,
-				} as any)
-				.where(eq((table as any).id, id));
-			count++;
-		}
+		// Process in batches within a transaction
+		await database.transaction(async (tx) => {
+			// Batch upsert records
+			if (changeSet.upserted.length > 0) {
+				const BATCH_SIZE = 100;
+				for (let i = 0; i < changeSet.upserted.length; i += BATCH_SIZE) {
+					const batch = changeSet.upserted.slice(i, i + BATCH_SIZE);
+					
+					for (const record of batch) {
+						// Convert string amounts back to numbers for local storage
+						const localRecord = { ...record };
+						if (typeof localRecord.amount === "string") {
+							localRecord.amount = Number.parseFloat(localRecord.amount as string);
+						}
+						if (typeof localRecord.price === "string") {
+							localRecord.price = Number.parseFloat(localRecord.price as string);
+						}
+						localRecord.syncStatus = "synced";
+
+						await tx
+							.insert(table)
+							// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
+							.values(localRecord as any)
+							.onConflictDoUpdate({
+								// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
+								target: (table as any).id,
+								// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
+								set: localRecord as any,
+							});
+						count++;
+					}
+				}
+			}
+
+			// Batch soft-delete records
+			if (changeSet.deleted.length > 0) {
+				const BATCH_SIZE = 100;
+				const deletedAt = new Date().toISOString();
+				
+				for (let i = 0; i < changeSet.deleted.length; i += BATCH_SIZE) {
+					const batch = changeSet.deleted.slice(i, i + BATCH_SIZE);
+					
+					for (const id of batch) {
+						await tx
+							.update(table)
+							.set({
+								deletedAt,
+								syncStatus: "synced" as const,
+								// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
+							} as any)
+							// biome-ignore lint/suspicious/noExplicitAny: Dynamic table type
+							.where(eq((table as any).id, id));
+						count++;
+					}
+				}
+			}
+		});
 
 		return count;
 	}
@@ -474,13 +557,36 @@ class SyncManager {
 
 	/**
 	 * Clear all sync data. Use on sign-out.
+	 * Cancels any in-progress sync to prevent race conditions.
 	 */
 	async reset(): Promise<void> {
+		// Cancel any in-progress sync
+		this.syncCancelled = true;
+		this.hasPendingSync = false;
+
+		// Clear debounce timer
+		if (this.debounceTimer) {
+			clearTimeout(this.debounceTimer);
+			this.debounceTimer = null;
+		}
+
+		// Wait for in-progress sync to complete if any
+		if (this.syncInProgress) {
+			// Wait up to 5 seconds for sync to complete
+			const maxWaitTime = 5000;
+			const startTime = Date.now();
+			while (this.syncInProgress && Date.now() - startTime < maxWaitTime) {
+				await new Promise((resolve) => setTimeout(resolve, 100));
+			}
+		}
+
+		// Clear storage
 		await Promise.all([
 			AsyncStorage.removeItem(STORAGE_KEYS.DEVICE_ID),
 			AsyncStorage.removeItem(STORAGE_KEYS.LAST_SYNCED_AT),
 		]);
 
+		// Reset state
 		this.state = {
 			status: "idle",
 			lastSyncedAt: null,
