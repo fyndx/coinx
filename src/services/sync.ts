@@ -235,10 +235,15 @@ class SyncManager {
 	 * Safe to call from anywhere — silently no-ops if not logged in.
 	 */
 	async syncIfAuthenticated(): Promise<void> {
-		const { data: { session } } = await supabase.auth.getSession();
-		if (!session?.access_token) return;
+		try {
+			const { data: { session } } = await supabase.auth.getSession();
+			if (!session?.access_token) return;
 
-		await this.sync();
+			await this.sync();
+		} catch (error) {
+			console.error("syncIfAuthenticated error:", error);
+			// Return silently to prevent unhandled promise rejection
+		}
 	}
 
 	/**
@@ -269,6 +274,11 @@ class SyncManager {
 	 * Queues another sync if changes occur during current sync.
 	 */
 	async sync(): Promise<void> {
+		// Skip sync for web platform — pseudo deviceId from ensureDevice() is local-only
+		if (Platform.OS === "web") {
+			return;
+		}
+
 		if (this.syncInProgress) {
 			// Mark that another sync is needed after current one completes
 			this.hasPendingSync = true;
@@ -569,12 +579,13 @@ class SyncManager {
 		let totalRecords = 0;
 
 		// Apply in dependency order (categories before transactions, products before listings, etc.)
-		totalRecords += await this.applyTableChanges(categories, changes.categories);
-		totalRecords += await this.applyTableChanges(stores, changes.stores);
-		totalRecords += await this.applyTableChanges(products, changes.products);
-		totalRecords += await this.applyTableChanges(transactions, changes.transactions);
-		totalRecords += await this.applyTableChanges(product_listings, changes.productListings);
-		totalRecords += await this.applyTableChanges(product_listings_history, changes.productListingHistory);
+		// Use safe defaults to handle incomplete responses gracefully
+		totalRecords += await this.applyTableChanges(categories, changes.categories ?? { upserted: [], deleted: [] });
+		totalRecords += await this.applyTableChanges(stores, changes.stores ?? { upserted: [], deleted: [] });
+		totalRecords += await this.applyTableChanges(products, changes.products ?? { upserted: [], deleted: [] });
+		totalRecords += await this.applyTableChanges(transactions, changes.transactions ?? { upserted: [], deleted: [] });
+		totalRecords += await this.applyTableChanges(product_listings, changes.productListings ?? { upserted: [], deleted: [] });
+		totalRecords += await this.applyTableChanges(product_listings_history, changes.productListingHistory ?? { upserted: [], deleted: [] });
 
 		return totalRecords;
 	}
@@ -670,7 +681,16 @@ class SyncManager {
 
 	private notifyListeners(): void {
 		for (const listener of this.listeners) {
-			listener(this.state);
+			try {
+				listener(this.state);
+			} catch (err) {
+				console.error(
+					"SyncManager: Listener threw error. State:",
+					this.state,
+					"Error:",
+					err,
+				);
+			}
 		}
 	}
 
