@@ -1,6 +1,7 @@
 import { api } from "@/src/services/api";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
+import { Effect } from "effect";
 import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
 
@@ -144,7 +145,7 @@ export class AuthModel {
 		this.obs.isLoading.set(true);
 		try {
 			await supabase.auth.signOut();
-			await syncManager.reset();
+			await Effect.runPromise(syncManager.reset());
 		} catch (error) {
 			console.error("Sign out error:", error);
 		} finally {

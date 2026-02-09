@@ -11,6 +11,7 @@ import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model"
 import { TransactionModel } from "@/src/LegendState/Transaction.model";
 import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
 import { syncManager } from "@/src/services/sync";
+import { Effect } from "effect";
 import { storeModel$ } from "./Store/Store.model";
 
 class RootStore {
@@ -47,7 +48,7 @@ class RootStore {
 		await authModel.actions.initialize();
 
 		// Initialize sync manager (restores deviceId, starts foreground listener)
-		await syncManager.initialize();
+		await Effect.runPromise(syncManager.initialize());
 
 		const isFirstLaunch = await appModel.checkFirstLaunch();
 		if (isFirstLaunch) {
