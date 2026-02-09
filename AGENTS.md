@@ -16,7 +16,8 @@ This file helps AI coding assistants (Claude, Cursor, Copilot, etc.) understand 
 | Local DB | SQLite via Drizzle ORM |
 | Auth | Supabase Auth |
 | Backend | Hono (separate repo: `coinx-backend`) |
-| Styling | NativeWind (Tailwind for RN) |
+| Styling | Hero Native UI + Uniwind |
+| FP Patterns | Effect-TS |
 | Build | EAS Build |
 
 ## Project Structure
@@ -130,6 +131,8 @@ See `wiki/Projects/CoinX/Phases/Phase2-AppIntegration.md` for task breakdown.
 - **Biome** for linting/formatting (not ESLint)
 - **Drizzle ORM** for database (not raw SQL)
 - **Legend State** for state (not Redux/Zustand)
+- **Effect-TS** for error handling and async operations
+- **Hero Native UI** for components with **Uniwind** for styling
 - **Functional components** with hooks
 - **File naming**: `kebab-case` for files, `PascalCase` for components
 

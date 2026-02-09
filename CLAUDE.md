@@ -23,6 +23,8 @@ Quick reference for Claude Code sessions working on CoinX.
 - ✅ Write design doc before implementing complex features
 - ✅ Use Drizzle ORM for all database operations
 - ✅ Use Legend State for state management
+- ✅ Use Effect-TS for error handling and async operations
+- ✅ Use Hero Native UI components with Uniwind for styling
 - ✅ Set `syncStatus: 'pending'` on local changes
 - ✅ Soft delete via `deletedAt`, never hard delete
 - ✅ Handle both authenticated and unauthenticated states
