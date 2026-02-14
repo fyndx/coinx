@@ -1,5 +1,7 @@
 import { api } from "@/src/services/api";
 import { supabase } from "@/src/services/supabase";
+import { syncManager } from "@/src/services/sync";
+import { Effect } from "effect";
 import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
 
@@ -81,12 +83,14 @@ export class AuthModel {
 					console.warn("Backend profile registration failed:", e);
 					// Don't block auth — backend profile can be created later
 				}
+
+				// Trigger initial sync after sign up
+				syncManager.syncIfAuthenticated();
 			}
 
 			return { success: true, needsConfirmation: !data.session };
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Sign up failed";
+			const message = error instanceof Error ? error.message : "Sign up failed";
 			this.obs.error.set(message);
 			return { success: false, error: message };
 		} finally {
@@ -120,10 +124,12 @@ export class AuthModel {
 				console.warn("Backend profile registration failed:", e);
 			}
 
+			// Trigger sync after sign in
+			syncManager.syncIfAuthenticated();
+
 			return { success: true };
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Sign in failed";
+			const message = error instanceof Error ? error.message : "Sign in failed";
 			this.obs.error.set(message);
 			return { success: false, error: message };
 		} finally {
@@ -133,11 +139,13 @@ export class AuthModel {
 
 	/**
 	 * Sign out and clear session.
+	 * Also resets sync state (deviceId, lastSyncedAt).
 	 */
 	signOut = async () => {
 		this.obs.isLoading.set(true);
 		try {
 			await supabase.auth.signOut();
+			await Effect.runPromise(syncManager.reset());
 		} catch (error) {
 			console.error("Sign out error:", error);
 		} finally {
