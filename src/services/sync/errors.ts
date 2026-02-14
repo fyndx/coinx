@@ -26,6 +26,12 @@ export class SyncPullError extends Data.TaggedError("SyncPullError")<{
 	cause?: unknown;
 }> {}
 
+export class ApiError extends Data.TaggedError("ApiError")<{
+	message: string;
+	operation: string;
+	cause?: unknown;
+}> {}
+
 export class DatabaseError extends Data.TaggedError("DatabaseError")<{
 	message: string;
 	operation: string;

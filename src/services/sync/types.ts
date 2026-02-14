@@ -7,7 +7,11 @@ import type { SQLiteTable, SQLiteColumn } from "drizzle-orm/sqlite-core";
  * Returns a properly typed Drizzle column that can be used in queries.
  */
 export function getIdColumn(table: SQLiteTable): SQLiteColumn {
-	return (table as unknown as Record<string, SQLiteColumn>).id;
+	const col = (table as unknown as Record<string, SQLiteColumn>).id;
+	if (!col) {
+		throw new Error(`Table does not have an 'id' column`);
+	}
+	return col;
 }
 
 // ─── Base Types ──────────────────────────────────────────────

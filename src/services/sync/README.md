@@ -7,9 +7,9 @@ Effect.ts-based synchronization manager for CoinX mobile app. Handles bidirectio
 The sync service is organized into focused modules:
 
 ```
-sync-v2/
+sync/
 ├── index.ts          # Main export and singleton instance
-├── manager.ts        # SyncManagerV2 class (orchestrator)
+├── manager.ts        # SyncManager class (orchestrator)
 ├── types.ts          # TypeScript types and interfaces
 ├── errors.ts         # Custom Error classes
 ├── storage.ts        # AsyncStorage Effect wrappers
@@ -62,7 +62,7 @@ Database operations wrapped as Effects:
 - `splitChanges(records)` - Split records into upserted/deleted sets
 
 ### `manager.ts`
-Main SyncManagerV2 class that orchestrates the sync flow:
+Main SyncManager class that orchestrates the sync flow:
 - Device registration
 - Push/pull sync operations
 - State management
@@ -73,27 +73,27 @@ Main SyncManagerV2 class that orchestrates the sync flow:
 ### Initialization
 
 ```typescript
-import { syncManagerV2 } from "@/services/sync-v2";
+import { syncManager } from "@/services/sync";
 import { Effect } from "effect";
 
 // Initialize during app startup (after auth)
-await Effect.runPromise(syncManagerV2.initialize());
+await Effect.runPromise(syncManager.initialize());
 ```
 
 ### Trigger Sync
 
 ```typescript
 // Manual sync (checks auth automatically)
-await syncManagerV2.syncIfAuthenticated();
+await syncManager.syncIfAuthenticated();
 
 // Debounced sync after local changes
-syncManagerV2.scheduleSyncAfterChange();
+syncManager.scheduleSyncAfterChange();
 ```
 
 ### Subscribe to State Changes
 
 ```typescript
-const unsubscribe = syncManagerV2.subscribe((state) => {
+const unsubscribe = syncManager.subscribe((state) => {
   console.log("Status:", state.status);
   console.log("Last synced:", state.lastSyncedAt);
   console.log("Error:", state.error);
@@ -106,7 +106,7 @@ unsubscribe();
 ### Get Current State
 
 ```typescript
-const state = syncManagerV2.getState();
+const state = syncManager.getState();
 console.log(state.status); // 'idle' | 'pushing' | 'pulling' | 'error' | 'success'
 ```
 
@@ -116,14 +116,14 @@ console.log(state.status); // 'idle' | 'pushing' | 'pulling' | 'error' | 'succes
 import { Effect } from "effect";
 
 // Clear sync state and storage
-await Effect.runPromise(syncManagerV2.reset());
+await Effect.runPromise(syncManager.reset());
 ```
 
 ### Cleanup
 
 ```typescript
 // Remove listeners and subscriptions
-syncManagerV2.destroy();
+syncManager.destroy();
 ```
 
 ## Effect Composition Examples
@@ -132,7 +132,7 @@ syncManagerV2.destroy();
 
 ```typescript
 import { Effect } from "effect";
-import { getStorageItem, setStorageItem } from "@/services/sync-v2";
+import { getStorageItem, setStorageItem } from "@/services/sync";
 
 // Get value
 const deviceIdEffect = getStorageItem("coinx:sync:deviceId");
@@ -147,7 +147,7 @@ await Effect.runPromise(setEffect);
 
 ```typescript
 import { Effect, pipe } from "effect";
-import { checkAuthentication, apiPost } from "@/services/sync-v2";
+import { checkAuthentication, apiPost } from "@/services/sync";
 
 const registerDevice = () =>
   pipe(
@@ -172,7 +172,7 @@ const deviceId = await Effect.runPromise(registerDevice());
 
 ```typescript
 import { Effect } from "effect";
-import { DatabaseError, StorageError } from "@/services/sync-v2";
+import { DatabaseError, StorageError } from "@/services/sync";
 
 const myEffect = pipe(
   someEffect,
@@ -225,9 +225,9 @@ import { syncManager } from "@/services/sync";
 await syncManager.initialize();
 
 // V2
-import { syncManagerV2 } from "@/services/sync-v2";
+import { syncManager } from "@/services/sync";
 import { Effect } from "effect";
-await Effect.runPromise(syncManagerV2.initialize());
+await Effect.runPromise(syncManager.initialize());
 ```
 
 The main difference is that Effect-returning methods need to be run with `Effect.runPromise()`.
@@ -238,7 +238,7 @@ Each module can be tested independently:
 
 ```typescript
 import { Effect } from "effect";
-import { getStorageItem, setStorageItem } from "@/services/sync-v2";
+import { getStorageItem, setStorageItem } from "@/services/sync";
 
 describe("Storage Effects", () => {
   it("should get and set storage items", async () => {

@@ -49,6 +49,7 @@ export class SyncManager {
 	private syncInProgress = false;
 	private syncCancelled = false;
 	private hasPendingSync = false;
+	private lastSyncHadError = false;
 	private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 	private listeners: Set<(state: SyncState) => void> = new Set();
 	private appStateSubscription: ReturnType<
@@ -125,7 +126,7 @@ export class SyncManager {
 				// Skip device registration for web platform
 				if (Platform.OS === "web") {
 					const webDeviceId = `web-session-${Date.now()}`;
-					this.state.deviceId = webDeviceId;
+					this.updateState({ deviceId: webDeviceId });
 					return Effect.succeed(webDeviceId);
 				}
 
@@ -155,7 +156,7 @@ export class SyncManager {
 						return pipe(
 							setStorageItem(KEYS.DEVICE_ID, deviceId),
 							Effect.map(() => {
-								this.state.deviceId = deviceId;
+								this.updateState({ deviceId });
 								return deviceId;
 							}),
 							Effect.mapError(
@@ -227,7 +228,7 @@ export class SyncManager {
 			Effect.sync(() => {
 				// Skip sync for web platform
 				if (Platform.OS === "web") {
-					return true;
+					return false;
 				}
 
 				if (this.syncInProgress) {
@@ -299,6 +300,7 @@ export class SyncManager {
 						error instanceof Error ? error.message : "Sync failed";
 					console.error("Sync error:", message);
 					if (!this.syncCancelled && !(error instanceof SyncCancelledError)) {
+						this.lastSyncHadError = true;
 						this.updateState({ status: "error", error: message });
 					}
 				}),
@@ -307,10 +309,17 @@ export class SyncManager {
 				Effect.sync(() => {
 					this.syncInProgress = false;
 					// If changes occurred during sync, schedule another sync
-					if (this.hasPendingSync && !this.syncCancelled) {
-						this.hasPendingSync = false;
+					// Only reschedule if no error occurred and sync wasn't cancelled
+					if (
+						this.hasPendingSync &&
+						!this.syncCancelled &&
+						!this.lastSyncHadError
+					) {
 						setTimeout(() => this.syncIfAuthenticated(), 0);
 					}
+					// Reset flags for next sync
+					this.hasPendingSync = false;
+					this.lastSyncHadError = false;
 				}),
 			),
 		);

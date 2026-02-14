@@ -94,10 +94,12 @@ export const applyTableChanges = (
 						const localRecord: Record<string, unknown> = { ...record };
 						// Convert string amounts back to numbers for local storage
 						if (typeof localRecord.amount === "string") {
-							localRecord.amount = Number.parseFloat(localRecord.amount);
+							const parsed = Number.parseFloat(localRecord.amount);
+							localRecord.amount = Number.isNaN(parsed) ? 0 : parsed;
 						}
 						if (typeof localRecord.price === "string") {
-							localRecord.price = Number.parseFloat(localRecord.price);
+							const parsed = Number.parseFloat(localRecord.price);
+							localRecord.price = Number.isNaN(parsed) ? 0 : parsed;
 						}
 						localRecord.syncStatus = "synced";
 
