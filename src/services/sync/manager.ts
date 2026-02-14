@@ -31,7 +31,6 @@ import type {
 	SyncPushResponse,
 	SyncPullResponse,
 	PushedIds,
-	STORAGE_KEYS,
 } from "./types";
 import { STORAGE_KEYS as KEYS } from "./types";
 
