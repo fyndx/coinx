@@ -70,6 +70,9 @@ export class SyncManager {
 			Effect.map(([deviceId, lastSyncedAt]) => {
 				this.updateState({ deviceId, lastSyncedAt });
 
+				// Remove existing listener if re-initializing
+				this.appStateSubscription?.remove();
+
 				// Auto-sync on app foreground
 				this.appStateSubscription = AppState.addEventListener(
 					"change",
