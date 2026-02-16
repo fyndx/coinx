@@ -9,7 +9,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { loadAsync } from "expo-font";
 import { getLocales } from "expo-localization";
-import type { CurrencyData } from "rn-currency-picker";
+
+interface CurrencyData {
+	code: string;
+	symbol: string;
+	name?: string;
+	[key: string]: unknown;
+}
 
 export class AppModel {
 	obs;
@@ -39,14 +45,10 @@ export class AppModel {
 	};
 
 	loadFonts = async () => {
-		try {
-			await loadAsync({
-				LatoRegular: LatoRegular,
-				...MaterialCommunityIcons.font,
-			});
-		} catch (error) {
-			throw error;
-		}
+		await loadAsync({
+			LatoRegular: LatoRegular,
+			...MaterialCommunityIcons.font,
+		});
 	};
 
 	private loadCurrency = async () => {

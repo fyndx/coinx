@@ -24,14 +24,14 @@ export const InsightsHeader = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
 		const handleOptionChange = ({ nativeEvent }: NativeActionEvent) => {
 			insightsModel$.actions.setDurationType({
-				durationType: nativeEvent.event,
+				durationType: nativeEvent.event as "week" | "month" | "year",
 			});
 		};
 		return (
 			<View className="flex-row justify-between items-center">
 				<Text className="text-3xl font-bold">Insights</Text>
 				<MenuView actions={ACTIONS} onPressAction={handleOptionChange}>
-					<Button size="sm" variant="outline">
+					<Button size="sm" variant="secondary">
 						<Text>{insightsModel$.obs.durationType.get()}</Text>
 					</Button>
 				</MenuView>

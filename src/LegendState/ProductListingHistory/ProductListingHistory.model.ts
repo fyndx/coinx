@@ -15,7 +15,7 @@ interface ConsolidatedPriceData {
 }
 
 interface ProductListingHistoryData {
-	productListingId: number;
+	productListingId: string;
 	price: number;
 	recordedAt: string;
 	listingName: string;
@@ -55,7 +55,7 @@ export class ProductsListingHistoryModel {
 		});
 	};
 
-	getProductListingsHistoryByProductId = async (productId: number) => {
+	getProductListingsHistoryByProductId = async (productId: string) => {
 		this.productsListingHistory.status.set("pending");
 		try {
 			const productListingHistoryData = await Effect.runPromise(
@@ -70,7 +70,7 @@ export class ProductsListingHistoryModel {
 						price: Currency.fromSmallestSubunit(
 							listing.price,
 							appModel.obs.currency.code.peek(),
-						),
+						) as number, // Added 'as number'
 					};
 				},
 			);

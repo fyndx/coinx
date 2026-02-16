@@ -35,7 +35,7 @@ export const Transaction = ({
 							amount: transaction.amount,
 							transactionType: transaction.transactionType,
 							transactionTime: transaction.transactionTime,
-							categoryId: transaction.category_id,
+							categoryId: transaction.categoryId,
 							categoryName: transaction.category_name,
 							note: transaction.note,
 						},
@@ -53,7 +53,9 @@ export const Transaction = ({
 							</View>
 							{/* Transaction Details */}
 							<View className="flex-1">
-								<Text className="font-medium">{transaction.note ?? transaction.category_name}</Text>
+								<Text className="font-medium">
+									{transaction.note ?? transaction.category_name}
+								</Text>
 								{/* Time with am and pm */}
 								<Text className="text-sm text-muted-foreground">
 									{dayjs(transaction.transactionTime).format("h:mm A")}
@@ -64,7 +66,9 @@ export const Transaction = ({
 						<View className="flex-row items-center px-3">
 							<Text
 								className={`text-lg font-medium ${
-									transaction.transactionType === "Income" ? "text-green-600" : "text-red-600"
+									transaction.transactionType === "Income"
+										? "text-green-600"
+										: "text-red-600"
 								}`}
 							>
 								{transaction.amount}
@@ -76,4 +80,3 @@ export const Transaction = ({
 		</SwipeableRow>
 	);
 };
-

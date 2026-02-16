@@ -4,21 +4,20 @@ import { ChevronRightCircle } from "lucide-react-native";
 import { Link } from "expo-router";
 import { useRef } from "react";
 import { View, Pressable } from "react-native";
-import {
-	CurrencyPicker,
-	type CurrencyPickerRef,
-} from "rn-currency-picker";
+import { CurrencyPicker, type CurrencyPickerRef } from "rn-currency-picker";
 import { Text } from "@/src/Components/ui/Text";
 
 const CurrencySelect = observer(() => {
-	const currencyPickerRef = useRef<CurrencyPickerRef>();
+	const currencyPickerRef = useRef<CurrencyPickerRef>(null);
 
-	const handleCurrencySelect = (data: any) => {
+	const handleCurrencySelect = (data: Record<string, unknown>) => {
 		if (!data || !data.symbol) {
 			console.error("Invalid currency data received");
 			return;
 		}
-		appModel.actions.setCurrency(data);
+		appModel.actions.setCurrency(
+			data as Parameters<typeof appModel.actions.setCurrency>[0],
+		);
 	};
 
 	return (
@@ -26,7 +25,7 @@ const CurrencySelect = observer(() => {
 			<View className="flex-1" />
 			<Text className="text-xl font-bold text-center">{"Select Currency"}</Text>
 			<CurrencyPicker
-				currencyPickerRef={(ref: any) => {
+				currencyPickerRef={(ref: CurrencyPickerRef) => {
 					currencyPickerRef.current = ref;
 				}}
 				enable={true}
@@ -50,7 +49,12 @@ const CurrencySelect = observer(() => {
 					asChild
 				>
 					<Pressable>
-						<ChevronRightCircle size={32} color={appModel.obs.currency.get() === undefined ? "gray" : "black"} />
+						<ChevronRightCircle
+							size={32}
+							color={
+								appModel.obs.currency.get() === undefined ? "gray" : "black"
+							}
+						/>
 					</Pressable>
 				</Link>
 			</View>
@@ -60,4 +64,3 @@ const CurrencySelect = observer(() => {
 });
 
 export default CurrencySelect;
-

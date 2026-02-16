@@ -66,6 +66,6 @@ export const createZipArchive = async ({
 	try {
 		await zip(sourceDir, destZipFile);
 	} catch (error) {
-		throw new Error(`Failed to create zip archive: ${error.message}`);
+		throw new Error(`Failed to create zip archive: ${error instanceof Error ? error.message : String(error)}`);
 	}
 };

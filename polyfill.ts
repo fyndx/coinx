@@ -1,5 +1,6 @@
 // FIXME: Remove polyfills when Expo SDK 51 drops which has TextEncoder and TextDecoder built-in
 // https://discord.com/channels/795981131316985866/1151827019684905000/1233104222954852454
+// @ts-nocheck - Vendored polyfill, not compatible with strict TS
 (function (window) {
 	"use strict";
 	var log = Math.log;
@@ -20,7 +21,7 @@
 	var arrayBufferString = Object_prototype_toString.call(
 		(NativeUint8Array ? ArrayBuffer : patchedU8Array).prototype,
 	);
-	function decoderReplacer(encoded) {
+	function decoderReplacer(encoded: string) {
 		var cp0 = encoded.charCodeAt(0),
 			codePoint = 0x110000,
 			i = 0,
@@ -69,12 +70,12 @@
 
 		return result;
 	}
-	function TextDecoder(_, opts) {
+	function TextDecoder(_label: string | undefined, opts: TextDecoderOptions | undefined) {
 		/*this["ignoreBOM"] = !!opts && !!opts["ignoreBOM"]*/
 	}
-	TextDecoder["prototype"]["decode"] = function (inputArrayOrBuffer) {
+	TextDecoder["prototype"]["decode"] = function (inputArrayOrBuffer: ArrayBuffer | ArrayBufferView | undefined) {
 		var buffer =
-			(inputArrayOrBuffer && inputArrayOrBuffer.buffer) || inputArrayOrBuffer;
+			((inputArrayOrBuffer as Record<string, unknown>)?.buffer) || inputArrayOrBuffer;
 		var asObjectString = Object_prototype_toString.call(buffer);
 		if (
 			asObjectString !== arrayBufferString &&
@@ -105,6 +106,6 @@
 			decoderReplacer,
 		);
 	};
-	if (!window["TextDecoder"]) window["TextDecoder"] = TextDecoder;
+	if (!window["TextDecoder"]) (window as Record<string, unknown>)["TextDecoder"] = TextDecoder;
 	// })(typeof global == "" + void 0 ? typeof self == "" + void 0 ? this : self : global);
 })(globalThis);

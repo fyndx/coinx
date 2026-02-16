@@ -42,7 +42,7 @@ const SignUp = observer(() => {
 					[{ text: "OK", onPress: () => router.replace("/(auth)/sign-in") }],
 				);
 			} else {
-				router.replace("/(tabs)");
+				router.replace("/(tabs)" as const as "/");
 			}
 		}
 	};
@@ -133,7 +133,7 @@ const SignUp = observer(() => {
 				</View>
 
 				<Pressable
-					onPress={() => router.replace("/(tabs)")}
+					onPress={() => router.replace("/(tabs)" as const as "/")}
 					className="mt-4"
 				>
 					<Text className="text-muted-foreground text-center text-sm">

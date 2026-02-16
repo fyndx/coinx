@@ -80,7 +80,7 @@ const AddProduct = observer(() => {
 				<Button
 					onPress={handleSubmit}
 					// TODO: Disable Button unless input and select is valid
-					disabled={isAddProductInProgress}
+					isDisabled={isAddProductInProgress}
 				>
 					<Text>{id ? "Edit Product" : "Add Product"}</Text>
 				</Button>

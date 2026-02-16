@@ -59,7 +59,7 @@ const EditProductListing = observer(() => {
 				</View>
 				<Button
 					onPress={editProductListingModel.updateProductListing}
-					disabled={editProductListingModel.views.isButtonDisabled.get()}
+					isDisabled={editProductListingModel.views.isButtonDisabled.get()}
 				>
 					<Text>Update Price</Text>
 				</Button>
