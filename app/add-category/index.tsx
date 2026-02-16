@@ -18,10 +18,12 @@ import { Button } from "heroui-native";
 import { Input } from "@/src/Components/ui/Input";
 import { Text } from "@/src/Components/ui/Text";
 
-const CategoryType = observer(({ state$ }: { state$: any }) => {
+type CategoryState = typeof rootStore.categoryModel.category;
+
+const CategoryType = observer(({ state$ }: { state$: CategoryState }) => {
 	const onCategoryChanged = (value: string) => {
 		console.log({ value });
-		state$.type.set(value);
+		state$.type.set(value as "Income" | "Expense");
 	};
 
 	const type = state$.type.get();
@@ -53,7 +55,7 @@ const CategoryType = observer(({ state$ }: { state$: any }) => {
 	);
 });
 
-const Emoji = observer(({ state$ }: { state$: any }) => {
+const Emoji = observer(({ state$ }: { state$: CategoryState }) => {
 	const handlePickedEmoji = (val: EmojiType) => {
 		state$.icon.set(val.emoji);
 	};
@@ -86,9 +88,13 @@ const CategoryNameRow = observer(
 		state$,
 		colorSheetRef,
 		addCategory,
-	}: { state$: any; colorSheetRef: any; addCategory: any }) => {
+	}: {
+		state$: CategoryState;
+		colorSheetRef: React.RefObject<BottomSheet | null>;
+		addCategory: () => void;
+	}) => {
 		const openColorPicker = () => {
-			colorSheetRef.current.snapToIndex(0);
+			colorSheetRef.current?.snapToIndex(0);
 		};
 
 		const handleTextChange = (text: string) => {
@@ -120,7 +126,11 @@ const ColorPickerSheet = observer(
 		state$,
 		colorSheetRef,
 		colors,
-	}: { state$: any; colorSheetRef: any; colors: string[] }) => {
+	}: {
+		state$: CategoryState;
+		colorSheetRef: React.RefObject<BottomSheet | null>;
+		colors: string[];
+	}) => {
 		const handleConfirm = () => {
 			colorSheetRef.current?.close?.();
 		};

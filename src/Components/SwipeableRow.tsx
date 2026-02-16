@@ -1,4 +1,4 @@
-import { Component, type PropsWithChildren } from "react";
+import React, { Component, type PropsWithChildren } from "react";
 import {
 	Pressable,
 	type StyleProp,
@@ -8,7 +8,6 @@ import {
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable, {
 	type SwipeableMethods,
-	type SwipeableRef,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
 	Extrapolation,
@@ -88,11 +87,8 @@ const ActionButton = ({
 export class SwipeableRow extends Component<
 	PropsWithChildren<SwipeableRowProps>
 > {
-	private swipeableRowRef?: SwipeableRef | null = null;
-
-	private updateRef = (ref: SwipeableRef | null) => {
-		this.swipeableRowRef = ref;
-	};
+	private swipeableRowRef: React.RefObject<SwipeableMethods | null> =
+		React.createRef<SwipeableMethods | null>();
 
 	private renderActions = ({
 		actions,
@@ -127,7 +123,7 @@ export class SwipeableRow extends Component<
 		const { children, leftActions = [], rightActions = [] } = this.props;
 		return (
 			<Swipeable
-				ref={this.updateRef}
+				ref={this.swipeableRowRef}
 				renderLeftActions={(progress, dragX, swipeable) =>
 					this.renderActions({
 						actions: leftActions,

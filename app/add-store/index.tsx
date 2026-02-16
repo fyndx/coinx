@@ -45,7 +45,7 @@ const AddStore = observer(() => {
 					value={location ?? ""}
 				/>
 			</View>
-			<Button onPress={handleSubmit} disabled={isSubmitting}>
+			<Button onPress={handleSubmit} isDisabled={isSubmitting}>
 				<Text>
 					{isSubmitting ? "Saving..." : id ? "Update Store" : "Add Store"}
 				</Text>

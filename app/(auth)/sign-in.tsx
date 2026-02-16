@@ -5,12 +5,7 @@ import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import { observer } from "@legendapp/state/react";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import {
-	KeyboardAvoidingView,
-	Platform,
-	Pressable,
-	View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, View } from "react-native";
 
 const SignIn = observer(() => {
 	const [email, setEmail] = useState("");
@@ -85,9 +80,7 @@ const SignIn = observer(() => {
 				</View>
 
 				<View className="flex-row justify-center mt-6">
-					<Text className="text-muted-foreground">
-						Don't have an account?{" "}
-					</Text>
+					<Text className="text-muted-foreground">Don't have an account? </Text>
 					<Link href="/(auth)/sign-up" asChild>
 						<Pressable>
 							<Text className="text-primary font-medium">Sign Up</Text>
@@ -96,7 +89,7 @@ const SignIn = observer(() => {
 				</View>
 
 				<Pressable
-					onPress={() => router.replace("/(tabs)")}
+					onPress={() => router.replace("/(tabs)" as const as "/")}
 					className="mt-4"
 				>
 					<Text className="text-muted-foreground text-center text-sm">

@@ -63,9 +63,7 @@ export class EditProductListing {
 			this.productListing.set({
 				data: {
 					...productListing[0],
-					syncStatus: productListing[0].syncStatus ?? null,
-					deletedAt: productListing[0].deletedAt ?? null,
-				} as ProductListingData,
+				} as unknown as ProductListingData,
 				status: "success",
 			});
 		} else {

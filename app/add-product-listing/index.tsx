@@ -15,8 +15,8 @@ const AddProductListing = observer(() => {
 	const productModel$ = rootStore.addProductListingModel;
 
 	useMount(() => {
-		const productId = Number(id);
-		if (Number.isNaN(productId)) {
+		const productId = id as string;
+		if (!productId) {
 			return;
 		}
 
@@ -94,7 +94,9 @@ const AddProductListing = observer(() => {
 					<Select
 						placeholder={"Store *"}
 						data={storeModel$.storesList.get()}
-						displayField={(item: any) => `${item.name} - ${item.location}`}
+						displayField={(item: { name: string; location: string | null }) =>
+							`${item.name} - ${item.location}`
+						}
 						onValueChange={handleStoreChange}
 					/>
 					<Input

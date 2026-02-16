@@ -136,15 +136,15 @@ const CategoryAndDateButtons = observer(
 		categorySheetRef,
 	}: {
 		transactionModel$: TransactionModel;
-		dateSheetRef: any;
-		categorySheetRef: any;
+		dateSheetRef: React.RefObject<BottomSheet | null>;
+		categorySheetRef: React.RefObject<BottomSheet | null>;
 	}) => {
 		const openDatepicker = () => {
-			dateSheetRef.current.snapToIndex(0);
+			dateSheetRef.current?.snapToIndex(0);
 		};
 
 		const openCategoryPicker = () => {
-			categorySheetRef.current.snapToIndex(0);
+			categorySheetRef.current?.snapToIndex(0);
 		};
 
 		const rawCategory = transactionModel$.transaction.categoryName.get();
@@ -154,7 +154,7 @@ const CategoryAndDateButtons = observer(
 		return (
 			<View className="flex-row gap-3 px-4">
 				<Button
-					variant="outline"
+					variant="secondary"
 					className="flex-3 bg-green-500 active:bg-green-700 border-0"
 					onPress={openDatepicker}
 				>
@@ -165,7 +165,7 @@ const CategoryAndDateButtons = observer(
 					</Text>
 				</Button>
 				<Button
-					variant="outline"
+					variant="secondary"
 					className="flex-2 bg-green-500 active:bg-green-700 border-0"
 					onPress={openCategoryPicker}
 				>
@@ -180,13 +180,16 @@ const DatePicker = observer(
 	({
 		transactionModel$,
 		dateSheetRef,
-	}: { transactionModel$: TransactionModel; dateSheetRef: any }) => {
+	}: {
+		transactionModel$: TransactionModel;
+		dateSheetRef: React.RefObject<BottomSheet | null>;
+	}) => {
 		const locale = appModel.obs.locale.get();
 		const snapPoints = useMemo(() => ["50%"], []);
 
 		const handleValueChange = (value: { date: DateType }) => {
 			transactionModel$.transaction.date.set(value.date);
-			dateSheetRef.current.close();
+			dateSheetRef.current?.close();
 		};
 
 		return (
@@ -215,12 +218,12 @@ const CategoryPicker = observer(
 	}: {
 		transactionModel$: TransactionModel;
 		categoryModel$: CategoryModel;
-		categorySheetRef: any;
+		categorySheetRef: React.RefObject<BottomSheet | null>;
 	}) => {
 		const onCategoryPressed = async (category: ICategory) => {
 			transactionModel$.transaction.categoryId.set(category.id);
 			transactionModel$.transaction.categoryName.set(category.name);
-			categorySheetRef.current.close();
+			categorySheetRef.current?.close();
 		};
 
 		return (
