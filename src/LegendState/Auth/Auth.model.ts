@@ -1,6 +1,7 @@
 import { api } from "@/src/services/api";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
+import { claimAnonymousData } from "@/src/services/sync/migration";
 import { Effect } from "effect";
 import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
@@ -77,6 +78,13 @@ export class AuthModel {
 
 			// Register profile on backend
 			if (data.session) {
+				const userId = data.session.user.id;
+
+				// Claim any anonymous local data for this user before syncing
+				await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
+					console.warn("Failed to claim anonymous data on sign up");
+				});
+
 				try {
 					await api.post("/api/auth/register");
 				} catch (e) {
@@ -84,7 +92,7 @@ export class AuthModel {
 					// Don't block auth — backend profile can be created later
 				}
 
-				// Trigger initial sync after sign up
+				// Trigger initial sync after sign up (will push newly claimed records)
 				syncManager.syncIfAuthenticated();
 			}
 
@@ -107,7 +115,7 @@ export class AuthModel {
 		this.obs.error.set(null);
 
 		try {
-			const { error } = await supabase.auth.signInWithPassword({
+			const { data, error } = await supabase.auth.signInWithPassword({
 				email,
 				password,
 			});
@@ -117,15 +125,24 @@ export class AuthModel {
 				return { success: false, error: error.message };
 			}
 
-			// Ensure profile exists on backend
-			try {
-				await api.post("/api/auth/register");
-			} catch (e) {
-				console.warn("Backend profile registration failed:", e);
-			}
+			if (data.session) {
+				const userId = data.session.user.id;
 
-			// Trigger sync after sign in
-			syncManager.syncIfAuthenticated();
+				// Claim any anonymous local data for this user before syncing
+				await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
+					console.warn("Failed to claim anonymous data on sign in");
+				});
+
+				// Ensure profile exists on backend
+				try {
+					await api.post("/api/auth/register");
+				} catch (e) {
+					console.warn("Backend profile registration failed:", e);
+				}
+
+				// Trigger sync after sign in (will push newly claimed records)
+				syncManager.syncIfAuthenticated();
+			}
 
 			return { success: true };
 		} catch (error) {
