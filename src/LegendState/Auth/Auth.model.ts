@@ -125,23 +125,24 @@ export class AuthModel {
 				return { success: false, error: error.message };
 			}
 
-			// Claim any anonymous local data for this user before syncing
 			if (data.session) {
 				const userId = data.session.user.id;
+
+				// Claim any anonymous local data for this user before syncing
 				await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
 					console.warn("Failed to claim anonymous data on sign in");
 				});
-			}
 
-			// Ensure profile exists on backend
-			try {
-				await api.post("/api/auth/register");
-			} catch (e) {
-				console.warn("Backend profile registration failed:", e);
-			}
+				// Ensure profile exists on backend
+				try {
+					await api.post("/api/auth/register");
+				} catch (e) {
+					console.warn("Backend profile registration failed:", e);
+				}
 
-			// Trigger sync after sign in (will push newly claimed records)
-			syncManager.syncIfAuthenticated();
+				// Trigger sync after sign in (will push newly claimed records)
+				syncManager.syncIfAuthenticated();
+			}
 
 			return { success: true };
 		} catch (error) {
