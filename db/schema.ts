@@ -28,6 +28,7 @@ export const categories = sqliteTable("coinx_category", {
 	// Sync fields
 	syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
 	deletedAt: text("deleted_at"),
+	localOwnerId: text("local_owner_id"),
 });
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -54,6 +55,7 @@ export const transactions = sqliteTable("coinx_transaction", {
 	// Sync fields
 	syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
 	deletedAt: text("deleted_at"),
+	localOwnerId: text("local_owner_id"),
 });
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
@@ -78,6 +80,7 @@ export const products = sqliteTable("coinx_product", {
 	// Sync fields
 	syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
 	deletedAt: text("deleted_at"),
+	localOwnerId: text("local_owner_id"),
 });
 
 export const productsRelations = relations(products, ({ many }) => ({
@@ -102,6 +105,7 @@ export const stores = sqliteTable(
 			"pending",
 		),
 		deletedAt: text("deleted_at"),
+		localOwnerId: text("local_owner_id"),
 	},
 	(table) => ({
 		uniqueNameAndLocation: unique("unique_store_name_location").on(
@@ -141,6 +145,7 @@ export const product_listings = sqliteTable(
 			"pending",
 		),
 		deletedAt: text("deleted_at"),
+		localOwnerId: text("local_owner_id"),
 	},
 	(table) => ({
 		productIdIdx: index("idx_product_listings_product_id").on(table.productId),
@@ -184,6 +189,7 @@ export const product_listings_history = sqliteTable(
 			"pending",
 		),
 		deletedAt: text("deleted_at"),
+		localOwnerId: text("local_owner_id"),
 	},
 	(table) => ({
 		productIdIdx: index("idx_product_listings_history_product_id").on(

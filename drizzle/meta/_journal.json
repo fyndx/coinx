@@ -15,6 +15,13 @@
       "when": 1769607718569,
       "tag": "0001_flaky_senator_kelly",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771301182626,
+      "tag": "0002_stale_lester",
+      "breakpoints": true
     }
   ]
 }
