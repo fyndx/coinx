@@ -70,12 +70,18 @@
 
 		return result;
 	}
-	function TextDecoder(_label: string | undefined, opts: TextDecoderOptions | undefined) {
+	function TextDecoder(
+		_label: string | undefined,
+		opts: TextDecoderOptions | undefined,
+	) {
 		/*this["ignoreBOM"] = !!opts && !!opts["ignoreBOM"]*/
 	}
-	TextDecoder["prototype"]["decode"] = function (inputArrayOrBuffer: ArrayBuffer | ArrayBufferView | undefined) {
+	TextDecoder["prototype"]["decode"] = function (
+		inputArrayOrBuffer: ArrayBuffer | ArrayBufferView | undefined,
+	) {
 		var buffer =
-			((inputArrayOrBuffer as Record<string, unknown>)?.buffer) || inputArrayOrBuffer;
+			(inputArrayOrBuffer as Record<string, unknown>)?.buffer ||
+			inputArrayOrBuffer;
 		var asObjectString = Object_prototype_toString.call(buffer);
 		if (
 			asObjectString !== arrayBufferString &&
@@ -106,6 +112,7 @@
 			decoderReplacer,
 		);
 	};
-	if (!window["TextDecoder"]) (window as Record<string, unknown>)["TextDecoder"] = TextDecoder;
+	if (!window["TextDecoder"])
+		(window as Record<string, unknown>)["TextDecoder"] = TextDecoder;
 	// })(typeof global == "" + void 0 ? typeof self == "" + void 0 ? this : self : global);
 })(globalThis);

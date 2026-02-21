@@ -59,7 +59,9 @@ export class ProductsListingsModel {
 				};
 			});
 			this.productId.set(productId);
-			this.productListings.set(updatedProductListings as ProductListingWithStore[]);
+			this.productListings.set(
+				updatedProductListings as ProductListingWithStore[],
+			);
 		} catch (error) {
 			console.error("[ProductsListings] Failed to fetch listings:", error);
 			Burnt.toast({
@@ -93,7 +95,10 @@ export class ProductsListingsModel {
 
 	createRandomProductListings = async () => {
 		// TODO: Pick Product IDs from the table
-		generateRandomProductListings(10, { productIds: ["1", "2", "3"], storeIds: ["1", "2", "3"] });
+		generateRandomProductListings(10, {
+			productIds: ["1", "2", "3"],
+			storeIds: ["1", "2", "3"],
+		});
 	};
 
 	// @Views

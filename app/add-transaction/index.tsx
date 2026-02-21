@@ -1,4 +1,6 @@
 import { CategoriesList } from "@/src/Components/CategoriesList";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import type {
@@ -11,23 +13,21 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { observer, useMount, useUnmount } from "@legendapp/state/react";
-import { CheckSquare, Delete } from "lucide-react-native";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { Button } from "heroui-native";
+import { CheckSquare, Delete } from "lucide-react-native";
 import { useMemo, useRef } from "react";
 import {
 	Alert,
 	Dimensions,
 	type GestureResponderEvent,
+	Pressable,
 	StyleSheet,
 	View,
-	Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
-import { Button } from "heroui-native";
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
 
 const TransactionType = observer(
 	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {

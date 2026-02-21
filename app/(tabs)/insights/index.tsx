@@ -1,3 +1,4 @@
+import { Text } from "@/src/Components/ui/Text";
 import { BarGraphView } from "@/src/Containers/Insights/Components/BarGraphView";
 import { InsightsHeader } from "@/src/Containers/Insights/Components/InsightsHeader";
 import { InsightsGraph } from "@/src/Containers/Insights/Containers/InsightsGraph";
@@ -7,7 +8,6 @@ import { useMount } from "@legendapp/state/react";
 import { Construction } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "@/src/Components/ui/Text";
 
 const Insights = () => {
 	useMount(() => {
@@ -53,4 +53,3 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 });
-

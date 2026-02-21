@@ -4,7 +4,10 @@ import { faker } from "@faker-js/faker";
 const generateRandomProductListing = ({
 	productIds,
 	storeIds,
-}: { productIds: string[]; storeIds: string[] }): Omit<InsertProductListing, "id"> => {
+}: { productIds: string[]; storeIds: string[] }): Omit<
+	InsertProductListing,
+	"id"
+> => {
 	const price = faker.number.float({ min: 10, max: 1000, fractionDigits: 2 });
 	const quantity = faker.number.float({ min: 1, max: 10, fractionDigits: 2 });
 	return {

@@ -3,8 +3,8 @@ import { observer } from "@legendapp/state/react";
 import { Trash2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import type { ICategory } from "../LegendState/Category.model";
-import { Text } from "./ui/Text";
 import { SwipeableRow } from "./SwipeableRow";
+import { Text } from "./ui/Text";
 
 interface CategoryProps {
 	category: ObservableObject<ICategory>;
@@ -49,4 +49,3 @@ export const Category = observer(
 		);
 	},
 );
-

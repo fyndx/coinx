@@ -1,9 +1,9 @@
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { generateRandomTransactions } from "@/src/database/seeds/TransactionSeeds";
-import { Delete } from "lucide-react-native";
 import { Link } from "expo-router";
+import { Delete } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 const PlaygroundScreen = () => {
 	const clearTransactions = () => {

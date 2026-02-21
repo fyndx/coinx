@@ -1,5 +1,5 @@
-import type { StoresListObservable } from "@/src/LegendState/Store/Store.model";
 import { Text } from "@/src/Components/ui/Text";
+import type { StoresListObservable } from "@/src/LegendState/Store/Store.model";
 import { observer } from "@legendapp/state/react";
 import { Store } from "lucide-react-native";
 import { Fragment } from "react";

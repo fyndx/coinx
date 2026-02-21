@@ -50,11 +50,13 @@ class RootStore {
 		// Initialize sync manager (restores deviceId, starts foreground listener)
 		await Effect.runPromise(
 			syncManager.initialize().pipe(
-				Effect.tapError((err) => 
-					Effect.sync(() => console.warn("Sync manager initialization failed:", err))
+				Effect.tapError((err) =>
+					Effect.sync(() =>
+						console.warn("Sync manager initialization failed:", err),
+					),
 				),
-				Effect.catchAll(() => Effect.void)
-			)
+				Effect.catchAll(() => Effect.void),
+			),
 		);
 
 		const isFirstLaunch = await appModel.checkFirstLaunch();
