@@ -18,7 +18,7 @@ import { DEFAULT_STORES } from "./stores-list";
 export interface StoresListObservable
 	extends ObservableArray<Array<SelectStore>> {}
 
-	type StoreDraft = Omit<InsertStore, "id"> & { id?: string };
+type StoreDraft = Omit<InsertStore, "id"> & { id?: string };
 
 export class StoreModel {
 	storesList: StoresListObservable;
