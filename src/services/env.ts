@@ -1,11 +1,15 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-	EXPO_PUBLIC_SUPABASE_URL: z.string().url("EXPO_PUBLIC_SUPABASE_URL must be a valid URL"),
+	EXPO_PUBLIC_SUPABASE_URL: z
+		.string()
+		.url("EXPO_PUBLIC_SUPABASE_URL must be a valid URL"),
 	EXPO_PUBLIC_SUPABASE_ANON_KEY: z
 		.string()
 		.min(1, "EXPO_PUBLIC_SUPABASE_ANON_KEY is required"),
-	EXPO_PUBLIC_BACKEND_URL: z.string().url("EXPO_PUBLIC_BACKEND_URL must be a valid URL"),
+	EXPO_PUBLIC_BACKEND_URL: z
+		.string()
+		.url("EXPO_PUBLIC_BACKEND_URL must be a valid URL"),
 });
 
 type Env = z.infer<typeof envSchema>;

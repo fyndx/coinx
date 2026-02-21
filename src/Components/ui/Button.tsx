@@ -1,8 +1,8 @@
-import * as React from "react";
-import { Pressable, Text, type PressableProps, View } from "react-native";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/src/utils/cn";
+import { type VariantProps, cva } from "class-variance-authority";
 import { Loader2 } from "lucide-react-native";
+import * as React from "react";
+import { Pressable, type PressableProps, Text, View } from "react-native";
 
 const buttonVariants = cva(
 	"group flex flex-row items-center justify-center rounded-md ring-offset-background web:transition-colors web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",

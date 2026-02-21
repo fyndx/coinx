@@ -1,4 +1,4 @@
-import type { SQLiteTable, SQLiteColumn } from "drizzle-orm/sqlite-core";
+import type { SQLiteColumn, SQLiteTable } from "drizzle-orm/sqlite-core";
 
 // ─── Type Utilities ──────────────────────────────────────────
 

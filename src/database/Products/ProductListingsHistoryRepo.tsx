@@ -1,8 +1,8 @@
 import { db as database } from "@/db/client";
 import {
+	type InsertProductListingHistory,
 	product_listings as productListingsRepo,
 	product_listings_history as productsListingsHistoryRepo,
-	type InsertProductListingHistory,
 } from "@/db/schema";
 import { DrizzleError } from "@/src/utils/error";
 import { generateUUID } from "@/src/utils/uuid";
@@ -52,7 +52,12 @@ export const getProductListingsHistoryByProductId = ({
 						productListingsRepo.id,
 					),
 				)
-				.where(and(eq(productsListingsHistoryRepo.productId, productId), isNull(productsListingsHistoryRepo.deletedAt)))
+				.where(
+					and(
+						eq(productsListingsHistoryRepo.productId, productId),
+						isNull(productsListingsHistoryRepo.deletedAt),
+					),
+				)
 				.orderBy(asc(productsListingsHistoryRepo.recordedAt));
 
 			return query.execute();

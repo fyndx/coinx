@@ -1,5 +1,5 @@
-import { View } from "react-native";
 import { Text } from "@/src/Components/ui/Text";
+import { View } from "react-native";
 
 export const TransactionSummary = ({
 	total,
@@ -15,4 +15,3 @@ export const TransactionSummary = ({
 		</View>
 	);
 };
-

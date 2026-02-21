@@ -101,7 +101,9 @@ export const stores = sqliteTable(
 		updatedAt: text("updated_at"),
 
 		// Sync fields
-		syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+		syncStatus: text("sync_status", { enum: syncStatusEnum }).default(
+			"pending",
+		),
 		deletedAt: text("deleted_at"),
 		localOwnerId: text("local_owner_id"),
 	},
@@ -139,7 +141,9 @@ export const product_listings = sqliteTable(
 		updatedAt: text("updated_at"),
 
 		// Sync fields
-		syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+		syncStatus: text("sync_status", { enum: syncStatusEnum }).default(
+			"pending",
+		),
 		deletedAt: text("deleted_at"),
 		localOwnerId: text("local_owner_id"),
 	},
@@ -181,7 +185,9 @@ export const product_listings_history = sqliteTable(
 		updatedAt: text("updated_at"),
 
 		// Sync fields
-		syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+		syncStatus: text("sync_status", { enum: syncStatusEnum }).default(
+			"pending",
+		),
 		deletedAt: text("deleted_at"),
 		localOwnerId: text("local_owner_id"),
 	},

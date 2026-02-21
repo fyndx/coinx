@@ -46,7 +46,10 @@ export const findProductByName = ({ name }: { name: string }) => {
 	});
 };
 
-export const addProduct = ({ name, defaultUnitCategory }: Omit<InsertProduct, "id">) => {
+export const addProduct = ({
+	name,
+	defaultUnitCategory,
+}: Omit<InsertProduct, "id">) => {
 	return Effect.promise(() => {
 		const query = database
 			.insert(productsRepo)

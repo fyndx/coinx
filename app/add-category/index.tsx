@@ -1,8 +1,11 @@
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { observer } from "@legendapp/state/react";
+import { Button } from "heroui-native";
 import { PlusSquare, Smile } from "lucide-react-native";
 import { useMemo, useRef } from "react";
-import { StyleSheet, View, Pressable } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import ColorPicker, {
 	BlueSlider,
 	GreenSlider,
@@ -14,9 +17,6 @@ import ColorPicker, {
 } from "reanimated-color-picker";
 import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
 import { rootStore } from "../../src/LegendState";
-import { Button } from "heroui-native";
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
 
 type CategoryState = typeof rootStore.categoryModel.category;
 

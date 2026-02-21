@@ -1,11 +1,11 @@
 import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
+import { Text } from "@/src/Components/ui/Text";
 import type { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
 import { observer } from "@legendapp/state/react";
 import { Circle, Text as SkiaText, useFont } from "@shopify/react-native-skia";
 import { Fragment } from "react";
-import { type SharedValue, useDerivedValue } from "react-native-reanimated";
 import { View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
+import { type SharedValue, useDerivedValue } from "react-native-reanimated";
 import { CartesianChart, Line, useChartPressState } from "victory-native";
 
 function ToolTip({

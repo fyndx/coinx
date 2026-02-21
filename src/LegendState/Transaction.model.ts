@@ -3,8 +3,8 @@ import {
 	type InsertTransaction,
 	transactions as transactionsRepo,
 } from "@/db/schema";
-import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { syncManager } from "@/src/services/sync";
+import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { generateUUID } from "@/src/utils/uuid";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";

@@ -1,10 +1,10 @@
-import { Effect } from "effect";
 import { db as database } from "@/db/client";
 import {
-	transactions as transactionsRepo,
 	categories as categoriesRepo,
+	transactions as transactionsRepo,
 } from "@/db/schema";
 import { and, between, desc, eq, isNull, sql, sum } from "drizzle-orm";
+import { Effect } from "effect";
 
 export const getCategories = ({
 	startDate,
