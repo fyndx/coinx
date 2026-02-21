@@ -56,6 +56,9 @@ export {
 // Sync Manager
 export { SyncManager } from "./manager";
 
+// Migration
+export { claimAnonymousData } from "./migration";
+
 // ─── Singleton Instance ──────────────────────────────────────
 
 import { SyncManager } from "./manager";
