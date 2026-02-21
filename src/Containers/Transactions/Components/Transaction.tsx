@@ -35,7 +35,7 @@ export const Transaction = ({
 							amount: transaction.amount,
 							transactionType: transaction.transactionType,
 							transactionTime: transaction.transactionTime,
-							categoryId: transaction.categoryId,
+							categoryId: transaction.category_id,
 							categoryName: transaction.category_name,
 							note: transaction.note,
 						},
