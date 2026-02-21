@@ -1,9 +1,11 @@
 import type { SelectProduct } from "@/db/schema";
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { WINDOW_HEIGHT } from "@gorhom/bottom-sheet";
 import { observer } from "@legendapp/state/react";
 import { FlashList } from "@shopify/flash-list";
+import { Link, useFocusEffect, useRouter } from "expo-router";
 import {
 	Box,
 	ChevronRight,
@@ -11,11 +13,9 @@ import {
 	PlusCircle,
 	Trash2,
 } from "lucide-react-native";
-import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "@/src/Components/ui/Text";
 
 const Product = ({
 	product,

@@ -1,36 +1,36 @@
-import { AppState, Platform } from "react-native";
-import { Effect, pipe } from "effect";
 import {
 	categories,
-	transactions,
-	products,
-	stores,
 	product_listings,
 	product_listings_history,
+	products,
+	stores,
+	transactions,
 } from "@/db/schema";
-import {
-	SyncCancelledError,
-	SyncPushError,
-	SyncPullError,
-	DeviceRegistrationError,
-	AuthenticationError,
-} from "./errors";
-import { getStorageItem, setStorageItem, removeStorageItem } from "./storage";
-import { checkAuthentication } from "./auth";
+import { Effect, pipe } from "effect";
+import { AppState, Platform } from "react-native";
 import { apiPost } from "./api";
+import { checkAuthentication } from "./auth";
 import {
+	applyTableChanges,
 	collectPendingRecords,
 	markRecordsSyncedForTable,
-	applyTableChanges,
 	splitChanges,
 } from "./database";
+import {
+	AuthenticationError,
+	DeviceRegistrationError,
+	SyncCancelledError,
+	SyncPullError,
+	SyncPushError,
+} from "./errors";
+import { getStorageItem, removeStorageItem, setStorageItem } from "./storage";
 import type {
-	SyncState,
+	PushedIds,
 	SyncChanges,
 	SyncChangesWithIds,
-	SyncPushResponse,
 	SyncPullResponse,
-	PushedIds,
+	SyncPushResponse,
+	SyncState,
 } from "./types";
 import { STORAGE_KEYS as KEYS } from "./types";
 

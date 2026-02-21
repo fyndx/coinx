@@ -34,7 +34,7 @@ export class AppModel {
 			// Run custom UUID migration first (converts integer IDs to UUIDs for existing users)
 			// This is a no-op for fresh installs
 			await runUUIDMigration(expoDb);
-			
+
 			// Then run Drizzle schema migrations
 			await migrate(db, migrations);
 			console.log("Database migrations ran successfully");

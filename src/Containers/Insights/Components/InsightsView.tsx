@@ -1,7 +1,7 @@
+import { Text } from "@/src/Components/ui/Text";
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 export const InsightsView = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
@@ -23,4 +23,3 @@ export const InsightsView = observer(
 		);
 	},
 );
-

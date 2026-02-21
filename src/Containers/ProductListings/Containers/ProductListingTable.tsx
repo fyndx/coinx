@@ -1,9 +1,9 @@
+import { Text } from "@/src/Components/ui/Text";
 import type { ObservableComputed } from "@legendapp/state";
 import { Switch, observer } from "@legendapp/state/react";
 import { useMemo, useRef } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 interface ProductListingTable {
 	head: string[];

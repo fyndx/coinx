@@ -1,11 +1,11 @@
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 import { DefaultUnitSelect } from "@/src/Containers/AddProduct/Components/DefaultUnitSelect";
 import { rootStore } from "@/src/LegendState";
 import { observer, useMount } from "@legendapp/state/react";
+import { Button } from "heroui-native";
 import { Keyboard, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "heroui-native";
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
 
 const AddProduct = observer(() => {
 	const addProductScreenModel$ = rootStore.addProductScreenModel;

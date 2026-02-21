@@ -3,13 +3,13 @@ import type {
 	TransactionsScreenModel,
 } from "@/src/LegendState/TransactionsScreen.model";
 import { observer } from "@legendapp/state/react";
-import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import dayjs from "dayjs";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useState } from "react";
 import { Modal, Pressable, View } from "react-native";
+import { dayjsLocaleDataInstance } from "../utils/date";
 import { Button } from "./ui/Button";
 import { Text } from "./ui/Text";
-import { dayjsLocaleDataInstance } from "../utils/date";
 
 const MONTHS = dayjsLocaleDataInstance.monthsShort();
 
@@ -92,7 +92,7 @@ export const MonthYearPicker = observer(
 				<Button variant="ghost" size="icon" onPress={handlePreviousMonth}>
 					<ChevronLeft size={24} color="black" />
 				</Button>
-				
+
 				<Button variant="outline" onPress={openPicker}>
 					{transactionsScreenModel$.selectedTimeRange.get()}
 				</Button>
@@ -139,7 +139,11 @@ export const MonthYearPicker = observer(
 									</Button>
 								))}
 							</View>
-							<Button variant="outline" className="mt-4" onPress={() => setModalVisible(false)}>
+							<Button
+								variant="outline"
+								className="mt-4"
+								onPress={() => setModalVisible(false)}
+							>
 								Cancel
 							</Button>
 						</View>
@@ -153,4 +157,3 @@ export const MonthYearPicker = observer(
 		);
 	},
 );
-

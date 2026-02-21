@@ -1,9 +1,9 @@
+import { Text } from "@/src/Components/ui/Text";
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { MenuView, type NativeActionEvent } from "@react-native-menu/menu";
-import { View } from "react-native";
 import { Button } from "heroui-native";
-import { Text } from "@/src/Components/ui/Text";
+import { View } from "react-native";
 
 const ACTIONS = [
 	{

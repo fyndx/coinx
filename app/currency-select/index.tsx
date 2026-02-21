@@ -1,11 +1,11 @@
+import { Text } from "@/src/Components/ui/Text";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import { observer } from "@legendapp/state/react";
-import { ChevronRightCircle } from "lucide-react-native";
 import { Link } from "expo-router";
+import { ChevronRightCircle } from "lucide-react-native";
 import { useRef } from "react";
-import { View, Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { CurrencyPicker, type CurrencyPickerRef } from "rn-currency-picker";
-import { Text } from "@/src/Components/ui/Text";
 
 const CurrencySelect = observer(() => {
 	const currencyPickerRef = useRef<CurrencyPickerRef>(null);

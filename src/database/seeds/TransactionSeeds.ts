@@ -6,7 +6,9 @@ import { faker } from "@faker-js/faker";
 // In production, fetch actual category IDs from the database
 const SEED_CATEGORY_IDS: string[] = [];
 
-const generateRandomTransaction = (categoryIds: string[]): Omit<InsertTransaction, "id"> => {
+const generateRandomTransaction = (
+	categoryIds: string[],
+): Omit<InsertTransaction, "id"> => {
 	return {
 		amount: faker.number.float({ min: 10, max: 1000, fractionDigits: 2 }),
 		transactionTime: faker.date.recent({ days: 90 }).toISOString(),
@@ -21,6 +23,10 @@ export const generateRandomTransactions = (
 	categoryIds?: string[],
 ): Omit<InsertTransaction, "id">[] => {
 	// Use provided category IDs or generate placeholder UUIDs
-	const ids = categoryIds?.length ? categoryIds : Array.from({ length: 5 }, () => generateUUID());
-	return Array.from({ length: count }).map(() => generateRandomTransaction(ids));
+	const ids = categoryIds?.length
+		? categoryIds
+		: Array.from({ length: 5 }, () => generateUUID());
+	return Array.from({ length: count }).map(() =>
+		generateRandomTransaction(ids),
+	);
 };

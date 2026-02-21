@@ -1,11 +1,11 @@
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import type { TransactionItem } from "@/src/LegendState/TransactionsScreen.model";
-import { Trash2 } from "lucide-react-native";
 import dayjs from "dayjs";
 import { Link } from "expo-router";
+import { Trash2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 export const Transaction = ({
 	transaction,

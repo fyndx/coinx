@@ -84,11 +84,11 @@ export class EditProductListing {
 		try {
 			this.editProductDraft.status.set("pending");
 			const productListing = this.productListing.data.peek();
-			
+
 			if (!productListing) {
 				throw new Error("Product listing not found");
 			}
-			
+
 			const price = Currency.toSmallestSubunit(
 				Number(this.editProductDraft.data.price.peek()),
 				appModel.obs.currency.code.peek(),

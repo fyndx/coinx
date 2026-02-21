@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { syncManager } from "@/src/services/sync";
+import { useEffect, useState } from "react";
 
 /**
  * React hook to subscribe to sync state.

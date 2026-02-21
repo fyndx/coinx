@@ -1,12 +1,12 @@
+import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { Component } from "react";
-import { InsightsView } from "../Components/InsightsView";
-import { BarGraphView } from "../Components/BarGraphView";
-import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
+import type { Animated as RNAnimated } from "react-native";
+import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import Animated from "react-native-reanimated";
-import { RectButton } from "react-native-gesture-handler";
-import type { Animated as RNAnimated } from "react-native";
+import { BarGraphView } from "../Components/BarGraphView";
+import { InsightsView } from "../Components/InsightsView";
 import { LineGraphView } from "../Components/LineGraphView";
 
 interface InsightsGraphProps {
@@ -83,4 +83,3 @@ export const InsightsGraph = observer(
 		);
 	},
 );
-

@@ -1,7 +1,7 @@
+import { Text } from "@/src/Components/ui/Text";
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { ScrollView, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 export const LineGraphView = observer(
 	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
@@ -40,13 +40,16 @@ export const LineGraphView = observer(
 					})}
 				</View>
 
-				<ScrollView horizontal={true} contentContainerStyle={{ flexGrow: 1 }} className="mt-2">
+				<ScrollView
+					horizontal={true}
+					contentContainerStyle={{ flexGrow: 1 }}
+					className="mt-2"
+				>
 					{categoriesGraphData.map((category) => (
-						<View
-							key={category.id}
-							className="flex-row items-center px-2"
-						>
-							<View style={{ backgroundColor: category.color, width: 8, height: 8 }} />
+						<View key={category.id} className="flex-row items-center px-2">
+							<View
+								style={{ backgroundColor: category.color, width: 8, height: 8 }}
+							/>
 							<Text className="pl-2">{category.name}</Text>
 							<Text className="px-2">{category.percentage}</Text>
 						</View>
@@ -56,4 +59,3 @@ export const LineGraphView = observer(
 		);
 	},
 );
-

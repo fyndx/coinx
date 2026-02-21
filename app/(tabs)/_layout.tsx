@@ -1,5 +1,5 @@
-import { Notebook, Package } from "lucide-react-native";
 import { Tabs } from "expo-router";
+import { Notebook, Package } from "lucide-react-native";
 import { Image } from "react-native";
 
 export default function RootLayout() {
@@ -71,4 +71,3 @@ export default function RootLayout() {
 		</Tabs>
 	);
 }
-

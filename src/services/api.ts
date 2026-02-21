@@ -54,7 +54,9 @@ export async function apiClient<T = unknown>(
 			const errorMessage =
 				errorBody?.error?.message ||
 				errorBody?.message ||
-				(typeof errorBody === "string" ? errorBody : JSON.stringify(errorBody)) ||
+				(typeof errorBody === "string"
+					? errorBody
+					: JSON.stringify(errorBody)) ||
 				response.statusText;
 			throw new Error(
 				`API error [${method} ${path}]: ${errorMessage} (${response.status})`,

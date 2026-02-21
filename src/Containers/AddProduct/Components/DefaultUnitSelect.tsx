@@ -40,8 +40,8 @@ export const DefaultUnitSelect = ({
 const styles = StyleSheet.create({
 	dropdown: {
 		height: 50,
-		backgroundColor: 'transparent',
-		borderBottomColor: 'gray',
+		backgroundColor: "transparent",
+		borderBottomColor: "gray",
 		borderBottomWidth: 0.5,
 	},
 	icon: {
@@ -62,4 +62,3 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 	},
 });
-
