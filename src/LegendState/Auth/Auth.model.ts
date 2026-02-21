@@ -81,8 +81,8 @@ export class AuthModel {
 				const userId = data.session.user.id;
 
 				// Claim any anonymous local data for this user before syncing
-				await Effect.runPromise(claimAnonymousData(userId)).catch((e) => {
-					console.warn("Failed to claim anonymous data on sign up:", e);
+				await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
+					console.warn("Failed to claim anonymous data on sign up");
 				});
 
 				try {
@@ -128,8 +128,8 @@ export class AuthModel {
 			// Claim any anonymous local data for this user before syncing
 			if (data.session) {
 				const userId = data.session.user.id;
-				await Effect.runPromise(claimAnonymousData(userId)).catch((e) => {
-					console.warn("Failed to claim anonymous data on sign in:", e);
+				await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
+					console.warn("Failed to claim anonymous data on sign in");
 				});
 			}
 

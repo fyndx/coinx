@@ -11,14 +11,14 @@
 import { db } from "@/db/client";
 import {
 	categories,
-	transactions,
-	products,
-	stores,
 	product_listings,
 	product_listings_history,
+	products,
+	stores,
+	transactions,
 } from "@/db/schema";
 import { isNull } from "drizzle-orm";
-import { Effect, pipe } from "effect";
+import { Effect } from "effect";
 
 // ─── Claim Anonymous Data ─────────────────────────────────────
 
@@ -29,67 +29,40 @@ import { Effect, pipe } from "effect";
  * and syncStatus = "pending" on all unclaimed records so they get pushed
  * to the server on the next sync.
  *
+ * All six table updates run inside a single transaction to ensure atomicity —
+ * either all records are claimed or none are.
+ *
  * @param userId - Supabase user ID to assign ownership to
  */
 export const claimAnonymousData = (userId: string) =>
-	pipe(
-		Effect.all([
-			Effect.tryPromise({
-				try: () =>
-					db
-						.update(categories)
-						.set({ localOwnerId: userId, syncStatus: "pending" })
-						.where(isNull(categories.localOwnerId)),
-				catch: (error) =>
-					new Error(`Failed to claim categories: ${String(error)}`),
+	Effect.tryPromise({
+		try: () =>
+			db.transaction(async (tx) => {
+				await tx
+					.update(categories)
+					.set({ localOwnerId: userId, syncStatus: "pending" })
+					.where(isNull(categories.localOwnerId));
+				await tx
+					.update(transactions)
+					.set({ localOwnerId: userId, syncStatus: "pending" })
+					.where(isNull(transactions.localOwnerId));
+				await tx
+					.update(products)
+					.set({ localOwnerId: userId, syncStatus: "pending" })
+					.where(isNull(products.localOwnerId));
+				await tx
+					.update(stores)
+					.set({ localOwnerId: userId, syncStatus: "pending" })
+					.where(isNull(stores.localOwnerId));
+				await tx
+					.update(product_listings)
+					.set({ localOwnerId: userId, syncStatus: "pending" })
+					.where(isNull(product_listings.localOwnerId));
+				await tx
+					.update(product_listings_history)
+					.set({ localOwnerId: userId, syncStatus: "pending" })
+					.where(isNull(product_listings_history.localOwnerId));
 			}),
-			Effect.tryPromise({
-				try: () =>
-					db
-						.update(transactions)
-						.set({ localOwnerId: userId, syncStatus: "pending" })
-						.where(isNull(transactions.localOwnerId)),
-				catch: (error) =>
-					new Error(`Failed to claim transactions: ${String(error)}`),
-			}),
-			Effect.tryPromise({
-				try: () =>
-					db
-						.update(products)
-						.set({ localOwnerId: userId, syncStatus: "pending" })
-						.where(isNull(products.localOwnerId)),
-				catch: (error) =>
-					new Error(`Failed to claim products: ${String(error)}`),
-			}),
-			Effect.tryPromise({
-				try: () =>
-					db
-						.update(stores)
-						.set({ localOwnerId: userId, syncStatus: "pending" })
-						.where(isNull(stores.localOwnerId)),
-				catch: (error) =>
-					new Error(`Failed to claim stores: ${String(error)}`),
-			}),
-			Effect.tryPromise({
-				try: () =>
-					db
-						.update(product_listings)
-						.set({ localOwnerId: userId, syncStatus: "pending" })
-						.where(isNull(product_listings.localOwnerId)),
-				catch: (error) =>
-					new Error(`Failed to claim product listings: ${String(error)}`),
-			}),
-			Effect.tryPromise({
-				try: () =>
-					db
-						.update(product_listings_history)
-						.set({ localOwnerId: userId, syncStatus: "pending" })
-						.where(isNull(product_listings_history.localOwnerId)),
-				catch: (error) =>
-					new Error(
-						`Failed to claim product listings history: ${String(error)}`,
-					),
-			}),
-		]),
-		Effect.map(() => undefined),
-	);
+		catch: (error) =>
+			new Error(`Failed to claim anonymous data: ${String(error)}`),
+	});
