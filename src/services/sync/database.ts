@@ -1,9 +1,9 @@
 import { db as database } from "@/db/client";
 import { eq, inArray } from "drizzle-orm";
+import type { SQLiteColumn, SQLiteTable } from "drizzle-orm/sqlite-core";
 import { Effect, pipe } from "effect";
-import type { SQLiteTable, SQLiteColumn } from "drizzle-orm/sqlite-core";
 import { DatabaseError } from "./errors";
-import type { SyncableRecord, ChangeSet } from "./types";
+import type { ChangeSet, SyncableRecord } from "./types";
 import { getIdColumn } from "./types";
 
 // ─── Type Helpers ────────────────────────────────────────────

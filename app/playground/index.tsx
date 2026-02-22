@@ -1,9 +1,9 @@
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { generateRandomTransactions } from "@/src/database/seeds/TransactionSeeds";
-import { Delete } from "lucide-react-native";
 import { Link } from "expo-router";
+import { Delete } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 const PlaygroundScreen = () => {
 	const clearTransactions = () => {
@@ -38,8 +38,23 @@ const PlaygroundScreen = () => {
 		rootStore.productsListingsModel.deleteAllProductListings();
 	};
 
-	const ListItem = ({ title, subTitle, onPress, icon: Icon, theme }: any) => (
-		<Pressable onPress={onPress} className="p-4 border-b border-gray-200 flex-row items-center justify-between">
+	const ListItem = ({
+		title,
+		subTitle,
+		onPress,
+		icon: Icon,
+		theme,
+	}: {
+		title: string;
+		subTitle?: string;
+		onPress: () => void;
+		icon?: React.ComponentType<{ size: number; color: string }>;
+		theme?: string;
+	}) => (
+		<Pressable
+			onPress={onPress}
+			className="p-4 border-b border-gray-200 flex-row items-center justify-between"
+		>
 			<View className="flex-1">
 				<Text className="text-lg">{title}</Text>
 				{subTitle && <Text className="text-gray-500">{subTitle}</Text>}
@@ -69,7 +84,7 @@ const PlaygroundScreen = () => {
 					onPress={createRandomProductListings}
 				/>
 			</View>
-			
+
 			<Text className="text-xl font-bold my-2">{"Deletion"}</Text>
 			<View className="bg-white rounded-md">
 				<ListItem
@@ -106,4 +121,3 @@ const PlaygroundScreen = () => {
 };
 
 export default PlaygroundScreen;
-

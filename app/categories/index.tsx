@@ -1,12 +1,18 @@
+import { Text } from "@/src/Components/ui/Text";
 import type { ICategory } from "@/src/LegendState/Category.model";
 import { useMount } from "@legendapp/state/react";
-import { PlusCircle } from "lucide-react-native";
 import { Link } from "expo-router";
+import { PlusCircle } from "lucide-react-native";
 import React, { Suspense } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+	ActivityIndicator,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	View,
+} from "react-native";
 import { CategoriesList } from "../../src/Components/CategoriesList";
 import { rootStore } from "../../src/LegendState";
-import { Text } from "@/src/Components/ui/Text";
 
 const Categories = () => {
 	const handleCagtegoryDelete = (category: ICategory) => {
@@ -19,7 +25,14 @@ const Categories = () => {
 
 	return (
 		<View className="flex-1">
-			<Suspense fallback={<View className="p-4"><Text>Loading...</Text><ActivityIndicator /></View>}>
+			<Suspense
+				fallback={
+					<View className="p-4">
+						<Text>Loading...</Text>
+						<ActivityIndicator />
+					</View>
+				}
+			>
 				<ScrollView>
 					<CategoriesList
 						categories={rootStore.categoryModel.categories}
@@ -28,9 +41,7 @@ const Categories = () => {
 					/>
 				</ScrollView>
 			</Suspense>
-			<View
-				className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full shadow-md"
-			>
+			<View className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full shadow-md">
 				<Link href={"/add-category"} asChild>
 					<Pressable>
 						<PlusCircle size={32} color="#2563eb" />
@@ -44,4 +55,3 @@ const Categories = () => {
 export default Categories;
 
 const styles = StyleSheet.create({});
-

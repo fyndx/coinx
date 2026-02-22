@@ -16,20 +16,35 @@ import { router } from "expo-router";
 import { generateRandomProductListings } from "../database/seeds/ProductListingSeeds";
 import { appModel } from "./AppState/App.model";
 
+// Type matching the actual query join result (doesn't include syncStatus/deletedAt from join)
+type ProductListingWithStore = {
+	id: string;
+	name: string;
+	productId: string;
+	storeId: string;
+	url: string | null;
+	price: number;
+	quantity: number;
+	unit: string;
+	createdAt: string;
+	updatedAt: string | null;
+	storeName: string;
+};
+
 export class ProductsListingsModel {
-	productListings: Observable<(SelectProductListing & { storeName: string })[]>;
-	productId: Observable<number>;
+	productListings: Observable<ProductListingWithStore[]>;
+	productId: Observable<string>;
 	constructor() {
-		this.productId = observable(0);
+		this.productId = observable("");
 		this.productListings = observable([]);
 	}
 
-	getProductListingById = async (id: number) => {
+	getProductListingById = async (id: string) => {
 		const productListing = await Effect.runPromise(getProductListingById(id));
 		return productListing;
 	};
 
-	getProductListingsByProductId = async (productId: number) => {
+	getProductListingsByProductId = async (productId: string) => {
 		try {
 			const productListings = await Effect.runPromise(
 				getProductListingsByProductId(productId),
@@ -40,11 +55,13 @@ export class ProductsListingsModel {
 					price: Currency.fromSmallestSubunit(
 						productListing.price,
 						appModel.obs.currency.code.peek(),
-					),
+					) as number,
 				};
 			});
 			this.productId.set(productId);
-			this.productListings.set(updatedProductListings);
+			this.productListings.set(
+				updatedProductListings as ProductListingWithStore[],
+			);
 		} catch (error) {
 			console.error("[ProductsListings] Failed to fetch listings:", error);
 			Burnt.toast({
@@ -56,7 +73,7 @@ export class ProductsListingsModel {
 		}
 	};
 
-	deleteProductListingById = async (id: number) => {
+	deleteProductListingById = async (id: string) => {
 		// Delete all product listings history for this product listing
 		await Effect.runPromise(deleteProductListingsByProductListingId(id));
 		// Delete the product listing
@@ -67,7 +84,7 @@ export class ProductsListingsModel {
 	};
 
 	reset = () => {
-		this.productId.set(0);
+		this.productId.set("");
 		this.productListings.set([]);
 	};
 
@@ -78,7 +95,10 @@ export class ProductsListingsModel {
 
 	createRandomProductListings = async () => {
 		// TODO: Pick Product IDs from the table
-		generateRandomProductListings(10, { productIds: [1, 2, 3] });
+		generateRandomProductListings(10, {
+			productIds: ["1", "2", "3"],
+			storeIds: ["1", "2", "3"],
+		});
 	};
 
 	// @Views

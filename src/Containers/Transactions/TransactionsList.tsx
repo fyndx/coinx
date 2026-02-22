@@ -1,3 +1,4 @@
+import { Text } from "@/src/Components/ui/Text";
 import { Transaction } from "@/src/Containers/Transactions/Components/Transaction";
 import { TransactionSummary } from "@/src/Containers/Transactions/Components/TransactionSummary";
 import type { FlashListTransactionsList } from "@/src/LegendState/TransactionsScreen.model";
@@ -8,7 +9,6 @@ import { Banknote } from "lucide-react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import { Text } from "@/src/Components/ui/Text";
 
 const AnimatedFlashList =
 	Animated.createAnimatedComponent<FlashListProps<FlashListTransactionsList>>(
@@ -31,9 +31,7 @@ export const TransactionsList = observer(
 				<View className="flex-1 items-center justify-center">
 					<Banknote size={32} color="gray" />
 					<Text className="text-center font-medium mt-2 text-lg">
-						{
-							"No Transactions found\n Tap the + icon to add a transaction"
-						}
+						{"No Transactions found\n Tap the + icon to add a transaction"}
 					</Text>
 				</View>
 			);
@@ -55,9 +53,8 @@ export const TransactionsList = observer(
 				onScroll={onScroll}
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps={"handled"}
-				estimatedItemSize={44}
+				{...({ estimatedItemSize: 44 } as Record<string, unknown>)}
 			/>
 		);
 	},
 );
-

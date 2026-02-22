@@ -1,11 +1,11 @@
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import type { TransactionItem } from "@/src/LegendState/TransactionsScreen.model";
-import { Trash2 } from "lucide-react-native";
 import dayjs from "dayjs";
 import { Link } from "expo-router";
+import { Trash2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
 
 export const Transaction = ({
 	transaction,
@@ -53,7 +53,9 @@ export const Transaction = ({
 							</View>
 							{/* Transaction Details */}
 							<View className="flex-1">
-								<Text className="font-medium">{transaction.note ?? transaction.category_name}</Text>
+								<Text className="font-medium">
+									{transaction.note ?? transaction.category_name}
+								</Text>
 								{/* Time with am and pm */}
 								<Text className="text-sm text-muted-foreground">
 									{dayjs(transaction.transactionTime).format("h:mm A")}
@@ -64,7 +66,9 @@ export const Transaction = ({
 						<View className="flex-row items-center px-3">
 							<Text
 								className={`text-lg font-medium ${
-									transaction.transactionType === "Income" ? "text-green-600" : "text-red-600"
+									transaction.transactionType === "Income"
+										? "text-green-600"
+										: "text-red-600"
 								}`}
 							>
 								{transaction.amount}
@@ -76,4 +80,3 @@ export const Transaction = ({
 		</SwipeableRow>
 	);
 };
-

@@ -6,7 +6,7 @@ import {
 	stores as storesRepo,
 } from "@/db/schema";
 import { generateUUID } from "@/src/utils/uuid";
-import { eq, and, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 
 export const getProductsListings = () => {
@@ -95,7 +95,9 @@ export const getProductListingById = (id: string) => {
 	});
 };
 
-export const addProductListing = (productListing: Omit<InsertProductListing, "id">) => {
+export const addProductListing = (
+	productListing: Omit<InsertProductListing, "id">,
+) => {
 	return Effect.promise(() => {
 		const query = database
 			.insert(productsListingsRepo)

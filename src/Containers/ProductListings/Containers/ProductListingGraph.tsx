@@ -1,11 +1,11 @@
 import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
+import { Text } from "@/src/Components/ui/Text";
 import type { ProductsListingHistoryModel } from "@/src/LegendState/ProductListingHistory/ProductListingHistory.model";
 import { observer } from "@legendapp/state/react";
 import { Circle, Text as SkiaText, useFont } from "@shopify/react-native-skia";
 import { Fragment } from "react";
-import { type SharedValue, useDerivedValue } from "react-native-reanimated";
 import { View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
+import { type SharedValue, useDerivedValue } from "react-native-reanimated";
 import { CartesianChart, Line, useChartPressState } from "victory-native";
 
 function ToolTip({
@@ -87,10 +87,13 @@ export const ProductListingGraph = observer(
 				acc[curVal] = 0;
 				return acc;
 			},
-			{} as any,
+			{} as Record<string, number>,
 		);
 
-		const { state, isActive } = useChartPressState({ x: 0, y: yState } as any);
+		const { state, isActive } = useChartPressState({
+			x: 0,
+			y: yState,
+		} as never);
 
 		if (extractedGraphData?.length === 0) {
 			return (
@@ -108,8 +111,8 @@ export const ProductListingGraph = observer(
 				<CartesianChart
 					data={extractedGraphData}
 					xKey={"recordedAt"}
-					yKeys={extractedProducts as any}
-					chartPressState={state as any}
+					yKeys={extractedProducts as never}
+					chartPressState={state as never}
 					domain={{ y: [minPrice, maxPrice] }}
 					domainPadding={{ right: 30, left: 30 }}
 					yAxis={[
@@ -137,7 +140,7 @@ export const ProductListingGraph = observer(
 								<Line
 									connectMissingData
 									key={key}
-									points={(points as any)[key]}
+									points={(points as never)[key]}
 									animate={{ type: "timing" }}
 									strokeWidth={2}
 									color={extractedProductListingColors[key]}
@@ -159,4 +162,3 @@ export const ProductListingGraph = observer(
 		);
 	},
 );
-

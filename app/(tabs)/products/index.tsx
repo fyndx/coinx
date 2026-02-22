@@ -1,9 +1,11 @@
 import type { SelectProduct } from "@/db/schema";
 import { SwipeableRow } from "@/src/Components/SwipeableRow";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { WINDOW_HEIGHT } from "@gorhom/bottom-sheet";
 import { observer } from "@legendapp/state/react";
 import { FlashList } from "@shopify/flash-list";
+import { Link, useFocusEffect, useRouter } from "expo-router";
 import {
 	Box,
 	ChevronRight,
@@ -11,11 +13,9 @@ import {
 	PlusCircle,
 	Trash2,
 } from "lucide-react-native";
-import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "@/src/Components/ui/Text";
 
 const Product = ({
 	product,
@@ -75,7 +75,7 @@ const Products = observer(() => {
 	useFocusEffect(
 		useCallback(() => {
 			productsModel$.getProductsList();
-		}, []),
+		}, [productsModel$]),
 	);
 
 	return (
@@ -87,42 +87,42 @@ const Products = observer(() => {
 				{/* TODO: Search */}
 				<View className="flex-1 p-4">
 					<FlashList
-					data={productsModel$.products.get()}
-					renderItem={({ item }) => <Product product={item} />}
-					estimatedItemSize={100}
-					ListEmptyComponent={() => {
-						// TODO: .get() might not work here
-						if (productsModel$.isLoading.get()) {
+						data={productsModel$.products.get()}
+						renderItem={({ item }) => <Product product={item} />}
+						{...({ estimatedItemSize: 100 } as Record<string, unknown>)}
+						ListEmptyComponent={() => {
+							// TODO: .get() might not work here
+							if (productsModel$.isLoading.get()) {
+								return (
+									<View
+										style={{ height: WINDOW_HEIGHT - 100 }}
+										className="items-center justify-center p-4"
+									>
+										<ActivityIndicator size={"large"} />
+									</View>
+								);
+							}
 							return (
 								<View
 									style={{ height: WINDOW_HEIGHT - 100 }}
 									className="items-center justify-center p-4"
 								>
-									<ActivityIndicator size={"large"} />
+									<Box size={32} color="gray" />
+									<Text className="text-center font-bold text-lg mt-2">
+										{
+											"No products found.\nTap the + icon to add your first product!"
+										}
+									</Text>
 								</View>
 							);
-						}
-						return (
-							<View
-								style={{ height: WINDOW_HEIGHT - 100 }}
-								className="items-center justify-center p-4"
-							>
-								<Box size={32} color="gray" />
-								<Text className="text-center font-bold text-lg mt-2">
-									{
-										"No products found.\nTap the + icon to add your first product!"
-									}
-								</Text>
-							</View>
-						);
-					}}
-					ItemSeparatorComponent={() => <View className="h-[1px] bg-border" />}
-				/>
+						}}
+						ItemSeparatorComponent={() => (
+							<View className="h-[1px] bg-border" />
+						)}
+					/>
 				</View>
 			</View>
-			<View
-				className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full"
-			>
+			<View className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full">
 				<Link href={{ pathname: "/add-product" }} asChild>
 					<Pressable>
 						<PlusCircle size={32} color="#2563eb" />
@@ -132,7 +132,6 @@ const Products = observer(() => {
 		</SafeAreaView>
 	);
 });
-
 
 export default Products;
 

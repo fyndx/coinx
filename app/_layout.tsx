@@ -41,7 +41,7 @@ const useProtectedRoute = () => {
 
 		// If user just signed in and is still on auth screens, redirect to app
 		if (isAuthenticated && inAuthGroup) {
-			router.replace("/(tabs)");
+			router.replace("/(tabs)" as const as "/");
 		}
 	}, [isAuthenticated, isAuthLoading, segments, router]);
 };

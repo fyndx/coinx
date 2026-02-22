@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Image } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import Animated, {
 	cancelAnimation,
 	useAnimatedStyle,
@@ -28,14 +28,9 @@ export const Splash = () => {
 	}));
 
 	return (
-		<View
-			style={styles.container}
-		>
+		<View style={styles.container}>
 			<Animated.View style={animatedStyle}>
-				<Image
-					source={SplashIcon}
-					style={{ width: 250, height: 250 }}
-				/>
+				<Image source={SplashIcon} style={{ width: 250, height: 250 }} />
 			</Animated.View>
 		</View>
 	);

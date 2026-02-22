@@ -1,13 +1,13 @@
 import { Select } from "@/src/Components/Select";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
 import { observer, useMount } from "@legendapp/state/react";
 import { useLocalSearchParams } from "expo-router";
+import { Button } from "heroui-native";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "heroui-native";
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
 
 const AddProductListing = observer(() => {
 	const { id } = useLocalSearchParams();
@@ -15,8 +15,8 @@ const AddProductListing = observer(() => {
 	const productModel$ = rootStore.addProductListingModel;
 
 	useMount(() => {
-		const productId = Number(id);
-		if (Number.isNaN(productId)) {
+		const productId = id as string;
+		if (!productId) {
 			return;
 		}
 
@@ -94,7 +94,9 @@ const AddProductListing = observer(() => {
 					<Select
 						placeholder={"Store *"}
 						data={storeModel$.storesList.get()}
-						displayField={(item: any) => `${item.name} - ${item.location}`}
+						displayField={(item: { name: string; location: string | null }) =>
+							`${item.name} - ${item.location}`
+						}
 						onValueChange={handleStoreChange}
 					/>
 					<Input

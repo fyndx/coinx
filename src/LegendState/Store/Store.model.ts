@@ -18,14 +18,16 @@ import { DEFAULT_STORES } from "./stores-list";
 export interface StoresListObservable
 	extends ObservableArray<Array<SelectStore>> {}
 
+type StoreDraft = Omit<InsertStore, "id"> & { id?: string };
+
 export class StoreModel {
 	storesList: StoresListObservable;
-	storeDraft: Observable<InsertStore>;
+	storeDraft: Observable<StoreDraft>;
 	isSubmitting: Observable<boolean>;
 
 	constructor() {
 		this.storesList = observable([]);
-		this.storeDraft = observable<InsertStore>({
+		this.storeDraft = observable<StoreDraft>({
 			name: "",
 			location: "",
 		});
@@ -102,6 +104,7 @@ export class StoreModel {
 
 	resetStoreDraft = () => {
 		this.storeDraft.set({
+			id: undefined,
 			name: "",
 			location: "",
 		});

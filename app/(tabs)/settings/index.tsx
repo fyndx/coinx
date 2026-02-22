@@ -1,16 +1,16 @@
+import { Button } from "@/src/Components/ui/Button";
+import { Text } from "@/src/Components/ui/Text";
+import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import {
 	exportData,
 	exportDataToCsv,
 } from "@/src/LegendState/Settings/Settings.model";
-import { authModel } from "@/src/LegendState/Auth/Auth.model";
-import { ChevronRight, LogIn, LogOut, User } from "lucide-react-native";
+import { observer } from "@legendapp/state/react";
 import * as Application from "expo-application";
 import { Link, router } from "expo-router";
+import { ChevronRight, LogIn, LogOut, User } from "lucide-react-native";
 import { Fragment } from "react";
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/Components/ui/Text";
-import { Button } from "@/src/Components/ui/Button";
-import { observer } from "@legendapp/state/react";
 
 const SettingsItem = ({
 	title,
@@ -68,9 +68,7 @@ const AccountSection = observer(() => {
 				<User size={20} color="gray" />
 				<Text className="text-lg ml-2">Account</Text>
 			</View>
-			<Text className="text-muted-foreground text-sm mb-3">
-				{user?.email}
-			</Text>
+			<Text className="text-muted-foreground text-sm mb-3">{user?.email}</Text>
 			<Button
 				variant="outline"
 				size="sm"

@@ -2,9 +2,9 @@ import { api } from "@/src/services/api";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
 import { claimAnonymousData } from "@/src/services/sync/migration";
-import { Effect } from "effect";
-import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
+import type { Session, User } from "@supabase/supabase-js";
+import { Effect } from "effect";
 
 type AuthState = {
 	user: User | null;

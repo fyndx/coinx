@@ -1,13 +1,9 @@
+import { Text } from "@/src/Components/ui/Text";
 import type { ObservableComputed } from "@legendapp/state";
 import { Switch, observer } from "@legendapp/state/react";
 import { useMemo, useRef } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
-import {
-	Pressable,
-	ScrollView,
-	View,
-} from "react-native";
-import { Text } from "@/src/Components/ui/Text";
+import { Pressable, ScrollView, View } from "react-native";
 
 interface ProductListingTable {
 	head: string[];
@@ -104,8 +100,13 @@ export const ProductListingTable = observer(
 				{{
 					text: () => <Text>{cell.value}</Text>,
 					button: () => (
-						<Pressable onPress={cell.onPress} className="bg-primary px-3 py-1 rounded-sm">
-							<Text className="text-primary-foreground text-xs">{cell?.value ?? ""}</Text>
+						<Pressable
+							onPress={cell.onPress}
+							className="bg-primary px-3 py-1 rounded-sm"
+						>
+							<Text className="text-primary-foreground text-xs">
+								{cell?.value ?? ""}
+							</Text>
 						</Pressable>
 					),
 					default: () => null,
@@ -175,7 +176,10 @@ export const ProductListingTable = observer(
 								}}
 							>
 								{data.map((row, rowIndex) => (
-									<View key={`rowIndex-${rowIndex}`} className="flex-row">
+									<View
+										key={`row-${row[0]?.value ?? rowIndex}`}
+										className="flex-row"
+									>
 										{row.slice(1).map((cell, cellIndex) => (
 											<View
 												key={`cellIndex-${cellIndex}-${cell.value}`}
@@ -195,4 +199,3 @@ export const ProductListingTable = observer(
 		);
 	},
 );
-

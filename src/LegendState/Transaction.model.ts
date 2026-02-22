@@ -3,8 +3,8 @@ import {
 	type InsertTransaction,
 	transactions as transactionsRepo,
 } from "@/db/schema";
-import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { syncManager } from "@/src/services/sync";
+import { dayjsInstance as dayjs } from "@/src/utils/date";
 import { generateUUID } from "@/src/utils/uuid";
 import { type ObservableListenerDispose, observable } from "@legendapp/state";
 import type { Dayjs } from "dayjs";
@@ -149,9 +149,9 @@ export class TransactionModel {
 		if (id) {
 			await this.updateTransaction({
 				amount: amountInNumber,
-				categoryId,
+				categoryId: categoryId ?? "",
 				note: note,
-				transactionTime: new Date(date).toISOString(),
+				transactionTime: dayjs(date ?? new Date()).toISOString(),
 				transactionType: transactionType,
 				id,
 			});
@@ -159,9 +159,9 @@ export class TransactionModel {
 			// Create a new transaction
 			await this.createNewTransaction({
 				amount: amountInNumber,
-				categoryId,
+				categoryId: categoryId ?? "",
 				note: note?.length ? note : categoryName,
-				transactionTime: new Date(date).toISOString(),
+				transactionTime: dayjs(date ?? new Date()).toISOString(),
 				transactionType: transactionType,
 			});
 		}

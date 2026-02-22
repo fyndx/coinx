@@ -40,7 +40,9 @@ export class AddProductScreenModel {
 
 		if (
 			product.defaultUnitCategory === undefined ||
-			!isValidUnitCategory(product.defaultUnitCategory)
+			!isValidUnitCategory(
+				product.defaultUnitCategory as (typeof MeasurementUnits)[number],
+			)
 		) {
 			return "Please select a valid measurement unit";
 		}

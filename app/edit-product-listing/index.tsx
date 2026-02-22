@@ -1,11 +1,11 @@
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { observer, useMount } from "@legendapp/state/react";
 import { useLocalSearchParams } from "expo-router";
+import { Button } from "heroui-native";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "heroui-native";
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
 
 const EditProductListing = observer(() => {
 	const { listing_id, product_id } = useLocalSearchParams();
@@ -59,7 +59,7 @@ const EditProductListing = observer(() => {
 				</View>
 				<Button
 					onPress={editProductListingModel.updateProductListing}
-					disabled={editProductListingModel.views.isButtonDisabled.get()}
+					isDisabled={editProductListingModel.views.isButtonDisabled.get()}
 				>
 					<Text>Update Price</Text>
 				</Button>

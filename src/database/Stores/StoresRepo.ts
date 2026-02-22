@@ -5,7 +5,9 @@ import { eq, isNull } from "drizzle-orm";
 import { Effect, Predicate, pipe } from "effect";
 import { InvalidIdError } from "./StoresErrors";
 
-export const addStore = (store: Omit<InsertStore, "id"> | Omit<InsertStore, "id">[]) =>
+export const addStore = (
+	store: Omit<InsertStore, "id"> | Omit<InsertStore, "id">[],
+) =>
 	Effect.promise(() => {
 		if (Array.isArray(store)) {
 			const storesWithIds = store.map((s) => ({

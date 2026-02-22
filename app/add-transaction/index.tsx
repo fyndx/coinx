@@ -1,4 +1,6 @@
 import { CategoriesList } from "@/src/Components/CategoriesList";
+import { Input } from "@/src/Components/ui/Input";
+import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import type {
@@ -11,23 +13,21 @@ import BottomSheet, {
 	BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { observer, useMount, useUnmount } from "@legendapp/state/react";
-import { CheckSquare, Delete } from "lucide-react-native";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { Button } from "heroui-native";
+import { CheckSquare, Delete } from "lucide-react-native";
 import { useMemo, useRef } from "react";
 import {
 	Alert,
 	Dimensions,
 	type GestureResponderEvent,
+	Pressable,
 	StyleSheet,
 	View,
-	Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, { type DateType } from "react-native-ui-datepicker";
-import { Button } from "heroui-native";
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
 
 const TransactionType = observer(
 	({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
@@ -136,15 +136,15 @@ const CategoryAndDateButtons = observer(
 		categorySheetRef,
 	}: {
 		transactionModel$: TransactionModel;
-		dateSheetRef: any;
-		categorySheetRef: any;
+		dateSheetRef: React.RefObject<BottomSheet | null>;
+		categorySheetRef: React.RefObject<BottomSheet | null>;
 	}) => {
 		const openDatepicker = () => {
-			dateSheetRef.current.snapToIndex(0);
+			dateSheetRef.current?.snapToIndex(0);
 		};
 
 		const openCategoryPicker = () => {
-			categorySheetRef.current.snapToIndex(0);
+			categorySheetRef.current?.snapToIndex(0);
 		};
 
 		const rawCategory = transactionModel$.transaction.categoryName.get();
@@ -154,7 +154,7 @@ const CategoryAndDateButtons = observer(
 		return (
 			<View className="flex-row gap-3 px-4">
 				<Button
-					variant="outline"
+					variant="secondary"
 					className="flex-3 bg-green-500 active:bg-green-700 border-0"
 					onPress={openDatepicker}
 				>
@@ -165,7 +165,7 @@ const CategoryAndDateButtons = observer(
 					</Text>
 				</Button>
 				<Button
-					variant="outline"
+					variant="secondary"
 					className="flex-2 bg-green-500 active:bg-green-700 border-0"
 					onPress={openCategoryPicker}
 				>
@@ -180,13 +180,16 @@ const DatePicker = observer(
 	({
 		transactionModel$,
 		dateSheetRef,
-	}: { transactionModel$: TransactionModel; dateSheetRef: any }) => {
+	}: {
+		transactionModel$: TransactionModel;
+		dateSheetRef: React.RefObject<BottomSheet | null>;
+	}) => {
 		const locale = appModel.obs.locale.get();
 		const snapPoints = useMemo(() => ["50%"], []);
 
 		const handleValueChange = (value: { date: DateType }) => {
 			transactionModel$.transaction.date.set(value.date);
-			dateSheetRef.current.close();
+			dateSheetRef.current?.close();
 		};
 
 		return (
@@ -215,12 +218,12 @@ const CategoryPicker = observer(
 	}: {
 		transactionModel$: TransactionModel;
 		categoryModel$: CategoryModel;
-		categorySheetRef: any;
+		categorySheetRef: React.RefObject<BottomSheet | null>;
 	}) => {
 		const onCategoryPressed = async (category: ICategory) => {
 			transactionModel$.transaction.categoryId.set(category.id);
 			transactionModel$.transaction.categoryName.set(category.name);
-			categorySheetRef.current.close();
+			categorySheetRef.current?.close();
 		};
 
 		return (

@@ -63,9 +63,7 @@ export class EditProductListing {
 			this.productListing.set({
 				data: {
 					...productListing[0],
-					syncStatus: productListing[0].syncStatus ?? null,
-					deletedAt: productListing[0].deletedAt ?? null,
-				} as ProductListingData,
+				} as unknown as ProductListingData,
 				status: "success",
 			});
 		} else {
@@ -86,11 +84,11 @@ export class EditProductListing {
 		try {
 			this.editProductDraft.status.set("pending");
 			const productListing = this.productListing.data.peek();
-			
+
 			if (!productListing) {
 				throw new Error("Product listing not found");
 			}
-			
+
 			const price = Currency.toSmallestSubunit(
 				Number(this.editProductDraft.data.price.peek()),
 				appModel.obs.currency.code.peek(),

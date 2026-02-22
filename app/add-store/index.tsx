@@ -1,9 +1,9 @@
-import { storeModel$ } from "@/src/LegendState/Store/Store.model";
-import { observer, useUnmount } from "@legendapp/state/react";
-import { Keyboard, View } from "react-native";
-import { Button } from "heroui-native";
 import { Input } from "@/src/Components/ui/Input";
 import { Text } from "@/src/Components/ui/Text";
+import { storeModel$ } from "@/src/LegendState/Store/Store.model";
+import { observer, useUnmount } from "@legendapp/state/react";
+import { Button } from "heroui-native";
+import { Keyboard, View } from "react-native";
 
 const AddStore = observer(() => {
 	const { storeDraft } = storeModel$;
@@ -45,7 +45,7 @@ const AddStore = observer(() => {
 					value={location ?? ""}
 				/>
 			</View>
-			<Button onPress={handleSubmit} disabled={isSubmitting}>
+			<Button onPress={handleSubmit} isDisabled={isSubmitting}>
 				<Text>
 					{isSubmitting ? "Saving..." : id ? "Update Store" : "Add Store"}
 				</Text>

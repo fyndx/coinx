@@ -26,7 +26,7 @@ export class AddProductListingModel {
 		this.productDetailsDraft = observable<Partial<InsertProductListing>>({});
 	}
 
-	getProductById = async (id: number) => {
+	getProductById = async (id: string) => {
 		const product = await Effect.runPromise(findProductById({ id }));
 		this.product.set(product[0]);
 		this.productDetailsDraft.productId.set(id);
@@ -49,9 +49,9 @@ export class AddProductListingModel {
 			const productListing = this.productDetailsDraft.peek();
 			// TODO: Change INR to currency from user settings
 			productListing.price = Currency.toSmallestSubunit(
-				productListing.price,
+				productListing.price ?? 0,
 				appModel.obs.currency.code.peek(),
-			);
+			) as number;
 
 			const validationResult =
 				insertProductListingSchema.safeParse(productListing);

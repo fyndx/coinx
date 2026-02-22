@@ -9,7 +9,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { loadAsync } from "expo-font";
 import { getLocales } from "expo-localization";
-import type { CurrencyData } from "rn-currency-picker";
+
+interface CurrencyData {
+	code: string;
+	symbol: string;
+	name?: string;
+	[key: string]: unknown;
+}
 
 export class AppModel {
 	obs;
@@ -28,7 +34,7 @@ export class AppModel {
 			// Run custom UUID migration first (converts integer IDs to UUIDs for existing users)
 			// This is a no-op for fresh installs
 			await runUUIDMigration(expoDb);
-			
+
 			// Then run Drizzle schema migrations
 			await migrate(db, migrations);
 			console.log("Database migrations ran successfully");
@@ -39,14 +45,10 @@ export class AppModel {
 	};
 
 	loadFonts = async () => {
-		try {
-			await loadAsync({
-				LatoRegular: LatoRegular,
-				...MaterialCommunityIcons.font,
-			});
-		} catch (error) {
-			throw error;
-		}
+		await loadAsync({
+			LatoRegular: LatoRegular,
+			...MaterialCommunityIcons.font,
+		});
 	};
 
 	private loadCurrency = async () => {

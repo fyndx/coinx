@@ -11,6 +11,7 @@ import { and, between, eq, sql, sum } from "drizzle-orm";
 import { Effect } from "effect";
 
 export interface TransactionItem extends SelectTransaction {
+	category_id: string;
 	category_name: string;
 	category_icon: string;
 	category_color: string;
