@@ -1,0 +1,82 @@
+name: Build APK (EAS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "EAS build profile"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - production
+
+  push:
+    tags:
+      - "v*.*.*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-android:
+    name: Build Android APK (${{ inputs.profile || 'preview' }})
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node + Bun + Install Dependencies
+        uses: ./.github/actions/setup-node-bun-install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Create .env file
+        run: |
+          echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
+          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
+          echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
+
+      - name: Build Android on EAS
+        id: eas-build
+        run: |
+          BUILD_OUTPUT=$(eas build \
+            --platform android \
+            --profile ${{ inputs.profile || 'preview' }} \
+            --non-interactive \
+            --wait \
+            --json 2>/dev/null)
+          ARTIFACT_URL=$(echo "$BUILD_OUTPUT" | jq -r '.[0].artifacts.buildUrl // .[0].artifactUrl // empty')
+          echo "artifact_url=$ARTIFACT_URL" >> $GITHUB_OUTPUT
+
+      - name: Download APK
+        run: |
+          ARTIFACT_URL="${{ steps.eas-build.outputs.artifact_url }}"
+          if [ -z "$ARTIFACT_URL" ]; then
+            echo "ERROR: No artifact URL returned from EAS build."
+            exit 1
+          fi
+          curl -L --fail --show-error \
+            -H "Authorization: Bearer ${{ secrets.EXPO_TOKEN }}" \
+            -o coinx.apk \
+            "$ARTIFACT_URL"
+          ls -lh coinx.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coinx-android-${{ inputs.profile || 'preview' }}-${{ github.sha }}
+          path: coinx.apk
+          retention-days: 30
+          if-no-files-found: error
