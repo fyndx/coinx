@@ -26,7 +26,6 @@ jobs:
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
-    # Run when platform is 'all', 'android', or unset (tag push)
     if: ${{ inputs.platform != 'ios' }}
     environment:
       name: staging
@@ -40,6 +39,12 @@ jobs:
       - name: Setup Node + Bun + Install Dependencies
         uses: ./.github/actions/setup-node-bun-install
 
+      - name: Setup EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
@@ -52,9 +57,6 @@ jobs:
           echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
 
-      - name: Expo Prebuild (Android)
-        run: bunx expo prebuild --platform android --clean --non-interactive
-
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
         with:
@@ -64,26 +66,21 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('package.json') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
-
-      - name: Build APK
-        run: ./gradlew assembleDebug --no-daemon
-        working-directory: android
+      - name: Build APK (local)
+        run: eas build --local --platform android --profile preview --non-interactive --output build.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: coinx-android-${{ github.sha }}
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: build.apk
           retention-days: 30
           if-no-files-found: error
 
   # ─── iOS IPA ────────────────────────────────────────────────────────────────
   build-ios:
-    name: Build iOS IPA (unsigned)
+    name: Build iOS IPA
     runs-on: macos-latest
-    # Run when platform is 'all', 'ios', or unset (tag push)
     if: ${{ inputs.platform != 'android' }}
     environment:
       name: staging
@@ -97,51 +94,32 @@ jobs:
       - name: Setup Node + Bun + Install Dependencies
         uses: ./.github/actions/setup-node-bun-install
 
+      - name: Setup EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
       - name: Create .env file
         run: |
           echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
           echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
 
-      - name: Expo Prebuild (iOS)
-        run: bunx expo prebuild --platform ios --clean --non-interactive
-
       - name: Cache CocoaPods
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/CocoaPods
-          key: ${{ runner.os }}-cocoapods-${{ hashFiles('ios/Podfile') }}
+          key: ${{ runner.os }}-cocoapods-${{ hashFiles('package.json') }}
           restore-keys: ${{ runner.os }}-cocoapods-
 
-      - name: Install CocoaPods dependencies
-        run: pod install
-        working-directory: ios
-
-      - name: Build iOS archive (unsigned)
-        run: |
-          xcodebuild \
-            -workspace ios/coinx.xcworkspace \
-            -scheme coinx \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath "$RUNNER_TEMP/coinx.xcarchive" \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            archive
-
-      - name: Package IPA
-        run: |
-          mkdir -p "$RUNNER_TEMP/ipa/Payload"
-          cp -r "$RUNNER_TEMP/coinx.xcarchive/Products/Applications/coinx.app" \
-            "$RUNNER_TEMP/ipa/Payload/"
-          cd "$RUNNER_TEMP/ipa"
-          zip -r coinx.ipa Payload
+      - name: Build IPA (local)
+        run: eas build --local --platform ios --profile preview --non-interactive --output build.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: coinx-ios-${{ github.sha }}
-          path: ${{ runner.temp }}/ipa/coinx.ipa
+          path: build.ipa
           retention-days: 30
           if-no-files-found: error
