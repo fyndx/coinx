@@ -85,10 +85,11 @@ const Products = observer(() => {
 					<Text className="text-xl font-bold">{"Products"}</Text>
 				</View>
 				{/* TODO: Search */}
-				<View className="flex-1 p-4">
+				<View className="flex-1">
 					<FlashList
 						data={productsModel$.products.get()}
 						renderItem={({ item }) => <Product product={item} />}
+						showsVerticalScrollIndicator={false}
 						{...({ estimatedItemSize: 100 } as Record<string, unknown>)}
 						ListEmptyComponent={() => {
 							// TODO: .get() might not work here

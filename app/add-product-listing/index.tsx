@@ -4,15 +4,22 @@ import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
 import { observer, useMount } from "@legendapp/state/react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Button } from "heroui-native";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { PlusCircle } from "lucide-react-native";
+import { useRef } from "react";
+import { ActivityIndicator, Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const AddProductListing = observer(() => {
 	const { id } = useLocalSearchParams();
+	const router = useRouter();
 
 	const productModel$ = rootStore.addProductListingModel;
+
+	const priceRef = useRef<TextInput>(null);
+	const quantityRef = useRef<TextInput>(null);
+	const urlRef = useRef<TextInput>(null);
 
 	useMount(() => {
 		const productId = id as string;
@@ -66,20 +73,28 @@ const AddProductListing = observer(() => {
 					<Input
 						placeholder="Product Name *"
 						aria-label={"Product Name"}
+						returnKeyType="next"
+						onSubmitEditing={() => priceRef.current?.focus()}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.name.set(text.trim())
 						}
 					/>
 					<Input
+						ref={priceRef}
 						placeholder="Price *"
 						keyboardType={"numeric"}
+						returnKeyType="next"
+						onSubmitEditing={() => quantityRef.current?.focus()}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.price.set(Number(text.trim()))
 						}
 					/>
 					<Input
+						ref={quantityRef}
 						placeholder="Quantity *"
 						keyboardType={"numeric"}
+						returnKeyType="done"
+						onSubmitEditing={Keyboard.dismiss}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.quantity.set(
 								Number(text.trim()),
@@ -91,16 +106,26 @@ const AddProductListing = observer(() => {
 						data={productModel$.units.get()}
 						onValueChange={handleUnitChange}
 					/>
-					<Select
-						placeholder={"Store *"}
-						data={storeModel$.storesList.get()}
-						displayField={(item: { name: string; location: string | null }) =>
-							`${item.name} - ${item.location}`
-						}
-						onValueChange={handleStoreChange}
-					/>
+					<View className="flex-row items-center gap-2">
+						<View className="flex-1">
+							<Select
+								placeholder={"Store *"}
+								data={storeModel$.storesList.get()}
+								displayField={(item: { name: string; location: string | null }) =>
+									`${item.name} - ${item.location}`
+								}
+								onValueChange={handleStoreChange}
+							/>
+						</View>
+						<Pressable onPress={() => router.push("/add-store")}>
+							<PlusCircle size={24} color="#2563eb" />
+						</Pressable>
+					</View>
 					<Input
+						ref={urlRef}
 						placeholder="URL"
+						returnKeyType="done"
+						onSubmitEditing={Keyboard.dismiss}
 						onChangeText={(text) =>
 							productModel$.productDetailsDraft.url.set(text.trim())
 						}
