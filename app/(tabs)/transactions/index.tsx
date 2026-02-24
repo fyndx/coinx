@@ -129,7 +129,11 @@ const Transactions = () => {
 				<View className="justify-center items-center py-2">
 					<Text className="text-xl font-bold">{"Transactions"}</Text>
 				</View>
-				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
+				<View className="mb-3">
+					<MonthYearPicker
+						transactionsScreenModel$={transactionsScreenModel$}
+					/>
+				</View>
 				<TransactionsList
 					transactions$={transactionsScreenModel$.groupedTransactions}
 					onScroll={scrollHandler}

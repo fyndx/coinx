@@ -5,10 +5,15 @@ import {
 	exportData,
 	exportDataToCsv,
 } from "@/src/LegendState/Settings/Settings.model";
+import {
+	type ThemeMode,
+	setTheme,
+	themeModel,
+} from "@/src/LegendState/Theme/Theme.model";
 import { observer } from "@legendapp/state/react";
 import * as Application from "expo-application";
 import { Link, router } from "expo-router";
-import { ChevronRight, LogIn, LogOut, User } from "lucide-react-native";
+import { ChevronRight, Moon, Sun, SunMoon, User } from "lucide-react-native";
 import { Fragment } from "react";
 import { Pressable, View } from "react-native";
 
@@ -81,6 +86,48 @@ const AccountSection = observer(() => {
 	);
 });
 
+const THEME_OPTIONS: { mode: ThemeMode; label: string; Icon: typeof Sun }[] = [
+	{ mode: "light", label: "Light", Icon: Sun },
+	{ mode: "dark", label: "Dark", Icon: Moon },
+	{ mode: "system", label: "System", Icon: SunMoon },
+];
+
+const AppearanceSection = observer(() => {
+	const currentMode = themeModel.mode.get();
+	return (
+		<View className="bg-card rounded-lg p-4 mb-1">
+			<Text className="text-base font-semibold mb-3">{"Appearance"}</Text>
+			<View className="flex-row gap-2">
+				{THEME_OPTIONS.map(({ mode, label, Icon }) => {
+					const isActive = currentMode === mode;
+					return (
+						<Pressable
+							key={mode}
+							onPress={() => setTheme(mode)}
+							className="flex-1"
+						>
+							<View
+								className={`flex-1 items-center justify-center py-3 rounded-lg border ${
+									isActive
+										? "bg-primary border-primary"
+										: "bg-background border-border"
+								}`}
+							>
+								<Icon size={18} color={isActive ? "white" : "gray"} />
+								<Text
+									className={`text-xs mt-1 font-medium ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`}
+								>
+									{label}
+								</Text>
+							</View>
+						</Pressable>
+					);
+				})}
+			</View>
+		</View>
+	);
+});
+
 const Settings = observer(() => {
 	return (
 		<View className="p-2 flex-1">
@@ -88,6 +135,9 @@ const Settings = observer(() => {
 			<View className="py-2">
 				{/* Account */}
 				<AccountSection />
+				<View className="h-[1px] bg-border my-1" />
+				{/* Appearance */}
+				<AppearanceSection />
 				<View className="h-[1px] bg-border my-1" />
 
 				<Link href={"/categories"} asChild>

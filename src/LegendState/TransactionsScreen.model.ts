@@ -7,7 +7,7 @@ import {
 import { getTransactions } from "@/src/database/Transactions/TransactionsRepo";
 import { computed, observable } from "@legendapp/state";
 import dayjs from "dayjs";
-import { and, between, eq, sql, sum } from "drizzle-orm";
+import { and, between, eq, sum } from "drizzle-orm";
 import { Effect } from "effect";
 
 export interface TransactionItem extends SelectTransaction {
@@ -24,14 +24,11 @@ export interface TransactionGroup {
 	total: number;
 }
 
-export type FlashListTransactionsList =
-	| {
-			transaction: TransactionItem;
-	  }
-	| {
-			transaction_time: string;
-			total: string;
-	  };
+export type FlashListTransactionsList = {
+	transaction_time: string;
+	total: string;
+	transactions: TransactionItem[];
+};
 
 export type DurationOptions =
 	| "today"
@@ -273,12 +270,8 @@ export class TransactionsScreenModel {
 			transactionsResult.push({
 				transaction_time: displayDate,
 				total: transactionGroupItem.total.toFixed(2),
+				transactions: transactionGroupItem.transactions,
 			});
-			for (const transaction of transactionGroupItem.transactions) {
-				transactionsResult.push({
-					transaction,
-				});
-			}
 		}
 		return transactionsResult;
 	});

@@ -26,7 +26,7 @@ export const Transaction = ({
 				},
 			]}
 		>
-			<View className="bg-card border-b border-border">
+			<View>
 				<Link
 					href={{
 						pathname: "/add-transaction",
