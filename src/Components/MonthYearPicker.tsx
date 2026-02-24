@@ -5,12 +5,12 @@ import type {
 import { observer } from "@legendapp/state/react";
 import dayjs from "dayjs";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
+import { MotiView } from "moti";
 import { useState } from "react";
 import { Modal, View } from "react-native";
 import { dayjsLocaleDataInstance } from "../utils/date";
 import { Button } from "./ui/Button";
 import { Text } from "./ui/Text";
-import { MotiView } from "moti";
 
 const MONTHS = dayjsLocaleDataInstance.monthsShort();
 
