@@ -123,17 +123,21 @@ const Transactions = () => {
 	});
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.container} className="px-6">
-				{/* <XStack justifyContent="space-between" paddingVertical={"$2"}>
-				<Search />
-				<ChevronDownSquare />
-			</XStack> */}
+		<SafeAreaView
+			style={styles.container}
+			className="bg-background"
+			edges={["top"]}
+		>
+			<View style={styles.container} className="px-6 bg-background">
 				{/* <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} /> */}
 				<View className="justify-center items-center py-2">
 					<Text className="text-xl font-bold">{"Transactions"}</Text>
 				</View>
-				<MonthYearPicker transactionsScreenModel$={transactionsScreenModel$} />
+				<View className="mb-3">
+					<MonthYearPicker
+						transactionsScreenModel$={transactionsScreenModel$}
+					/>
+				</View>
 				<TransactionsList
 					transactions$={transactionsScreenModel$.groupedTransactions}
 					onScroll={scrollHandler}

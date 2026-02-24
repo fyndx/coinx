@@ -6,12 +6,9 @@ export const TransactionSummary = ({
 	transaction_time,
 }: { total: string; transaction_time: string }) => {
 	return (
-		<View className="pt-4">
-			<View className="flex-row justify-between">
-				<Text>{transaction_time}</Text>
-				<Text>{total}</Text>
-			</View>
-			<View className="border-b-[0.5px] border-border my-2" />
+		<View className="flex-row justify-between items-center px-4 py-3 border-b border-border">
+			<Text className="font-semibold text-sm">{transaction_time}</Text>
+			<Text className="text-sm text-muted-foreground">{total}</Text>
 		</View>
 	);
 };

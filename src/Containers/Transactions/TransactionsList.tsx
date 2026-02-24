@@ -39,21 +39,24 @@ export const TransactionsList = observer(
 		return (
 			<AnimatedFlashList
 				data={transactions}
-				renderItem={({ item }) => {
-					if ("transaction" in item) {
-						return <Transaction transaction={item.transaction} />;
-					}
-					return (
+				renderItem={({ item }) => (
+					<View className="bg-card rounded-2xl mb-3 overflow-hidden">
 						<TransactionSummary
 							transaction_time={item.transaction_time}
 							total={item.total}
 						/>
-					);
-				}}
+						{item.transactions.map((transaction, index) => (
+							<View key={transaction.id}>
+								{index > 0 && <View className="h-[0.5px] bg-border mx-4" />}
+								<Transaction transaction={transaction} />
+							</View>
+						))}
+					</View>
+				)}
 				onScroll={onScroll}
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps={"handled"}
-				{...({ estimatedItemSize: 44 } as Record<string, unknown>)}
+				estimatedItemSize={120}
 			/>
 		);
 	},

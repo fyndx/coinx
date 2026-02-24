@@ -3,6 +3,7 @@ import { Splash } from "@/src/Components/Splash";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
+import { themeModel } from "@/src/LegendState/Theme/Theme.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { observer, useMount } from "@legendapp/state/react";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -11,6 +12,9 @@ import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "@/src/utils/date";
+
+// Apply stored theme preference before rendering
+themeModel.initTheme();
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -52,7 +56,7 @@ const RootLayoutNav = observer(() => {
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<RootProvider>
-				<Stack screenOptions={{ statusBarStyle: "dark" }}>
+				<Stack screenOptions={{ statusBarStyle: "auto" }}>
 					<Stack.Screen name="index" options={{ headerShown: false }} />
 					<Stack.Screen name="(auth)" options={{ headerShown: false }} />
 					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
