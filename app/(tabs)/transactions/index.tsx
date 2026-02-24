@@ -145,7 +145,7 @@ const Transactions = () => {
 			</View>
 
 			<AnimatedView
-				className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full"
+				className="absolute right-6 bottom-6 bg-primary/15 dark:bg-primary/25 p-2 rounded-full"
 				style={animatedFabStyle}
 			>
 				<Link href={{ pathname: "/add-transaction" }} asChild>

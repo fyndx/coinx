@@ -40,7 +40,7 @@ export const TransactionsList = observer(
 			<AnimatedFlashList
 				data={transactions}
 				renderItem={({ item }) => (
-					<View className="bg-card rounded-2xl mb-3 overflow-hidden">
+					<View className="bg-card dark:bg-zinc-900 rounded-2xl mb-3 overflow-hidden">
 						<TransactionSummary
 							transaction_time={item.transaction_time}
 							total={item.total}
