@@ -6,10 +6,11 @@ import { observer } from "@legendapp/state/react";
 import dayjs from "dayjs";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useState } from "react";
-import { Modal, Pressable, View } from "react-native";
+import { Modal, View } from "react-native";
 import { dayjsLocaleDataInstance } from "../utils/date";
 import { Button } from "./ui/Button";
 import { Text } from "./ui/Text";
+import { MotiView } from "moti";
 
 const MONTHS = dayjsLocaleDataInstance.monthsShort();
 
@@ -23,9 +24,16 @@ export const MonthYearPicker = observer(
 		const [selectedYear, setSelectedYear] = useState(dayjs().year());
 		const [tempYear, setTempYear] = useState(selectedYear);
 		const [modalVisible, setModalVisible] = useState(false);
+		const [showContent, setShowContent] = useState(false);
 
 		const openPicker = () => {
 			setModalVisible(true);
+			requestAnimationFrame(() => setShowContent(true));
+		};
+
+		const closePicker = () => {
+			setShowContent(false);
+			setTimeout(() => setModalVisible(false), 280);
 		};
 
 		const handleMonthChange = ({
@@ -42,7 +50,7 @@ export const MonthYearPicker = observer(
 				endDate: endOfMonth.format(),
 			};
 			transactionsScreenModel$.obs.timeRange.set(timeRange);
-			setModalVisible(false);
+			closePicker();
 		};
 
 		const handlePreviousMonth = () => {
@@ -90,7 +98,7 @@ export const MonthYearPicker = observer(
 		return (
 			<View className="flex-row justify-between items-center w-full">
 				<Button variant="ghost" size="icon" onPress={handlePreviousMonth}>
-					<ChevronLeft size={24} color="black" />
+					<ChevronLeft size={24} color="#09090b" />
 				</Button>
 
 				<Button variant="outline" onPress={openPicker}>
@@ -98,60 +106,74 @@ export const MonthYearPicker = observer(
 				</Button>
 
 				<Modal
-					animationType="slide"
+					animationType="none"
 					transparent={true}
 					visible={modalVisible}
-					onRequestClose={() => setModalVisible(false)}
+					onRequestClose={closePicker}
 				>
-					<View className="flex-1 justify-center items-center bg-black/50">
-						<View className="bg-background m-4 p-4 rounded-lg w-4/5 shadow-lg border border-border">
-							{/* Year Row */}
-							<View className="flex-row justify-between items-center mb-4">
-								<Button
-									variant="ghost"
-									size="icon"
-									onPress={() => {
-										setTempYear(tempYear - 1);
-									}}
-								>
-									<ChevronLeft size={20} color="black" />
-								</Button>
-								<Text className="text-lg font-bold">{tempYear}</Text>
-								<Button
-									variant="ghost"
-									size="icon"
-									onPress={() => {
-										setTempYear(tempYear + 1);
-									}}
-								>
-									<ChevronRight size={20} color="black" />
-								</Button>
-							</View>
-							<View className="flex-row flex-wrap justify-center gap-2">
-								{MONTHS.map((month, index) => (
+					<MotiView
+						animate={{ opacity: showContent ? 1 : 0 }}
+						transition={{ type: "timing", duration: 200 }}
+						style={{
+							flex: 1,
+							justifyContent: "center",
+							alignItems: "center",
+							backgroundColor: "rgba(0,0,0,0.5)",
+						}}
+					>
+						<MotiView
+							animate={{
+								opacity: showContent ? 1 : 0,
+								scale: showContent ? 1 : 0.92,
+							}}
+							transition={{ type: "spring", damping: 18, stiffness: 220 }}
+							style={{ width: "80%", margin: 16 }}
+						>
+							<View className="bg-background p-4 rounded-2xl w-full shadow-lg border border-border">
+								{/* Year Row */}
+								<View className="flex-row justify-between items-center mb-4">
 									<Button
-										key={month}
-										variant={index === selectedMonth ? "default" : "ghost"}
-										className="w-[30%] mb-2"
-										onPress={() => handleMonthChange({ month, index })}
+										variant="ghost"
+										size="icon"
+										onPress={() => setTempYear(tempYear - 1)}
 									>
-										{month}
+										<ChevronLeft size={20} color="#09090b" />
 									</Button>
-								))}
+									<Text className="text-lg font-bold">{tempYear}</Text>
+									<Button
+										variant="ghost"
+										size="icon"
+										onPress={() => setTempYear(tempYear + 1)}
+									>
+										<ChevronRight size={20} color="#09090b" />
+									</Button>
+								</View>
+								<View className="flex-row flex-wrap justify-center gap-2">
+									{MONTHS.map((month, index) => (
+										<Button
+											key={month}
+											variant={index === selectedMonth ? "default" : "ghost"}
+											className="w-[30%] mb-2"
+											onPress={() => handleMonthChange({ month, index })}
+										>
+											{month}
+										</Button>
+									))}
+								</View>
+								<Button
+									variant="outline"
+									className="mt-4"
+									onPress={closePicker}
+								>
+									Cancel
+								</Button>
 							</View>
-							<Button
-								variant="outline"
-								className="mt-4"
-								onPress={() => setModalVisible(false)}
-							>
-								Cancel
-							</Button>
-						</View>
-					</View>
+						</MotiView>
+					</MotiView>
 				</Modal>
 
 				<Button variant="ghost" size="icon" onPress={handleNextMonth}>
-					<ChevronRight size={24} color="black" />
+					<ChevronRight size={24} color="#09090b" />
 				</Button>
 			</View>
 		);

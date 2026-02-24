@@ -123,13 +123,9 @@ const Transactions = () => {
 	});
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<SafeAreaView style={styles.container} edges={["top"]}>
 			<View style={styles.container} className="px-6">
-				{/* <XStack justifyContent="space-between" paddingVertical={"$2"}>
-				<Search />
-				<ChevronDownSquare />
-			</XStack> */}
-				{/* <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} /> */}
+		{/* <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} /> */}
 				<View className="justify-center items-center py-2">
 					<Text className="text-xl font-bold">{"Transactions"}</Text>
 				</View>
