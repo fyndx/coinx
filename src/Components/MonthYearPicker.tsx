@@ -30,12 +30,12 @@ export const MonthYearPicker = observer(
 
 		const openPicker = () => {
 			setModalVisible(true);
-			requestAnimationFrame(() => setShowContent(true));
+			setShowContent(true);
 		};
 
 		const closePicker = () => {
 			setShowContent(false);
-			setTimeout(() => setModalVisible(false), 280);
+			// setModalVisible(false) is called by onDidAnimate when the fade-out completes
 		};
 
 		const handleMonthChange = ({
@@ -114,8 +114,14 @@ export const MonthYearPicker = observer(
 					onRequestClose={closePicker}
 				>
 					<MotiView
+						from={{ opacity: 0 }}
 						animate={{ opacity: showContent ? 1 : 0 }}
 						transition={{ type: "timing", duration: 200 }}
+						onDidAnimate={(styleProp, finished, _, { attemptedValue }) => {
+							if (styleProp === "opacity" && finished && attemptedValue === 0) {
+								setModalVisible(false);
+							}
+						}}
 						style={{
 							flex: 1,
 							justifyContent: "center",
@@ -124,6 +130,7 @@ export const MonthYearPicker = observer(
 						}}
 					>
 						<MotiView
+							from={{ opacity: 0, scale: 0.92 }}
 							animate={{
 								opacity: showContent ? 1 : 0,
 								scale: showContent ? 1 : 0.92,
@@ -154,7 +161,11 @@ export const MonthYearPicker = observer(
 									{MONTHS.map((month, index) => (
 										<Button
 											key={month}
-											variant={index === selectedMonth ? "default" : "ghost"}
+											variant={
+												index === selectedMonth && tempYear === selectedYear
+													? "default"
+													: "ghost"
+											}
 											className="w-[30%] mb-2"
 											onPress={() => handleMonthChange({ month, index })}
 										>

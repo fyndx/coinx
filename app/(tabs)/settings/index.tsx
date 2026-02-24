@@ -7,7 +7,6 @@ import {
 } from "@/src/LegendState/Settings/Settings.model";
 import {
 	type ThemeMode,
-	setTheme,
 	themeModel,
 } from "@/src/LegendState/Theme/Theme.model";
 import { observer } from "@legendapp/state/react";
@@ -93,7 +92,7 @@ const THEME_OPTIONS: { mode: ThemeMode; label: string; Icon: typeof Sun }[] = [
 ];
 
 const AppearanceSection = observer(() => {
-	const currentMode = themeModel.mode.get();
+	const currentMode = themeModel.obs.mode.get();
 	return (
 		<View className="bg-card rounded-lg p-4 mb-1">
 			<Text className="text-base font-semibold mb-3">{"Appearance"}</Text>
@@ -103,7 +102,7 @@ const AppearanceSection = observer(() => {
 					return (
 						<Pressable
 							key={mode}
-							onPress={() => setTheme(mode)}
+							onPress={() => themeModel.setTheme(mode)}
 							className="flex-1"
 						>
 							<View

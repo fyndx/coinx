@@ -6,21 +6,30 @@ export type ThemeMode = "light" | "dark" | "system";
 
 const storage = new MMKV({ id: "theme-storage" });
 
-const getStoredTheme = (): ThemeMode => {
-	return (storage.getString("themeMode") as ThemeMode) ?? "system";
-};
+const isThemeMode = (value?: string): value is ThemeMode =>
+	value === "light" || value === "dark" || value === "system";
 
-export const themeModel = observable({
-	mode: getStoredTheme(),
-});
+export class ThemeModel {
+	obs;
 
-export const setTheme = (mode: ThemeMode) => {
-	storage.set("themeMode", mode);
-	themeModel.mode.set(mode);
-	Uniwind.setTheme(mode);
-};
+	constructor() {
+		const stored = storage.getString("themeMode");
+		this.obs = observable({
+			mode: isThemeMode(stored) ? stored : ("system" as ThemeMode),
+		});
+	}
 
-export const initTheme = () => {
-	const mode = getStoredTheme();
-	Uniwind.setTheme(mode);
-};
+	setTheme = (mode: ThemeMode) => {
+		storage.set("themeMode", mode);
+		this.obs.mode.set(mode);
+		Uniwind.setTheme(mode);
+	};
+
+	initTheme = () => {
+		const stored = storage.getString("themeMode");
+		const mode = isThemeMode(stored) ? stored : "system";
+		Uniwind.setTheme(mode);
+	};
+}
+
+export const themeModel = new ThemeModel();

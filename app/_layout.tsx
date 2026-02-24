@@ -3,7 +3,7 @@ import { Splash } from "@/src/Components/Splash";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
-import { initTheme } from "@/src/LegendState/Theme/Theme.model";
+import { themeModel } from "@/src/LegendState/Theme/Theme.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { observer, useMount } from "@legendapp/state/react";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -14,7 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "@/src/utils/date";
 
 // Apply stored theme preference before rendering
-initTheme();
+themeModel.initTheme();
 
 export {
 	// Catch any errors thrown by the Layout component.
