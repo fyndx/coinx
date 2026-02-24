@@ -123,8 +123,12 @@ const Transactions = () => {
 	});
 
 	return (
-		<SafeAreaView style={styles.container} edges={["top"]}>
-			<View style={styles.container} className="px-6">
+		<SafeAreaView
+			style={styles.container}
+			className="bg-background"
+			edges={["top"]}
+		>
+			<View style={styles.container} className="px-6 bg-background">
 				{/* <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} /> */}
 				<View className="justify-center items-center py-2">
 					<Text className="text-xl font-bold">{"Transactions"}</Text>

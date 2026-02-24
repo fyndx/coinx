@@ -1,6 +1,6 @@
 import { observable } from "@legendapp/state";
-import { Appearance } from "react-native";
 import { MMKV } from "react-native-mmkv";
+import { Uniwind } from "uniwind";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -17,10 +17,10 @@ export const themeModel = observable({
 export const setTheme = (mode: ThemeMode) => {
 	storage.set("themeMode", mode);
 	themeModel.mode.set(mode);
-	Appearance.setColorScheme(mode === "system" ? null : mode);
+	Uniwind.setTheme(mode);
 };
 
 export const initTheme = () => {
 	const mode = getStoredTheme();
-	Appearance.setColorScheme(mode === "system" ? null : mode);
+	Uniwind.setTheme(mode);
 };

@@ -7,7 +7,10 @@ const Text = React.forwardRef<React.ElementRef<typeof RUNativeText>, TextProps>(
 		return (
 			<RUNativeText
 				ref={ref}
-				className={cn("text-base text-foreground file:font-medium", className)}
+				className={cn(
+					"text-base text-foreground dark:text-white file:font-medium",
+					className,
+				)}
 				{...props}
 			/>
 		);

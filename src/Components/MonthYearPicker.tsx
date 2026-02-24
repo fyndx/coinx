@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { MotiView } from "moti";
 import { useState } from "react";
-import { Modal, View } from "react-native";
+import { Modal, View, useColorScheme } from "react-native";
 import { dayjsLocaleDataInstance } from "../utils/date";
 import { Button } from "./ui/Button";
 import { Text } from "./ui/Text";
@@ -20,6 +20,8 @@ interface MonthYearPickerProps {
 
 export const MonthYearPicker = observer(
 	({ transactionsScreenModel$ }: MonthYearPickerProps) => {
+		const colorScheme = useColorScheme();
+		const iconColor = colorScheme === "dark" ? "#ffffff" : "#09090b";
 		const [selectedMonth, setSelectedMonth] = useState(dayjs().month());
 		const [selectedYear, setSelectedYear] = useState(dayjs().year());
 		const [tempYear, setTempYear] = useState(selectedYear);
@@ -98,7 +100,7 @@ export const MonthYearPicker = observer(
 		return (
 			<View className="flex-row justify-between items-center w-full">
 				<Button variant="ghost" size="icon" onPress={handlePreviousMonth}>
-					<ChevronLeft size={24} color="#09090b" />
+					<ChevronLeft size={24} color={iconColor} />
 				</Button>
 
 				<Button variant="outline" onPress={openPicker}>
@@ -137,7 +139,7 @@ export const MonthYearPicker = observer(
 										size="icon"
 										onPress={() => setTempYear(tempYear - 1)}
 									>
-										<ChevronLeft size={20} color="#09090b" />
+										<ChevronLeft size={20} color={iconColor} />
 									</Button>
 									<Text className="text-lg font-bold">{tempYear}</Text>
 									<Button
@@ -145,7 +147,7 @@ export const MonthYearPicker = observer(
 										size="icon"
 										onPress={() => setTempYear(tempYear + 1)}
 									>
-										<ChevronRight size={20} color="#09090b" />
+										<ChevronRight size={20} color={iconColor} />
 									</Button>
 								</View>
 								<View className="flex-row flex-wrap justify-center gap-2">
@@ -173,7 +175,7 @@ export const MonthYearPicker = observer(
 				</Modal>
 
 				<Button variant="ghost" size="icon" onPress={handleNextMonth}>
-					<ChevronRight size={24} color="#09090b" />
+					<ChevronRight size={24} color={iconColor} />
 				</Button>
 			</View>
 		);
