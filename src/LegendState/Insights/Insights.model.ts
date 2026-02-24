@@ -244,12 +244,8 @@ export class InsightsModel {
 			transactionsResult.push({
 				transaction_time: displayDate,
 				total: transactionGroupItem.total.toFixed(2),
+				transactions: transactionGroupItem.transactions,
 			});
-			for (const transaction of transactionGroupItem.transactions) {
-				transactionsResult.push({
-					transaction,
-				});
-			}
 		}
 		return transactionsResult;
 	});

@@ -4,16 +4,15 @@ import { TransactionSummary } from "@/src/Containers/Transactions/Components/Tra
 import type { FlashListTransactionsList } from "@/src/LegendState/TransactionsScreen.model";
 import type { ObservableComputed } from "@legendapp/state";
 import { observer } from "@legendapp/state/react";
-import { FlashList, type FlashListProps } from "@shopify/flash-list";
+import { FlashList } from "@shopify/flash-list";
 import { Banknote } from "lucide-react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
-const AnimatedFlashList =
-	Animated.createAnimatedComponent<FlashListProps<FlashListTransactionsList>>(
-		FlashList,
-	);
+const AnimatedFlashList = Animated.createAnimatedComponent(
+	FlashList,
+) as typeof FlashList;
 
 export const TransactionsList = observer(
 	({
@@ -56,7 +55,6 @@ export const TransactionsList = observer(
 				onScroll={onScroll}
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps={"handled"}
-				estimatedItemSize={120}
 			/>
 		);
 	},

@@ -8,7 +8,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { PlusCircle } from "lucide-react-native";
 import { useRef } from "react";
-import { ActivityIndicator, Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { ActivityIndicator, Keyboard, Pressable, StyleSheet, type TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const AddProductListing = observer(() => {
