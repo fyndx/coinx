@@ -1,29 +1,30 @@
-import { db as database } from "@/db/client";
-import {
-	type InsertProductListingHistory,
-	product_listings as productListingsRepo,
-	product_listings_history as productsListingsHistoryRepo,
-} from "@/db/schema";
-import { DrizzleError } from "@/src/utils/error";
-import { generateUUID } from "@/src/utils/uuid";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 
-export const addProductListingsHistory = (
-	productListingHistory: Omit<InsertProductListingHistory, "id">,
-) => {
-	return Effect.promise(() => {
-		const query = database
-			.insert(productsListingsHistoryRepo)
-			.values({
-				...productListingHistory,
-				id: generateUUID(),
-				syncStatus: "pending",
-			})
-			.returning();
+import { db as database } from "@/db/client";
+import {
+  type InsertProductListingHistory,
+  product_listings as productListingsRepo,
+  product_listings_history as productsListingsHistoryRepo,
+} from "@/db/schema";
+import { DrizzleError } from "@/src/utils/error";
+import { generateUUID } from "@/src/utils/uuid";
 
-		return query.execute();
-	});
+export const addProductListingsHistory = (
+  productListingHistory: Omit<InsertProductListingHistory, "id">,
+) => {
+  return Effect.promise(() => {
+    const query = database
+      .insert(productsListingsHistoryRepo)
+      .values({
+        ...productListingHistory,
+        id: generateUUID(),
+        syncStatus: "pending",
+      })
+      .returning();
+
+    return query.execute();
+  });
 };
 
 /**
@@ -33,63 +34,65 @@ export const addProductListingsHistory = (
  * @param {string} params.productId - The UUID of the product to retrieve the listings history for.
  */
 export const getProductListingsHistoryByProductId = ({
-	productId,
-}: { productId: string }) => {
-	return Effect.tryPromise({
-		try: () => {
-			const query = database
-				.select({
-					productListingId: productsListingsHistoryRepo.productListingId,
-					price: productsListingsHistoryRepo.price,
-					recordedAt: productsListingsHistoryRepo.recordedAt,
-					listingName: productListingsRepo.name, // Selecting the listing name from product_listings
-				})
-				.from(productsListingsHistoryRepo)
-				.innerJoin(
-					productListingsRepo,
-					eq(
-						productsListingsHistoryRepo.productListingId,
-						productListingsRepo.id,
-					),
-				)
-				.where(
-					and(
-						eq(productsListingsHistoryRepo.productId, productId),
-						isNull(productsListingsHistoryRepo.deletedAt),
-					),
-				)
-				.orderBy(asc(productsListingsHistoryRepo.recordedAt));
+  productId,
+}: {
+  productId: string;
+}) => {
+  return Effect.tryPromise({
+    try: () => {
+      const query = database
+        .select({
+          productListingId: productsListingsHistoryRepo.productListingId,
+          price: productsListingsHistoryRepo.price,
+          recordedAt: productsListingsHistoryRepo.recordedAt,
+          listingName: productListingsRepo.name, // Selecting the listing name from product_listings
+        })
+        .from(productsListingsHistoryRepo)
+        .innerJoin(
+          productListingsRepo,
+          eq(
+            productsListingsHistoryRepo.productListingId,
+            productListingsRepo.id,
+          ),
+        )
+        .where(
+          and(
+            eq(productsListingsHistoryRepo.productId, productId),
+            isNull(productsListingsHistoryRepo.deletedAt),
+          ),
+        )
+        .orderBy(asc(productsListingsHistoryRepo.recordedAt));
 
-			return query.execute();
-		},
-		catch: (error) => {
-			// console.error(error);
-			Effect.logError({
-				error: error instanceof Error ? error.message : "Unknown error",
-				operation: "getProductListingsHistoryByProductId",
-				productId,
-			});
-			return Effect.fail(
-				new DrizzleError({
-					message:
-						"Failed to get product listings history for the given product id",
-				}),
-			);
-		},
-	});
+      return query.execute();
+    },
+    catch: (error) => {
+      // console.error(error);
+      Effect.logError({
+        error: error instanceof Error ? error.message : "Unknown error",
+        operation: "getProductListingsHistoryByProductId",
+        productId,
+      });
+      return Effect.fail(
+        new DrizzleError({
+          message:
+            "Failed to get product listings history for the given product id",
+        }),
+      );
+    },
+  });
 };
 
 export const deleteProductListingsByProductListingId = (id: string) => {
-	return Effect.promise(() => {
-		const query = database
-			.update(productsListingsHistoryRepo)
-			.set({
-				deletedAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-				syncStatus: "pending",
-			})
-			.where(eq(productsListingsHistoryRepo.productListingId, id));
+  return Effect.promise(() => {
+    const query = database
+      .update(productsListingsHistoryRepo)
+      .set({
+        deletedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        syncStatus: "pending",
+      })
+      .where(eq(productsListingsHistoryRepo.productListingId, id));
 
-		return query.execute();
-	});
+    return query.execute();
+  });
 };

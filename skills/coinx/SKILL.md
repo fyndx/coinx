@@ -36,9 +36,9 @@ db/
 ## Data Flow
 
 ```
-Screen (app/) 
-  → Model (LegendState/) 
-    → Repo (database/) 
+Screen (app/)
+  → Model (LegendState/)
+    → Repo (database/)
       → Drizzle (db/)
 ```
 
@@ -51,9 +51,13 @@ export const newEntity = sqliteTable("coinx_new_entity", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   // ... fields
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
   updatedAt: text("updated_at"),
-  syncStatus: text("sync_status", { enum: ["pending", "synced"] }).default("pending"),
+  syncStatus: text("sync_status", { enum: ["pending", "synced"] }).default(
+    "pending",
+  ),
   deletedAt: text("deleted_at"),
 });
 ```
@@ -73,11 +77,15 @@ export const getAll = () =>
 
 export const add = (data: Omit<InsertNewEntity, "id">) =>
   Effect.promise(() =>
-    db.insert(newEntity).values({
-      id: generateUUID(),
-      ...data,
-      syncStatus: "pending",
-    }).returning().execute()
+    db
+      .insert(newEntity)
+      .values({
+        id: generateUUID(),
+        ...data,
+        syncStatus: "pending",
+      })
+      .returning()
+      .execute(),
   );
 ```
 
@@ -137,20 +145,25 @@ const NewEntityScreen = observer(() => {
 ## Conventions
 
 ### IDs
+
 - All IDs are UUIDs (strings)
 - Generate with `generateUUID()` from `@/src/utils/uuid`
 
 ### Sync Fields
+
 All tables have:
+
 - `syncStatus`: "pending" | "synced"
 - `deletedAt`: soft delete timestamp
 
 ### Error Handling
+
 - Use Effect-TS in repos
 - Use Burnt.toast for user feedback
 - Log errors with console.error
 
 ### Naming
+
 - Repos: `[Entity]Repo.ts`
 - Models: `[Entity].model.ts`
 - Screens: `app/[entity]/index.tsx`

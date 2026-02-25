@@ -10,16 +10,16 @@ CoinX is a personal finance mobile app built with React Native/Expo. It tracks t
 
 ```bash
 # Development
-pnpm start           # Start Expo dev server
-pnpm ios             # Run on iOS simulator
-pnpm android         # Run on Android emulator
+bun start           # Start Expo dev server
+bun ios             # Run on iOS simulator
+bun android         # Run on Android emulator
 
 # Code quality
-pnpm lint            # Run Biome linter
-pnpm type-check      # TypeScript check
+bun lint            # Run Biome linter
+bun type-check      # TypeScript check
 
 # Database
-pnpm generate        # Generate Drizzle migrations from schema changes
+bun generate        # Generate Drizzle migrations from schema changes
 ```
 
 ## Architecture
@@ -40,7 +40,7 @@ The app uses `@legendapp/state` with class-based observable models. The pattern:
 - **Schema**: `db/schema.ts` - All tables use UUIDs as primary keys
 - **Sync fields**: Every table has `syncStatus` ('pending'|'synced') and `deletedAt` for soft deletes
 - **Repos**: `src/database/*Repo.ts` - Database operations wrapped in Effect.ts
-- **Migrations**: `drizzle/` folder, generated via `pnpm generate`
+- **Migrations**: `drizzle/` folder, generated via `bun generate`
 
 Tables: categories, transactions, products, stores, product_listings, product_listings_history
 
@@ -49,6 +49,7 @@ Tables: categories, transactions, products, stores, product_listings, product_li
 Located in `src/services/sync/`. Bidirectional sync between local SQLite and Supabase backend.
 
 Key files:
+
 - `manager.ts` - SyncManager orchestrator (push/pull operations)
 - `database.ts` - Database Effect wrappers for sync operations
 - `api.ts` - API Effect wrappers
@@ -59,6 +60,7 @@ Sync flow: Initialize → Check Auth → Ensure Device → Push (local changes) 
 ### Navigation (Expo Router)
 
 File-based routing in `app/` directory:
+
 - `app/(tabs)/` - Main tab screens (transactions, products, insights, budgets, settings)
 - `app/(auth)/` - Authentication screens (sign-in, sign-up)
 - Modal screens at root level (add-transaction, add-product, etc.)
@@ -72,6 +74,7 @@ Uses `uniwind` (TailwindCSS for React Native) with `tailwind-variants` for compo
 ### Effect.ts for Database Operations
 
 Repos return Effects that are composed and run with `Effect.runPromise()`:
+
 ```typescript
 const result = await Effect.runPromise(getTransactions({ startDate, endDate }));
 ```
@@ -79,6 +82,7 @@ const result = await Effect.runPromise(getTransactions({ startDate, endDate }));
 ### Soft Deletes
 
 All records use soft deletes - never use hard delete. Always set `deletedAt` and `syncStatus: 'pending'` when "deleting":
+
 ```typescript
 .set({ deletedAt: new Date().toISOString(), syncStatus: "pending" })
 ```

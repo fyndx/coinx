@@ -1,167 +1,167 @@
 import React, { Component, type PropsWithChildren } from "react";
 import {
-	Pressable,
-	type StyleProp,
-	StyleSheet,
-	type ViewStyle,
+  Pressable,
+  type StyleProp,
+  StyleSheet,
+  type ViewStyle,
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable, {
-	type SwipeableMethods,
+  type SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
-	Extrapolation,
-	interpolate,
-	useAnimatedStyle,
-	type SharedValue,
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  type SharedValue,
 } from "react-native-reanimated";
 
 interface Action {
-	content: React.ReactNode;
-	onPress: () => void;
-	style?: StyleProp<ViewStyle>;
+  content: React.ReactNode;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 interface SwipeableRowProps {
-	rightActions?: Action[];
-	leftActions?: Action[];
+  rightActions?: Action[];
+  leftActions?: Action[];
 }
 
 const SWIPE_THRESHOLD = 40;
 
 const ActionButton = ({
-	action,
-	dragX,
-	inputRange,
-	outputRange,
-	swipeable,
+  action,
+  dragX,
+  inputRange,
+  outputRange,
+  swipeable,
 }: {
-	action: Action;
-	dragX: SharedValue<number>;
-	inputRange: number[];
-	outputRange: number[];
-	swipeable: SwipeableMethods;
+  action: Action;
+  dragX: SharedValue<number>;
+  inputRange: number[];
+  outputRange: number[];
+  swipeable: SwipeableMethods;
 }) => {
-	const styleAnimation = useAnimatedStyle(() => ({
-		transform: [
-			{
-				scale: interpolate(
-					dragX.value,
-					inputRange,
-					outputRange,
-					Extrapolation.CLAMP,
-				),
-			},
-		],
-		opacity: interpolate(
-			dragX.value,
-			inputRange,
-			outputRange,
-			Extrapolation.CLAMP,
-		),
-	}));
-	return (
-		<RectButton
-			hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
-			style={[styles.actionButton, action.style]}
-			onPress={() => {
-				swipeable.close();
-				action.onPress();
-			}}
-		>
-			<Pressable
-				onPress={(event) => {
-					// Hack to prevent the parent to trigger the onPress event
-					event.preventDefault();
-				}}
-				hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
-			>
-				<Reanimated.View style={styleAnimation}>
-					{action.content}
-				</Reanimated.View>
-			</Pressable>
-		</RectButton>
-	);
+  const styleAnimation = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: interpolate(
+          dragX.value,
+          inputRange,
+          outputRange,
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
+    opacity: interpolate(
+      dragX.value,
+      inputRange,
+      outputRange,
+      Extrapolation.CLAMP,
+    ),
+  }));
+  return (
+    <RectButton
+      hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+      style={[styles.actionButton, action.style]}
+      onPress={() => {
+        swipeable.close();
+        action.onPress();
+      }}
+    >
+      <Pressable
+        onPress={(event) => {
+          // Hack to prevent the parent to trigger the onPress event
+          event.preventDefault();
+        }}
+        hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+      >
+        <Reanimated.View style={styleAnimation}>
+          {action.content}
+        </Reanimated.View>
+      </Pressable>
+    </RectButton>
+  );
 };
 
 export class SwipeableRow extends Component<
-	PropsWithChildren<SwipeableRowProps>
+  PropsWithChildren<SwipeableRowProps>
 > {
-	private swipeableRowRef: React.RefObject<SwipeableMethods | null> =
-		React.createRef<SwipeableMethods | null>();
+  private swipeableRowRef: React.RefObject<SwipeableMethods | null> =
+    React.createRef<SwipeableMethods | null>();
 
-	private renderActions = ({
-		actions,
-		dragX,
-		isLeft,
-		swipeable,
-	}: {
-		actions: Action[];
-		progress: SharedValue<number>;
-		dragX: SharedValue<number>;
-		isLeft: boolean;
-		swipeable: SwipeableMethods;
-	}) => {
-		const inputRange = isLeft ? [0, SWIPE_THRESHOLD] : [-SWIPE_THRESHOLD, 0];
-		const outputRange = isLeft ? [0, 1] : [1, 0];
+  private renderActions = ({
+    actions,
+    dragX,
+    isLeft,
+    swipeable,
+  }: {
+    actions: Action[];
+    progress: SharedValue<number>;
+    dragX: SharedValue<number>;
+    isLeft: boolean;
+    swipeable: SwipeableMethods;
+  }) => {
+    const inputRange = isLeft ? [0, SWIPE_THRESHOLD] : [-SWIPE_THRESHOLD, 0];
+    const outputRange = isLeft ? [0, 1] : [1, 0];
 
-		return actions.map((action, index) => {
-			return (
-				<ActionButton
-					key={`${action.content}-${index}`}
-					action={action}
-					dragX={dragX}
-					inputRange={inputRange}
-					outputRange={outputRange}
-					swipeable={swipeable}
-				/>
-			);
-		});
-	};
+    return actions.map((action, index) => {
+      return (
+        <ActionButton
+          key={`${action.content}-${index}`}
+          action={action}
+          dragX={dragX}
+          inputRange={inputRange}
+          outputRange={outputRange}
+          swipeable={swipeable}
+        />
+      );
+    });
+  };
 
-	render() {
-		const { children, leftActions = [], rightActions = [] } = this.props;
-		return (
-			<Swipeable
-				ref={this.swipeableRowRef}
-				renderLeftActions={(progress, dragX, swipeable) =>
-					this.renderActions({
-						actions: leftActions,
-						progress,
-						dragX,
-						isLeft: true,
-						swipeable,
-					})
-				}
-				renderRightActions={(progress, dragX, swipeable) =>
-					this.renderActions({
-						actions: rightActions,
-						progress,
-						dragX,
-						isLeft: false,
-						swipeable,
-					})
-				}
-				leftThreshold={40}
-				rightThreshold={40}
-			>
-				{children}
-			</Swipeable>
-		);
-	}
+  render() {
+    const { children, leftActions = [], rightActions = [] } = this.props;
+    return (
+      <Swipeable
+        ref={this.swipeableRowRef}
+        renderLeftActions={(progress, dragX, swipeable) =>
+          this.renderActions({
+            actions: leftActions,
+            progress,
+            dragX,
+            isLeft: true,
+            swipeable,
+          })
+        }
+        renderRightActions={(progress, dragX, swipeable) =>
+          this.renderActions({
+            actions: rightActions,
+            progress,
+            dragX,
+            isLeft: false,
+            swipeable,
+          })
+        }
+        leftThreshold={40}
+        rightThreshold={40}
+      >
+        {children}
+      </Swipeable>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-	actionButton: {
-		justifyContent: "center",
-		alignItems: "center",
-		width: 48,
-		zIndex: 1,
-	},
-	deleteButton: {
-		backgroundColor: "red",
-		justifyContent: "center",
-		minWidth: SWIPE_THRESHOLD,
-		padding: 8,
-	},
+  actionButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 48,
+    zIndex: 1,
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    justifyContent: "center",
+    minWidth: SWIPE_THRESHOLD,
+    padding: 8,
+  },
 });

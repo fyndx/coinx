@@ -36,10 +36,7 @@ export default function RootLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="modal" 
-        options={{ presentation: "modal" }} 
-      />
+      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
     </Stack>
   );
 }
@@ -109,7 +106,7 @@ import { Link } from "expo-router";
 
 <Link href="/details">Go to Details</Link>
 
-<Link 
+<Link
   href={{
     pathname: "/details/[id]",
     params: { id: "123" },
@@ -170,11 +167,11 @@ import { Stack } from "expo-router";
 export default function Screen() {
   return (
     <>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: "Custom Title",
           headerRight: () => <Button />,
-        }} 
+        }}
       />
       <View />
     </>
@@ -192,7 +189,7 @@ export default function Screen() {
     presentation: "modal",
     headerShown: false,
   }}
-/>
+/>;
 
 // Navigate to modal
 router.push("/modal");
@@ -211,11 +208,11 @@ import { Redirect } from "expo-router";
 
 export default function Layout() {
   const { isLoggedIn } = useAuth();
-  
+
   if (!isLoggedIn) {
     return <Redirect href="/login" />;
   }
-  
+
   return <Stack />;
 }
 ```
@@ -230,10 +227,10 @@ useFocusEffect(
   useCallback(() => {
     // Runs when screen is focused
     loadData();
-    
+
     return () => {
       // Cleanup when unfocused
     };
-  }, [])
+  }, []),
 );
 ```

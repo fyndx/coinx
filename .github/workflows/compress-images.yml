@@ -32,7 +32,7 @@ jobs:
         if: steps.calibre.outputs.markdown != ''
         uses: peter-evans/create-pull-request@v7
         with:
-          title: 'chore: Optimize image assets using calibreapp/image-actions'
+          title: "chore: Optimize image assets using calibreapp/image-actions"
           branch-suffix: timestamp
-          commit-message: 'chore: Optimize image assets using calibreapp/image-actions'
+          commit-message: "chore: Optimize image assets using calibreapp/image-actions"
           body: ${{ steps.calibre.outputs.markdown }}

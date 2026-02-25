@@ -21,7 +21,9 @@ sync/
 ## Module Overview
 
 ### `types.ts`
+
 Core TypeScript types and interfaces for the sync system:
+
 - `SyncableRecord` - Base interface for syncable database records
 - `ChangeSet` - Upserted and deleted record sets
 - `SyncChanges` - Changes across all tables
@@ -29,7 +31,9 @@ Core TypeScript types and interfaces for the sync system:
 - `STORAGE_KEYS` - Storage key constants
 
 ### `errors.ts`
+
 Custom typed errors using Effect's `Data.TaggedError`:
+
 - `SyncInitializationError` - Initialization failures
 - `DeviceRegistrationError` - Device registration failures
 - `SyncPushError` - Push operation failures
@@ -40,29 +44,39 @@ Custom typed errors using Effect's `Data.TaggedError`:
 - `SyncCancelledError` - Cancelled sync operations
 
 ### `storage.ts`
+
 AsyncStorage operations wrapped as Effects:
+
 - `getStorageItem(key)` - Get value from storage
 - `setStorageItem(key, value)` - Set value in storage
 - `removeStorageItem(key)` - Remove value from storage
 
 ### `auth.ts`
+
 Supabase authentication wrapped as Effects:
+
 - `getCurrentSession()` - Get current auth session
 - `checkAuthentication()` - Verify user is logged in
 
 ### `api.ts`
+
 API client wrapped as Effects:
+
 - `apiPost<T>(path, body?)` - POST request with error handling
 
 ### `database.ts`
+
 Database operations wrapped as Effects:
+
 - `collectPendingRecords(table)` - Get pending records from table
 - `markRecordsSyncedForTable(table, ids)` - Mark records as synced
 - `applyTableChanges(table, changeSet)` - Apply remote changes locally
 - `splitChanges(records)` - Split records into upserted/deleted sets
 
 ### `manager.ts`
+
 Main SyncManager class that orchestrates the sync flow:
+
 - Device registration
 - Push/pull sync operations
 - State management
@@ -156,12 +170,12 @@ const registerDevice = () =>
       apiPost<{ data: { id: string } }>("/api/auth/device", {
         platform: "ios",
         deviceName: "My iPhone",
-      })
+      }),
     ),
     Effect.map((response) => response.data.id),
     Effect.tapError((error) =>
-      Effect.sync(() => console.error("Registration failed:", error))
-    )
+      Effect.sync(() => console.error("Registration failed:", error)),
+    ),
   );
 
 // Run the effect
@@ -180,14 +194,14 @@ const myEffect = pipe(
     Effect.sync(() => {
       console.error("DB error:", error.message);
       return null;
-    })
+    }),
   ),
   Effect.catchTag("StorageError", (error) =>
     Effect.sync(() => {
       console.error("Storage error:", error.message);
       return null;
-    })
-  )
+    }),
+  ),
 );
 ```
 

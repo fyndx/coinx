@@ -1,4 +1,3 @@
-
 name: "Setup Node + Bun + Install Dependencies"
 description: "Setup Node.js, Bun, and install project dependencies."
 runs:

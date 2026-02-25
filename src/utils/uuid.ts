@@ -5,5 +5,5 @@ import * as Crypto from "expo-crypto";
  * Uses crypto.randomUUID() which is available in React Native (Hermes).
  */
 export function generateUUID(): string {
-	return Crypto.randomUUID();
+  return Crypto.randomUUID();
 }

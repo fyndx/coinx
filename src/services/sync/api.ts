@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+
 import { api } from "../api";
 import { ApiError } from "./errors";
 
@@ -11,12 +12,12 @@ import { ApiError } from "./errors";
  * (e.g., AuthenticationError, SyncPushError) as needed.
  */
 export const apiPost = <T>(path: string, body?: unknown) =>
-	Effect.tryPromise({
-		try: () => api.post<T>(path, body),
-		catch: (error) =>
-			new ApiError({
-				message: `API POST ${path} failed: ${error instanceof Error ? error.message : String(error)}`,
-				operation: `POST ${path}`,
-				cause: error,
-			}),
-	});
+  Effect.tryPromise({
+    try: () => api.post<T>(path, body),
+    catch: (error) =>
+      new ApiError({
+        message: `API POST ${path} failed: ${error instanceof Error ? error.message : String(error)}`,
+        operation: `POST ${path}`,
+        cause: error,
+      }),
+  });

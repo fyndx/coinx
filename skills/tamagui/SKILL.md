@@ -46,13 +46,13 @@ import { Button, Input, ListItem } from "tamagui";
 <Button onPress={handlePress}>Submit</Button>
 <Button variant="outlined" size="$4">Secondary</Button>
 
-<Input 
+<Input
   placeholder="Enter text"
   value={value}
   onChangeText={setValue}
 />
 
-<ListItem 
+<ListItem
   title="Item Title"
   subTitle="Description"
   iconAfter={ChevronRight}
@@ -71,7 +71,7 @@ import { YGroup } from "tamagui";
   <YGroup.Item>
     <ListItem title="Option 2" />
   </YGroup.Item>
-</YGroup>
+</YGroup>;
 ```
 
 ## Spacing Tokens
@@ -106,20 +106,20 @@ Usage: `fontSize="$6"`
 
 ```tsx
 // Theme colors
-color="$color"           // Primary text
-color="$colorFocus"      // Focused state
-backgroundColor="$background"
-backgroundColor="$backgroundFocus"
+color = "$color"; // Primary text
+color = "$colorFocus"; // Focused state
+backgroundColor = "$background";
+backgroundColor = "$backgroundFocus";
 
 // Gray scale
-color="$gray10"
-color="$gray11"
-color="$gray12"
+color = "$gray10";
+color = "$gray11";
+color = "$gray12";
 
 // Named colors
-color="red"
-color="green"
-backgroundColor="$white5"
+color = "red";
+color = "green";
+backgroundColor = "$white5";
 ```
 
 ## Styling Props
@@ -147,9 +147,9 @@ backgroundColor="$white5"
 
 ```tsx
 <Stack
-  width="$10"      // Token
-  width={100}      // Pixels
-  width="100%"     // Percentage
+  width="$10" // Token
+  width={100} // Pixels
+  width="100%" // Percentage
   height="$5"
   minHeight={200}
   maxWidth="$20"
@@ -176,14 +176,10 @@ const Screen = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <YStack flex={1} padding="$4" gap="$4">
         <H3>Screen Title</H3>
-        
-        <YStack flex={1}>
-          {/* Content */}
-        </YStack>
-        
-        <Button onPress={handleSubmit}>
-          Submit
-        </Button>
+
+        <YStack flex={1}>{/* Content */}</YStack>
+
+        <Button onPress={handleSubmit}>Submit</Button>
       </YStack>
     </SafeAreaView>
   );
@@ -197,12 +193,10 @@ import { FlashList } from "@shopify/flash-list";
 
 <FlashList
   data={items}
-  renderItem={({ item }) => (
-    <ListItem title={item.name} />
-  )}
+  renderItem={({ item }) => <ListItem title={item.name} />}
   estimatedItemSize={50}
   ItemSeparatorComponent={() => <Separator />}
-/>
+/>;
 ```
 
 ## Platform Notes
