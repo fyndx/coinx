@@ -93,21 +93,25 @@ const AddProductListing = observer(() => {
             keyboardType={"numeric"}
             returnKeyType="next"
             onSubmitEditing={() => quantityRef.current?.focus()}
-            onChangeText={(text) =>
-              productModel$.productDetailsDraft.price.set(Number(text.trim()))
-            }
+            onChangeText={(text) => {
+              const value = Number.parseFloat(text.trim());
+              if (!Number.isNaN(value)) {
+                productModel$.productDetailsDraft.price.set(value);
+              }
+            }}
           />
           <Input
             ref={quantityRef}
             placeholder="Quantity *"
             keyboardType={"numeric"}
-            returnKeyType="done"
-            onSubmitEditing={Keyboard.dismiss}
-            onChangeText={(text) =>
-              productModel$.productDetailsDraft.quantity.set(
-                Number(text.trim()),
-              )
-            }
+            returnKeyType="next"
+            onSubmitEditing={() => urlRef.current?.focus()}
+            onChangeText={(text) => {
+              const value = Number.parseFloat(text.trim());
+              if (!Number.isNaN(value)) {
+                productModel$.productDetailsDraft.quantity.set(value);
+              }
+            }}
           />
           <Select
             placeholder={"Unit *"}
