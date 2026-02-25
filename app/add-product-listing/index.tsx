@@ -8,7 +8,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { PlusCircle } from "lucide-react-native";
 import { useRef } from "react";
-import { ActivityIndicator, Keyboard, Pressable, StyleSheet, type TextInput, View } from "react-native";
+import {
+	ActivityIndicator,
+	Keyboard,
+	Pressable,
+	StyleSheet,
+	type TextInput,
+	View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const AddProductListing = observer(() => {
@@ -111,14 +118,20 @@ const AddProductListing = observer(() => {
 							<Select
 								placeholder={"Store *"}
 								data={storeModel$.storesList.get()}
-								displayField={(item: { name: string; location: string | null }) =>
-									`${item.name} - ${item.location}`
-								}
+								displayField={(item: {
+									name: string;
+									location: string | null;
+								}) => `${item.name} - ${item.location}`}
 								onValueChange={handleStoreChange}
 							/>
 						</View>
-						<Pressable onPress={() => router.push("/add-store")}>
-							<PlusCircle size={24} color="#2563eb" />
+						<Pressable
+							onPress={() => router.push("/add-store")}
+							accessibilityRole="button"
+							accessibilityLabel="Add store"
+							hitSlop={10}
+						>
+							<PlusCircle size={24} color="#2563eb" accessible={false} />
 						</Pressable>
 					</View>
 					<Input

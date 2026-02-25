@@ -37,7 +37,10 @@ const ProductListings = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<Stack.Screen
-				options={{ headerTitle: (name as string) ?? "Product Listings", headerBackTitle: "Back" }}
+				options={{
+					headerTitle: (name as string) ?? "Product Listings",
+					headerBackTitle: "Back",
+				}}
 			/>
 			<View className="flex-1 bg-background">
 				<ProductListingTable
