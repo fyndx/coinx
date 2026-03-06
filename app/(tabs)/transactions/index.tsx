@@ -6,14 +6,13 @@ import { Link, useFocusEffect } from "expo-router";
 import { Button } from "heroui-native";
 import { PlusCircle } from "lucide-react-native";
 import { useCallback } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import type {
   DurationOptions,
@@ -21,6 +20,7 @@ import type {
 } from "@/src/LegendState/TransactionsScreen.model";
 
 import { MonthYearPicker } from "@/src/Components/MonthYearPicker";
+import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
 import { Text } from "@/src/Components/ui/Text";
 import { TransactionsList } from "@/src/Containers/Transactions/TransactionsList";
 import { rootStore } from "@/src/LegendState";
@@ -126,12 +126,8 @@ const Transactions = () => {
   });
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      className="bg-background"
-      edges={["top"]}
-    >
-      <View style={styles.container} className="px-6 bg-background">
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+      <View className="flex-1 px-6 bg-background">
         {/* <SpentMenuComponent transactionsScreenModel$={transactionsScreenModel$} /> */}
         <View className="justify-center items-center py-2">
           <Text className="text-xl font-bold">{"Transactions"}</Text>
@@ -162,9 +158,3 @@ const Transactions = () => {
 };
 
 export default Transactions;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

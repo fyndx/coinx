@@ -3,12 +3,14 @@ import dayjs from "dayjs";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { MotiView } from "moti";
 import { useState } from "react";
-import { Modal, View, useColorScheme } from "react-native";
+import { Modal, View } from "react-native";
 
 import type {
   TimeRangeOptions,
   TransactionsScreenModel,
 } from "@/src/LegendState/TransactionsScreen.model";
+
+import { useResolvedTheme } from "@/src/hooks/useResolvedTheme";
 
 import { dayjsLocaleDataInstance } from "../utils/date";
 import { Button } from "./ui/Button";
@@ -22,8 +24,8 @@ interface MonthYearPickerProps {
 
 export const MonthYearPicker = observer(
   ({ transactionsScreenModel$ }: MonthYearPickerProps) => {
-    const colorScheme = useColorScheme();
-    const iconColor = colorScheme === "dark" ? "#ffffff" : "#09090b";
+    const { isDark } = useResolvedTheme();
+    const iconColor = isDark ? "#ffffff" : "#09090b";
     const [selectedMonth, setSelectedMonth] = useState(dayjs().month());
     const [selectedYear, setSelectedYear] = useState(dayjs().year());
     const [tempYear, setTempYear] = useState(selectedYear);

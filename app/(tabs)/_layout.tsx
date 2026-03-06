@@ -1,10 +1,19 @@
 import { Tabs } from "expo-router";
 import { Notebook, Package } from "lucide-react-native";
 import { Image } from "react-native";
+import { useCSSVariable } from "uniwind";
 
 export default function RootLayout() {
+  const surfaceColor = useCSSVariable("--color-surface") as string;
+  const accentColor = useCSSVariable("--color-accent") as string;
+
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarStyle: { backgroundColor: surfaceColor, borderTopWidth: 0 },
+        tabBarActiveTintColor: accentColor,
+      }}
+    >
       <Tabs.Screen
         name={"transactions/index"}
         options={{

@@ -10,14 +10,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary hover:bg-primary/90 active:bg-primary/90",
+        default: "bg-accent hover:bg-accent/90 active:bg-accent/90",
         destructive:
           "bg-destructive hover:bg-destructive/90 active:bg-destructive/90",
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground active:bg-accent",
         secondary: "bg-secondary hover:bg-secondary/80 active:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground active:bg-accent",
-        link: "text-primary underline-offset-4 hover:underline active:underline",
+        link: "text-accent underline-offset-4 hover:underline active:underline",
       },
       size: {
         default: "h-10 px-4 py-2 native:h-12 native:px-5 native:py-3",
@@ -38,12 +38,12 @@ const buttonTextVariants = cva(
   {
     variants: {
       variant: {
-        default: "text-primary-foreground",
+        default: "text-accent-foreground",
         destructive: "text-destructive-foreground",
         outline: "group-active:text-accent-foreground",
         secondary: "text-secondary-foreground",
         ghost: "group-active:text-accent-foreground",
-        link: "text-primary group-active:text-primary",
+        link: "text-accent group-active:text-accent",
       },
       size: {
         default: "",

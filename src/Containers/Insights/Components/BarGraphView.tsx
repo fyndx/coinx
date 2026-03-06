@@ -6,11 +6,17 @@ import { Bar, CartesianChart } from "victory-native";
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 
 import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
+import { useResolvedTheme } from "@/src/hooks/useResolvedTheme";
 
 export const BarGraphView = observer(
   ({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
     const font = useFont(LatoRegular, 12);
     const graphData = insightsModel$.durationGraphData.get();
+    const { isDark } = useResolvedTheme();
+    const chartColors = isDark
+      ? ["#a78bfa", "#a78bfa50"] // Purple for dark
+      : ["#7c3aed", "#7c3aed50"]; // Darker purple for light
+
     return (
       <View style={{ height: 275 }}>
         <CartesianChart
@@ -39,7 +45,7 @@ export const BarGraphView = observer(
                 <LinearGradient
                   start={vec(0, 0)}
                   end={vec(0, 400)}
-                  colors={["#a78bfa", "#a78bfa50"]}
+                  colors={chartColors}
                 />
               </Bar>
             </>

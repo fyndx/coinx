@@ -1,17 +1,13 @@
 import { observer } from "@legendapp/state/react";
 import * as Application from "expo-application";
 import { Link, router } from "expo-router";
-import { ChevronRight, Moon, Sun, SunMoon, User } from "lucide-react-native";
+import { ChevronRight, SunMoon, User, Check } from "lucide-react-native";
 import { Fragment } from "react";
 import { Pressable, View } from "react-native";
 
 import { Button } from "@/src/Components/ui/Button";
 import { Text } from "@/src/Components/ui/Text";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
-import {
-  exportData,
-  exportDataToCsv,
-} from "@/src/LegendState/Settings/Settings.model";
 import {
   type ThemeMode,
   themeModel,
@@ -86,10 +82,14 @@ const AccountSection = observer(() => {
   );
 });
 
-const THEME_OPTIONS: { mode: ThemeMode; label: string; Icon: typeof Sun }[] = [
-  { mode: "light", label: "Light", Icon: Sun },
-  { mode: "dark", label: "Dark", Icon: Moon },
-  { mode: "system", label: "System", Icon: SunMoon },
+const THEME_OPTIONS: {
+  mode: ThemeMode;
+  label: string;
+  preview: string | null;
+}[] = [
+  { mode: "system", label: "System", preview: null },
+  { mode: "light", label: "Light", preview: "#ffffff" },
+  { mode: "dark", label: "Dark", preview: "#1a1a1a" },
 ];
 
 const AppearanceSection = observer(() => {
@@ -97,29 +97,34 @@ const AppearanceSection = observer(() => {
   return (
     <View className="bg-card rounded-lg p-4 mb-1">
       <Text className="text-base font-semibold mb-3">{"Appearance"}</Text>
-      <View className="flex-row gap-2">
-        {THEME_OPTIONS.map(({ mode, label, Icon }) => {
+      <View>
+        {THEME_OPTIONS.map(({ mode, label, preview }, index) => {
           const isActive = currentMode === mode;
+          const isLast = index === THEME_OPTIONS.length - 1;
           return (
             <Pressable
               key={mode}
               onPress={() => themeModel.setTheme(mode)}
-              className="flex-1"
+              className={`flex-row items-center justify-between py-4 ${
+                !isLast ? "border-b border-border" : ""
+              }`}
             >
-              <View
-                className={`flex-1 items-center justify-center py-3 rounded-lg border ${
-                  isActive
-                    ? "bg-primary border-primary"
-                    : "bg-background border-border"
-                }`}
-              >
-                <Icon size={18} color={isActive ? "white" : "gray"} />
-                <Text
-                  className={`text-xs mt-1 font-medium ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`}
-                >
-                  {label}
-                </Text>
+              <View className="flex-row items-center gap-3">
+                {preview ? (
+                  <View
+                    className="w-8 h-8 rounded-full border border-border"
+                    style={{ backgroundColor: preview }}
+                  />
+                ) : (
+                  <View className="w-8 h-8 rounded-full border border-border bg-muted flex items-center justify-center">
+                    <SunMoon size={16} color="gray" />
+                  </View>
+                )}
+                <Text className="text-foreground text-base">{label}</Text>
               </View>
+              {isActive && (
+                <Check size={20} className="text-primary color-primary" />
+              )}
             </Pressable>
           );
         })}

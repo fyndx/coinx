@@ -30,10 +30,10 @@ export const TransactionsList = observer(
     const transactions = transactions$.get();
     if (transactions.length === 0) {
       return (
-        <View className="flex-1 items-center justify-center">
-          <Banknote size={32} color="gray" />
-          <Text className="text-center font-medium mt-2 text-lg">
-            {"No Transactions found\n Tap the + icon to add a transaction"}
+        <View className="py-20 items-center justify-center px-4">
+          <Banknote size={48} color="gray" />
+          <Text className="text-center font-medium mt-4 text-lg">
+            {"No Transactions found\nTap the + icon to add a transaction"}
           </Text>
         </View>
       );
