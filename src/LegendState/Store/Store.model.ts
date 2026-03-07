@@ -6,6 +6,7 @@ import {
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
+import { analytics } from "@/src/services/analytics";
 
 import type { InsertStore, SelectStore } from "@/db/schema";
 
@@ -41,8 +42,9 @@ export class StoreModel {
   addStore = async () => {
     this.isSubmitting.set(true);
     Effect.runPromise(addStore(this.storeDraft.peek()))
-      .then((result) => {
+      .then((_result) => {
         Burnt.toast({ title: "Store added successfully" });
+        analytics.logEvent("store_created");
         this.getStoresList();
         router.back();
       })
@@ -62,7 +64,7 @@ export class StoreModel {
     if (id) {
       this.isSubmitting.set(true);
       Effect.runPromise(editStore({ name, location }, id))
-        .then((result) => {
+        .then((_result) => {
           Burnt.toast({ title: "Store updated successfully" });
           this.getStoresList();
           router.back();
@@ -87,7 +89,7 @@ export class StoreModel {
   deleteStore = (id: string) => {
     this.isSubmitting.set(true);
     Effect.runPromise(deleteStoreById(id))
-      .then((result) => {
+      .then((_result) => {
         Burnt.toast({ title: "Store deleted successfully" });
         this.getStoresList();
       })

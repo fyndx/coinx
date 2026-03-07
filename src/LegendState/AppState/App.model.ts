@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { loadAsync } from "expo-font";
 import { getLocales } from "expo-localization";
+import { analytics } from "@/src/services/analytics";
 
 import { LatoRegular } from "@/assets/fonts";
 import { db, expoDb } from "@/db/client";
@@ -67,6 +68,7 @@ export class AppModel {
 
     AppStorage.set("currency", JSON.stringify(currencyData));
     this.obs.currency.set(currencyData);
+    analytics.setMetadata("currency_preference", currency.code);
   };
 
   checkFirstLaunch = async () => {
@@ -90,6 +92,7 @@ export class AppModel {
         this.loadFonts(),
         this.loadCurrency(),
       ]);
+      analytics.setMetadata("language_locale", this.obs.locale.get());
     } catch (error) {
       console.log("Error starting services:", error);
     } finally {

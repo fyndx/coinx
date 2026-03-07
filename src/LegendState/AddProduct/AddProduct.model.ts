@@ -2,6 +2,7 @@ import { observable } from "@legendapp/state";
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
+import { analytics } from "@/src/services/analytics";
 
 import type { InsertProduct } from "@/db/schema";
 
@@ -86,6 +87,7 @@ export class AddProductScreenModel {
 
       if (createdProduct.length > 0) {
         Burnt.toast({ title: "Product added successfully" });
+        analytics.logEvent('product_added');
         this.product.set({
           name: "",
           defaultUnitCategory: "",
@@ -122,7 +124,7 @@ export class AddProductScreenModel {
     this.isLoading.set(true);
 
     Effect.runPromise(updateProduct({ ...product, id: product.id }))
-      .then((result) => {
+      .then((_result) => {
         Burnt.toast({ title: "Product updated successfully" });
         this.resetProduct();
         router.back();

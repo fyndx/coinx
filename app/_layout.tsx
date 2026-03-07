@@ -11,8 +11,11 @@ import { appModel } from "@/src/LegendState/AppState/App.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import { themeModel } from "@/src/LegendState/Theme/Theme.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
+import { analytics } from "@/src/services/analytics";
 import "@/src/utils/date";
 import "../global.css";
+
+analytics.init();
 
 // Apply stored theme preference before rendering
 themeModel.initTheme();

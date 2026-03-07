@@ -20,6 +20,7 @@
     "@legendapp/state": "^2.1.15",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-menu/menu": "^1.1.6",
+    "@rejourneyco/react-native": "^1.0.11",
     "@rn-primitives/slot": "^1.2.0",
     "@shopify/flash-list": "2.0.2",
     "@shopify/react-native-skia": "2.2.12",
