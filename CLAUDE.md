@@ -1,98 +1,85 @@
-# CLAUDE.md
+# CLAUDE.md — Claude Code Instructions
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Quick reference for Claude Code sessions working on CoinX.
 
-## Project Overview
+## What: Technology Stack
 
-CoinX is a personal finance mobile app built with React Native/Expo. It tracks transactions (income/expenses), products with price history, and stores. The app supports offline-first operation with cloud sync via Supabase.
+- **Expo SDK 54** with React Native 0.81.5 - Managed React Native development
+- **TypeScript** - Strict type safety throughout
+- **Expo Router 6** - File-based routing
+- **TailwindCSS** via Uniwind/Hero Native UI - Utility-first styling for React Native
+- **Legend State** - Fast, fine-grained global state management
+- **Drizzle ORM** & **Expo SQLite** - Local database and schema management
+- **Effect-TS** - Functional programming patterns and robust error handling
+- **Supabase** - Auth and backend services
+- **MMKV** - Encrypted, fast local storage
+- **Bun** - Package manager and script runner
 
-## Commands
+## What: Project Structure
+
+```text
+app/                    # Expo Router file-based routes (add new routes here)
+├── (tabs)/             # Main tab navigator
+├── _layout.tsx         # Root layout & providers
+components/             # Pre-built UI components
+db/                     # Database layer
+├── client.ts           # Drizzle SQLite client
+├── schema.ts           # All table definitions
+└── migrations/         # Drizzle migrations
+src/
+├── Components/         # Feature-specific components
+├── LegendState/        # State management models and store initialization
+├── hooks/              # Custom React hooks
+└── services/           # Service clients (api.ts, supabase.ts, sync.ts)
+```
+
+## How: Development Workflow
+
+**Essential Commands:**
 
 ```bash
-# Development
-bun start           # Start Expo dev server
-bun ios             # Run on iOS simulator
-bun android         # Run on Android emulator
-
-# Code quality
-bun lint            # Run Biome linter
-bun type-check      # TypeScript check
-
-# Database
-bun generate        # Generate Drizzle migrations from schema changes
+bun start               # Start dev server
+bun run ios             # Run on iOS simulator
+bun run android         # Run on Android emulator
+bun run lint            # Run linter
+bun run type-check      # TypeScript validation
+bun run db:generate     # Generate Drizzle migrations
+bun run db:push         # Push migrations to local DB
 ```
 
-## Architecture
+**Testing Checklist (Before PR):**
 
-### State Management (LegendState)
+- [ ] Works when logged out
+- [ ] Works when logged in
+- [ ] Works offline
+- [ ] Works after token expiry
+- [ ] No console errors in dev mode
 
-The app uses `@legendapp/state` with class-based observable models. The pattern:
+## How: Key Patterns & Concepts
 
-- **RootStore** (`src/LegendState/index.ts`) - Instantiates and holds all models
-- **Models** - Each domain has a model class with:
-  - Observable state via `observable()`
-  - Actions as class methods
-  - UI props accept models with `$` suffix (e.g., `transactionModel$`)
-- **Screens** wrap components with `observer()` from `@legendapp/state/react`
+- **Database Operations**: Always try to use Drizzle ORM (`db/client.ts`), only use raw SQL if necessary.
+- **Sync Architecture**:
+  1. Check auth state and pro plan status BEFORE any sync operation.
+  2. No sync UI/logic for logged-out or non-pro users.
+  3. Cancel in-flight sync on logout.
+  4. Local records start with `syncStatus: 'pending'`.
+  5. Mark records `synced` ONLY after server confirms.
+- **Backend API**: Base URL is `EXPO_PUBLIC_API_URL`
+  - Endpoints: `POST /api/auth/register`, `POST /api/auth/device`, `POST /api/sync/push`, `POST /api/sync/pull` (All require `Authorization: Bearer <token>`).
 
-### Database (Drizzle + SQLite)
+## How: Essential Rules
 
-- **Schema**: `db/schema.ts` - All tables use UUIDs as primary keys
-- **Sync fields**: Every table has `syncStatus` ('pending'|'synced') and `deletedAt` for soft deletes
-- **Repos**: `src/database/*Repo.ts` - Database operations wrapped in Effect.ts
-- **Migrations**: `drizzle/` folder, generated via `bun generate`
+- ✅ **DO** use Drizzle ORM for all database operations.
+- ✅ **DO** use Legend State for state management.
+- ✅ **DO** use Effect-TS for error handling and async operations.
+- ✅ **DO** use Hero Native UI components with Uniwind for styling.
+- ✅ **DO** handle both authenticated and unauthenticated states.
+- ✅ **DO** soft delete via `deletedAt`.
+- ❌ **DO NOT** hard delete records (`rm`).
+- ❌ **DO NOT** push directly to `main` — create small, focused PRs.
+- ❌ **DO NOT** assume the user is logged in.
 
-Tables: categories, transactions, products, stores, product_listings, product_listings_history
+**Related Repos:**
 
-### Sync Service (Effect.ts)
-
-Located in `src/services/sync/`. Bidirectional sync between local SQLite and Supabase backend.
-
-Key files:
-
-- `manager.ts` - SyncManager orchestrator (push/pull operations)
-- `database.ts` - Database Effect wrappers for sync operations
-- `api.ts` - API Effect wrappers
-- `types.ts` and `errors.ts` - TypeScript types and tagged errors
-
-Sync flow: Initialize → Check Auth → Ensure Device → Push (local changes) → Pull (remote changes) → Commit
-
-### Navigation (Expo Router)
-
-File-based routing in `app/` directory:
-
-- `app/(tabs)/` - Main tab screens (transactions, products, insights, budgets, settings)
-- `app/(auth)/` - Authentication screens (sign-in, sign-up)
-- Modal screens at root level (add-transaction, add-product, etc.)
-
-### Styling
-
-Uses `uniwind` (TailwindCSS for React Native) with `tailwind-variants` for component variants.
-
-## Key Patterns
-
-### Effect.ts for Database Operations
-
-Repos return Effects that are composed and run with `Effect.runPromise()`:
-
-```typescript
-const result = await Effect.runPromise(getTransactions({ startDate, endDate }));
-```
-
-### Soft Deletes
-
-All records use soft deletes - never use hard delete. Always set `deletedAt` and `syncStatus: 'pending'` when "deleting":
-
-```typescript
-.set({ deletedAt: new Date().toISOString(), syncStatus: "pending" })
-```
-
-Filter out deleted records with `isNull(table.deletedAt)` in queries.
-
-### Sync After Changes
-
-Call `syncManager.scheduleSyncAfterChange()` after any local database mutation.
-
-## Path Aliases
-
-`@/*` maps to project root (e.g., `@/src/`, `@/db/`)
+- **coinx-backend** — Hono API server (https://github.com/fyndx/coinx-backend)
+- **wiki** — Project docs & decisions (https://github.com/fyndx/wiki)
