@@ -2,68 +2,84 @@
 
 Quick reference for Claude Code sessions working on CoinX.
 
-## Before You Code
+## What: Technology Stack
 
-1. **Read the design doc first** — Check `wiki/Projects/CoinX/` for specs
-2. **Check current phase** — See `wiki/Projects/CoinX/Phases/`
-3. **Understand the schema** — Look at `db/schema.ts`
+- **Expo SDK 54** with React Native 0.81.5 - Managed React Native development
+- **TypeScript** - Strict type safety throughout
+- **Expo Router 6** - File-based routing
+- **TailwindCSS** via Uniwind/Hero Native UI - Utility-first styling for React Native
+- **Legend State** - Fast, fine-grained global state management
+- **Drizzle ORM** & **Expo SQLite** - Local database and schema management
+- **Effect-TS** - Functional programming patterns and robust error handling
+- **Supabase** - Auth and backend services
+- **MMKV** - Encrypted, fast local storage
+- **Bun** - Package manager and script runner
 
-## Key Files to Know
+## What: Project Structure
 
-| File | Purpose |
-|------|---------|
-| `db/schema.ts` | All table definitions |
-| `src/LegendState/index.ts` | State initialization |
-| `src/services/api.ts` | HTTP client with auth |
-| `src/services/supabase.ts` | Supabase client |
-| `app/_layout.tsx` | Root layout & providers |
+```text
+app/                    # Expo Router file-based routes (add new routes here)
+├── (tabs)/             # Main tab navigator
+├── _layout.tsx         # Root layout & providers
+components/             # Pre-built UI components
+db/                     # Database layer
+├── client.ts           # Drizzle SQLite client
+├── schema.ts           # All table definitions
+└── migrations/         # Drizzle migrations
+src/
+├── Components/         # Feature-specific components
+├── LegendState/        # State management models and store initialization
+├── hooks/              # Custom React hooks
+└── services/           # Service clients (api.ts, supabase.ts, sync.ts)
+```
 
-## Do's
+## How: Development Workflow
 
-- ✅ Write design doc before implementing complex features
-- ✅ Use Drizzle ORM for all database operations
-- ✅ Use Legend State for state management
-- ✅ Use Effect-TS for error handling and async operations
-- ✅ Use Hero Native UI components with Uniwind for styling
-- ✅ Set `syncStatus: 'pending'` on local changes
-- ✅ Soft delete via `deletedAt`, never hard delete
-- ✅ Handle both authenticated and unauthenticated states
-- ✅ Create small, focused PRs
+**Essential Commands:**
 
-## Don'ts
+```bash
+bun start               # Start dev server
+bun run ios             # Run on iOS simulator
+bun run android         # Run on Android emulator
+bun run lint            # Run linter
+bun run type-check      # TypeScript validation
+bun run db:generate     # Generate Drizzle migrations
+bun run db:push         # Push migrations to local DB
+```
 
-- ❌ Don't skip the design doc for sync/auth features
-- ❌ Don't use raw SQL — use Drizzle
-- ❌ Don't hard delete records
-- ❌ Don't push directly to main
-- ❌ Don't assume user is logged in
+**Testing Checklist (Before PR):**
 
-## Sync Implementation Notes
-
-When implementing sync:
-1. Check auth state BEFORE any sync operation
-2. No sync UI/logic for logged-out users
-3. Handle token expiration gracefully
-4. Cancel in-flight sync on logout
-5. Mark records synced ONLY after server confirms
-
-## Testing Checklist
-
-Before submitting PR:
 - [ ] Works when logged out
 - [ ] Works when logged in
 - [ ] Works offline
 - [ ] Works after token expiry
 - [ ] No console errors in dev mode
 
-## Backend API
+## How: Key Patterns & Concepts
 
-Base URL: `EXPO_PUBLIC_API_URL`
+- **Database Operations**: Always try to use Drizzle ORM (`db/client.ts`), only use raw SQL if necessary.
+- **Sync Architecture**:
+  1. Check auth state and pro plan status BEFORE any sync operation.
+  2. No sync UI/logic for logged-out or non-pro users.
+  3. Cancel in-flight sync on logout.
+  4. Local records start with `syncStatus: 'pending'`.
+  5. Mark records `synced` ONLY after server confirms.
+- **Backend API**: Base URL is `EXPO_PUBLIC_API_URL`
+  - Endpoints: `POST /api/auth/register`, `POST /api/auth/device`, `POST /api/sync/push`, `POST /api/sync/pull` (All require `Authorization: Bearer <token>`).
 
-Key endpoints:
-- `POST /api/auth/register` — Create profile
-- `POST /api/auth/device` — Register device
-- `POST /api/sync/push` — Upload local changes
-- `POST /api/sync/pull` — Download remote changes
+## How: Essential Rules
 
-All endpoints require `Authorization: Bearer <supabase_token>`.
+- ✅ **DO** use Drizzle ORM for all database operations.
+- ✅ **DO** use Legend State for state management.
+- ✅ **DO** use Effect-TS for error handling and async operations.
+- ✅ **DO** use Hero Native UI components with Uniwind for styling.
+- ✅ **DO** handle both authenticated and unauthenticated states.
+- ✅ **DO** soft delete via `deletedAt`.
+- ❌ **DO NOT** hard delete records (`rm`).
+- ❌ **DO NOT** push directly to `main` — create small, focused PRs.
+- ❌ **DO NOT** assume the user is logged in.
+
+**Related Repos:**
+
+- **coinx-backend** — Hono API server (https://github.com/fyndx/coinx-backend)
+- **wiki** — Project docs & decisions (https://github.com/fyndx/wiki)

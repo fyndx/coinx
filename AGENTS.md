@@ -2,152 +2,84 @@
 
 This file helps AI coding assistants (Claude, Cursor, Copilot, etc.) understand the CoinX codebase.
 
-## Project Overview
+## What: Project Overview
 
-**CoinX** is a personal finance app built with React Native (Expo). It tracks expenses, products, and price history with local-first architecture and optional cloud sync.
+**CoinX** is a personal finance app built with React Native (Expo). It tracks expenses, products, and price history with local-first architecture and cloud sync for authenticated users with a pro plan.
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Framework | React Native + Expo (SDK 51) |
-| Router | Expo Router (file-based) |
-| State | Legend State |
-| Local DB | SQLite via Drizzle ORM |
-| Auth | Supabase Auth |
-| Backend | Hono (separate repo: `coinx-backend`) |
-| Styling | Hero Native UI + Uniwind |
-| FP Patterns | Effect-TS |
-| Build | EAS Build |
-
-## Project Structure
-
-```
-app/                    # Expo Router screens (file-based routing)
-├── (tabs)/            # Tab navigator screens
-│   ├── index.tsx      # Home/Dashboard
-│   ├── transactions/  # Transaction list & detail
-│   └── settings/      # Settings & account
-├── _layout.tsx        # Root layout
-
-components/            # Reusable UI components
-
-db/                    # Database layer
-├── client.ts          # Drizzle SQLite client
-├── schema.ts          # Table definitions
-└── migrations/        # Drizzle migrations
-
-src/
-├── Components/        # Feature components
-├── LegendState/       # State management
-│   ├── Auth/          # Auth state & actions
-│   ├── Transaction.model.ts
-│   └── index.ts       # Store initialization
-├── hooks/             # Custom React hooks
-└── services/          # API & external services
-    ├── api.ts         # HTTP client
-    ├── supabase.ts    # Supabase client
-    └── sync.ts        # Sync manager (WIP)
-
-drizzle/               # Generated migrations
-```
-
-## Key Concepts
-
-### Local-First Architecture
-- All data stored in SQLite on device
-- App works 100% offline
-- Sync is optional (requires auth)
-- `syncStatus` field tracks pending changes
-
-### Tables (db/schema.ts)
-- `transactions` — Income/expense records
-- `categories` — User-defined categories
-- `products` — Product catalog
-- `stores` — Store list
-- `product_listings` — Products at stores (with prices)
-- `product_listings_history` — Price history over time
-
-### Sync Fields
-Every syncable table has:
-- `id` — UUID (text, primary key)
-- `syncStatus` — `'pending'` | `'synced'` | `null`
-- `deletedAt` — Soft delete timestamp (ISO string or null)
-- `lastModifiedAt` — Last local change timestamp
-
-### Auth Flow
-- Auth is **optional** — app works without login
-- Supabase handles email/password auth
-- Tokens stored in Expo SecureStore
-- Backend validates Supabase JWT
-
-## Development Commands
-
-```bash
-# Install dependencies
-bun install
-
-# Run iOS simulator
-bun run ios
-
-# Run Android emulator
-bun run android
-
-# Run web (limited support)
-bun run web
-
-# Generate Drizzle migrations
-bun run db:generate
-
-# Push migrations to local DB
-bun run db:push
-
-# Lint & format
-bun run lint
-bun run format
-```
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in:
-- `EXPO_PUBLIC_SUPABASE_URL` — Supabase project URL
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
-- `EXPO_PUBLIC_API_URL` — Backend API URL
-
-## Current Phase
-
-**Phase 2: App Integration** — connecting app to backend with auth + sync.
-
-See `wiki/Projects/CoinX/Phases/Phase2-AppIntegration.md` for task breakdown.
-
-## Related Repos
+**Related Repos:**
 
 - **coinx-backend** — Hono API server (https://github.com/fyndx/coinx-backend)
 - **wiki** — Project docs & decisions (https://github.com/fyndx/wiki)
 
-## Coding Conventions
+## What: Technology Stack
 
-- **TypeScript** everywhere, strict mode
-- **Biome** for linting/formatting (not ESLint)
-- **Drizzle ORM** for database (not raw SQL)
-- **Legend State** for state (not Redux/Zustand)
-- **Effect-TS** for error handling and async operations
-- **Hero Native UI** for components with **Uniwind** for styling
-- **Functional components** with hooks
-- **File naming**: `kebab-case` for files, `PascalCase` for components
+- **Expo SDK 54** with React Native 0.81.5 - Managed React Native development
+- **TypeScript** - Strict type safety throughout
+- **Expo Router 6** - File-based routing (like Next.js)
+- **TailwindCSS** via Uniwind/Hero Native UI - Utility-first styling for React Native
+- **Legend State** - Fast, fine-grained global state management
+- **Drizzle ORM** & **Expo SQLite** - Local database and schema management
+- **Effect-TS** - Functional programming patterns and robust error handling
+- **Supabase** - Auth and backend services
+- **MMKV** - Encrypted local storage
+- **Bun** - Package manager and script runner
 
-## PR Guidelines
+## What: Project Structure
 
-1. Create feature branch from `main`
-2. Small, focused commits
-3. Run `bun run lint` before pushing
-4. PR description should explain what & why
-5. Wait for CI checks to pass
+```text
+app/                    # Expo Router screens (file-based routing)
+├── (tabs)/             # Tab navigator screens
+├── _layout.tsx         # Root layout
+components/             # Reusable UI components
+db/                     # Database layer (client.ts, schema.ts, migrations/)
+src/
+├── Components/         # Feature components
+├── LegendState/        # State management (Auth, Transactions, etc.)
+├── hooks/              # Custom React hooks
+└── services/           # Service clients (api.ts, supabase.ts, sync.ts)
+drizzle/                # Generated migrations
+```
 
-## Common Pitfalls
+## How: Development Workflow
 
-- **Don't use `rm`** — use soft deletes via `deletedAt`
-- **Don't push directly to main** — always use PRs
-- **UUID generation** — use `crypto.randomUUID()`, not auto-increment
-- **Sync status** — new records start as `'pending'`, set `'synced'` only after backend confirms
-- **Amount/price types** — stored as numbers locally, sent as strings to backend
+**Essential Commands:**
+
+```bash
+bun install             # Install dependencies
+bun start               # Start dev server
+bun run ios             # Run iOS simulator
+bun run android         # Run Android emulator
+bun run lint            # Run linter
+bun run type-check      # TypeScript validation
+bun run db:generate     # Generate Drizzle migrations
+bun run db:push         # Push migrations to local DB
+```
+
+**Environment Variables:**
+Copy `.env.example` to `.env` and fill in:
+
+- `EXPO_PUBLIC_SUPABASE_URL` — Supabase project URL
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
+- `EXPO_PUBLIC_API_URL` — Backend API URL
+
+## How: Key Patterns
+
+- **Local-First Architecture:** All data is stored in SQLite on-device. App works 100% offline. Sync is for authenticated users with a pro plan.
+- **Core Entities (`db/schema.ts`):** `transactions`, `categories`, `products`, `stores`, `product_listings`, `product_listings_history`.
+- **Sync Mechanism:** Every syncable table has `id` (UUID), `syncStatus` (`'pending'`|`'synced'`|`null`), `deletedAt` (soft delete timestamp), and `lastModifiedAt`.
+- **Auth Flow:** Auth is modular. Supabase handles email/password. App stores tokens in SecureStore/MMKV.
+- **Data Types:** Amount/price types are stored as numbers locally, but may need to be handled carefully or sent as strings to backend.
+
+## How: Essential Rules
+
+- ✅ **DO** use **TypeScript** everywhere in strict mode.
+- ✅ **DO** use **Drizzle ORM** for database queries.
+- ✅ **DO** use **Legend State** for state mutations.
+- ✅ **DO** use **Effect-TS** for error handling.
+- ✅ **DO** use **Hero Native UI** and **Uniwind** for styling.
+- ✅ **DO** generate UUIDs with `crypto.randomUUID()`.
+- ✅ **DO** follow PR Guidelines: Create feature branches, ensure `bun run lint` passes, write focused commits.
+- ✅ **DO** use MMKV storage for fast and secure data (prefer over AsyncStorage where feasible).
+- ❌ **DO NOT** use raw SQL queries.
+- ❌ **DO NOT** push directly to `main` — always use PRs.
+- ❌ **DO NOT** modify native `android/`/`ios/` directories directly; use Expo config plugins.
