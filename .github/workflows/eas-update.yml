@@ -95,4 +95,4 @@ jobs:
           echo "MESSAGE=$MESSAGE" >> $GITHUB_ENV
 
       - name: Publish update
-        run: eas update --branch ${{ steps.channel.outputs.channel }} --message "$MESSAGE" --non-interactive
+        run: eas update --branch ${{ steps.channel.outputs.channel }} --environment ${{ steps.channel.outputs.channel }} --message "$MESSAGE" --non-interactive
