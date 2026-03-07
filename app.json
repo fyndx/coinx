@@ -59,7 +59,16 @@
       ],
       "expo-localization",
       "expo-sqlite",
-      "expo-updates"
+      "expo-updates",
+      "expo-secure-store",
+      [
+        "@sentry/react-native",
+        {
+          "organization": "fyndx",
+          "project": "coinx",
+          "dsn": "https://65b84b072ecf556794b373fd098a0c79@o365646.ingest.us.sentry.io/4511002627538944"
+        }
+      ]
     ],
     "scheme": "coinx",
     "experiments": {

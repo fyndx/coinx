@@ -11,6 +11,7 @@ import { appModel } from "@/src/LegendState/AppState/App.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import { themeModel } from "@/src/LegendState/Theme/Theme.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
+import * as Sentry from "@sentry/react-native";
 import { analytics } from "@/src/services/analytics";
 import "@/src/utils/date";
 import "../global.css";
@@ -151,4 +152,4 @@ const RootLayout = observer(() => {
   return <RootLayoutNav />;
 });
 
-export default RootLayout;
+export default Sentry.wrap(RootLayout);

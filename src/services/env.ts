@@ -10,7 +10,6 @@ const envSchema = z.object({
   EXPO_PUBLIC_BACKEND_URL: z
     .string()
     .url("EXPO_PUBLIC_BACKEND_URL must be a valid URL"),
-  EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY: z.string().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
@@ -20,7 +19,6 @@ function parseEnv(): Env {
     EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
     EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     EXPO_PUBLIC_BACKEND_URL: process.env.EXPO_PUBLIC_BACKEND_URL,
-    EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY: process.env.EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY,
   });
 
   if (!result.success) {

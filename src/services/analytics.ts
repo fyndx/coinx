@@ -1,56 +1,33 @@
-import { Rejourney } from "@rejourneyco/react-native";
-
-import { env } from "@/src/services/env";
+import * as Sentry from "@sentry/react-native";
 
 class AnalyticsService {
   init() {
-    try {
-      const publicKey = env.EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY;
-      if (!publicKey) {
-        console.warn("Analytics: Rejourney public key is missing. Analytics will be disabled.");
-        return;
-      }
-      Rejourney.init(publicKey);
-      Rejourney.start();
-    } catch (e) {
-      console.warn("Analytics: Failed to initialize Rejourney", e);
-    }
+    Sentry.init({
+      dsn: "https://65b84b072ecf556794b373fd098a0c79@o365646.ingest.us.sentry.io/4511002627538944",
+      sendDefaultPii: false,
+    });
   }
 
   setUserIdentity(userId: string) {
-    try {
-      Rejourney.setUserIdentity(userId);
-    } catch (e) {
-      console.warn("Analytics: Failed to set user identity", e);
-    }
+    Sentry.setUser({ id: userId });
   }
 
   clearUserIdentity() {
-    try {
-      Rejourney.clearUserIdentity();
-    } catch (e) {
-      console.warn("Analytics: Failed to clear user identity", e);
-    }
+    Sentry.setUser(null);
   }
 
   setMetadata(keyOrProperties: string | Record<string, string | number | boolean>, value?: string | number | boolean) {
-    try {
-      if (typeof keyOrProperties === "object") {
-        Rejourney.setMetadata(keyOrProperties);
-      } else {
-        Rejourney.setMetadata(keyOrProperties, value);
+    if (typeof keyOrProperties === "object") {
+      for (const [k, v] of Object.entries(keyOrProperties)) {
+        Sentry.setTag(k, String(v));
       }
-    } catch (e) {
-      console.warn("Analytics: Failed to set metadata", e);
+    } else {
+      Sentry.setTag(keyOrProperties, String(value));
     }
   }
 
   logEvent(name: string, properties?: Record<string, unknown>) {
-    try {
-      Rejourney.logEvent(name, properties);
-    } catch (e) {
-      console.warn("Analytics: Failed to log event", e);
-    }
+    Sentry.addBreadcrumb({ message: name, data: properties, level: "info" });
   }
 }
 
