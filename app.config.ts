@@ -72,7 +72,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         organization: env.SENTRY_ORG,
         project: env.SENTRY_PROJECT,
-        dsn: env.SENTRY_DSN
+        dsn: env.EXPO_PUBLIC_SENTRY_DSN
       }
     ]
   ],
