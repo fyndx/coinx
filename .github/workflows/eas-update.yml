@@ -53,6 +53,11 @@ jobs:
 
       - name: Create .env file
         run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "EXPO_PUBLIC_APP_ENV=staging" >> .env
+          else
+            echo "EXPO_PUBLIC_APP_ENV=${{ inputs.environment }}" >> .env
+          fi
           echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
           echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
