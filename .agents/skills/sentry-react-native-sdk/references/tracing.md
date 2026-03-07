@@ -65,9 +65,7 @@ import * as Sentry from "@sentry/react-native";
 Sentry.init({
   dsn: "YOUR_DSN",
   tracesSampleRate: 1.0,
-  integrations: [
-    Sentry.reactNativeTracingIntegration(),
-  ],
+  integrations: [Sentry.reactNativeTracingIntegration()],
 });
 ```
 
@@ -95,9 +93,9 @@ Sentry.init({
 
 **Unique to mobile.** Tracks the duration from the earliest native process initialization to React Native root component mount.
 
-| Metric | Measurement Key | When it fires |
-|---|---|---|
-| **Cold start** | `measurements.app_start_cold` | Process launched from scratch (not in memory) |
+| Metric         | Measurement Key               | When it fires                                     |
+| -------------- | ----------------------------- | ------------------------------------------------- |
+| **Cold start** | `measurements.app_start_cold` | Process launched from scratch (not in memory)     |
 | **Warm start** | `measurements.app_start_warm` | Process was already in memory, activity recreated |
 
 > **Hot starts and resumes are not tracked.** They're considered too fast to be meaningful for monitoring.
@@ -120,18 +118,18 @@ Common causes of slow cold starts and how to address them:
 
 ```typescript
 // ❌ Eager import — executes at bundle parse time
-import { HeavyModule } from './heavy-module';
+import { HeavyModule } from "./heavy-module";
 
 // ✅ Lazy import — deferred until actually needed
-const loadHeavy = () => import('./heavy-module');
+const loadHeavy = () => import("./heavy-module");
 
 // ❌ Synchronous AsyncStorage read at startup
-const theme = await AsyncStorage.getItem('theme'); // blocks JS thread
+const theme = await AsyncStorage.getItem("theme"); // blocks JS thread
 
 // ✅ Use a synchronous-safe default, hydrate later
-const [theme, setTheme] = useState('light');
+const [theme, setTheme] = useState("light");
 useEffect(() => {
-  AsyncStorage.getItem('theme').then(setTheme);
+  AsyncStorage.getItem("theme").then(setTheme);
 }, []);
 ```
 
@@ -200,10 +198,10 @@ Sentry.init({
   tracesSampleRate: 1.0,
   integrations: [
     Sentry.reactNativeNavigationIntegration({
-      navigation: Navigation,                        // required — the RNN Navigation object
-      routeChangeTimeoutMs: 1_000,                   // discard stale transactions
-      enableTabsInstrumentation: true,               // create transactions on tab changes (default: false)
-      ignoreEmptyBackNavigationTransactions: true,   // drop no-span back navigations
+      navigation: Navigation, // required — the RNN Navigation object
+      routeChangeTimeoutMs: 1_000, // discard stale transactions
+      enableTabsInstrumentation: true, // create transactions on tab changes (default: false)
+      ignoreEmptyBackNavigationTransactions: true, // drop no-span back navigations
     }),
   ],
 });
@@ -236,10 +234,10 @@ Tab navigators preload screens, so auto-instrumentation only creates a transacti
 
 Two **Mobile Vitals** that have no web equivalent:
 
-| Metric | Abbreviation | What it measures |
-|---|---|---|
-| **Time to Initial Display** | TTID | From navigation event → first rendered frame visible after Screen mounts |
-| **Time to Full Display** | TTFD | From navigation event → all async content loaded and ready for user interaction |
+| Metric                      | Abbreviation | What it measures                                                                |
+| --------------------------- | ------------ | ------------------------------------------------------------------------------- |
+| **Time to Initial Display** | TTID         | From navigation event → first rendered frame visible after Screen mounts        |
+| **Time to Full Display**    | TTFD         | From navigation event → all async content loaded and ready for user interaction |
 
 > **Requirements:** SDK ≥ `5.20.0` · Native build required (not available in Expo Go)
 
@@ -294,11 +292,7 @@ function ProductDetailScreen({ productId }: { productId: string }) {
       {/* Fires once when product transitions from null to loaded */}
       <Sentry.TimeToFullDisplay record={product !== null} />
 
-      {product ? (
-        <Text>{product.name}</Text>
-      ) : (
-        <ActivityIndicator />
-      )}
+      {product ? <Text>{product.name}</Text> : <ActivityIndicator />}
     </View>
   );
 }
@@ -328,10 +322,10 @@ function HomeTabScreen({ isLoading }: { isLoading: boolean }) {
 
 **Mobile Vitals** — automatically captured per transaction when tracing is enabled. No configuration required.
 
-| Frame type | Threshold | User experience |
-|---|---|---|
-| **Slow frame** | Takes longer than expected for the refresh rate | UI hitches, animation jank |
-| **Frozen frame** | Completely unresponsive | App appears hung |
+| Frame type       | Threshold                                       | User experience            |
+| ---------------- | ----------------------------------------------- | -------------------------- |
+| **Slow frame**   | Takes longer than expected for the refresh rate | UI hitches, animation jank |
+| **Frozen frame** | Completely unresponsive                         | App appears hung           |
 
 > Web Vitals (LCP, FID, CLS) are **not** reported for React Native — slow/frozen frames are the mobile equivalent.
 
@@ -358,11 +352,11 @@ api('io.sentry:sentry-android:8.33.0') {
 
 Three metrics automatically attached to every transaction:
 
-| Metric | Description |
-|---|---|
+| Metric                 | Description                                          |
+| ---------------------- | ---------------------------------------------------- |
 | **Longest Stall Time** | Duration (ms) of the single longest event loop stall |
-| **Total Stall Time** | Combined ms of all stalls during the transaction |
-| **Stall Count** | Number of individual stalls |
+| **Total Stall Time**   | Combined ms of all stalls during the transaction     |
+| **Stall Count**        | Number of individual stalls                          |
 
 No configuration needed — stall tracking is enabled automatically by `reactNativeTracingIntegration`.
 
@@ -392,6 +386,7 @@ InteractionManager.runAfterInteractions(() => {
 Every `fetch` and `XMLHttpRequest` call made while a transaction is active automatically gets a child span. No code changes needed.
 
 Span data includes:
+
 - HTTP method and URL
 - Response status code
 - Request/response size
@@ -427,10 +422,10 @@ Connects mobile traces to backend traces so you can see the full request lifecyc
 
 When a `fetch` request fires inside a transaction, the SDK attaches two headers:
 
-| Header | Purpose |
-|---|---|
-| `sentry-trace` | Carries the trace ID and span ID |
-| `baggage` | Carries sampling decision and trace metadata |
+| Header         | Purpose                                      |
+| -------------- | -------------------------------------------- |
+| `sentry-trace` | Carries the trace ID and span ID             |
+| `baggage`      | Carries sampling decision and trace metadata |
 
 Your backend Sentry SDK reads these headers and links its spans to the same trace, so you see one unified waterfall in Sentry.
 
@@ -444,9 +439,9 @@ Sentry.init({
   // Default on mobile: [/.*/] — attaches to ALL outgoing requests
   // Restrict to your own APIs:
   tracePropagationTargets: [
-    "api.myapp.com",             // string — matched against the full URL
-    /^https:\/\/api\./,          // regex — matched against the full URL
-    "localhost",                 // useful for local development
+    "api.myapp.com", // string — matched against the full URL
+    /^https:\/\/api\./, // regex — matched against the full URL
+    "localhost", // useful for local development
   ],
 });
 ```
@@ -535,9 +530,9 @@ export default Sentry.wrap(App, {
 <Pressable
   sentry-label="checkout"
   sentry-span-attributes={{
-    "user.plan": userPlan,         // string
-    "cart.item_count": itemCount,  // number
-    "cart.has_coupon": hasCoupon,  // boolean
+    "user.plan": userPlan, // string
+    "cart.item_count": itemCount, // number
+    "cart.has_coupon": hasCoupon, // boolean
   }}
   onPress={handleCheckout}
 >
@@ -558,7 +553,7 @@ function ZoomableImage() {
   const longPress = Gesture.LongPress();
 
   const gesture = Gesture.Race(
-    sentryTraceGesture("pinch-to-zoom", pinch),       // label must be unique per screen
+    sentryTraceGesture("pinch-to-zoom", pinch), // label must be unique per screen
     sentryTraceGesture("long-press-cancel", longPress),
   );
 
@@ -586,9 +581,12 @@ The span becomes the active parent for any child spans created inside the callba
 
 ```typescript
 // Synchronous
-const total = Sentry.startSpan({ name: "computeCartTotal", op: "function" }, () => {
-  return items.reduce((sum, item) => sum + item.price, 0);
-});
+const total = Sentry.startSpan(
+  { name: "computeCartTotal", op: "function" },
+  () => {
+    return items.reduce((sum, item) => sum + item.price, 0);
+  },
+);
 
 // Async
 const data = await Sentry.startSpan(
@@ -596,14 +594,23 @@ const data = await Sentry.startSpan(
   async () => {
     const res = await fetch("https://api.example.com/profile");
     return res.json();
-  }
+  },
 );
 
 // Nested — child spans automatically attach to their enclosing parent
 await Sentry.startSpan({ name: "checkout", op: "function" }, async () => {
-  await Sentry.startSpan({ name: "validateCart", op: "function" }, validateCart);
-  await Sentry.startSpan({ name: "processPayment", op: "function" }, processPayment);
-  await Sentry.startSpan({ name: "sendConfirmation", op: "http.client" }, sendEmail);
+  await Sentry.startSpan(
+    { name: "validateCart", op: "function" },
+    validateCart,
+  );
+  await Sentry.startSpan(
+    { name: "processPayment", op: "function" },
+    processPayment,
+  );
+  await Sentry.startSpan(
+    { name: "sendConfirmation", op: "http.client" },
+    sendEmail,
+  );
 });
 ```
 
@@ -613,13 +620,20 @@ Use when the span lifetime doesn't map cleanly to a function scope (e.g., spans 
 
 ```typescript
 function trackAnimationPerformance() {
-  return Sentry.startSpanManual({ name: "heroAnimation", op: "ui.render" }, (span) => {
-    const animation = Animated.timing(translateY, { toValue: 0, duration: 300, useNativeDriver: true });
-    animation.start(({ finished }) => {
-      span.setAttribute("animation.completed", finished);
-      span.end(); // must call end() manually
-    });
-  });
+  return Sentry.startSpanManual(
+    { name: "heroAnimation", op: "ui.render" },
+    (span) => {
+      const animation = Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      });
+      animation.start(({ finished }) => {
+        span.setAttribute("animation.completed", finished);
+        span.end(); // must call end() manually
+      });
+    },
+  );
 }
 ```
 
@@ -629,7 +643,10 @@ Inactive spans never become automatic parents for child spans. Use for fire-and-
 
 ```typescript
 // Start a background sync span without it affecting the current active span
-const syncSpan = Sentry.startInactiveSpan({ name: "backgroundSync", op: "function" });
+const syncSpan = Sentry.startInactiveSpan({
+  name: "backgroundSync",
+  op: "function",
+});
 
 await syncLocalDatabase();
 
@@ -638,27 +655,30 @@ syncSpan.end();
 
 ### Span options
 
-| Option | Type | Description |
-|---|---|---|
-| `name` | `string` | **Required.** Display name in Sentry UI |
-| `op` | `string` | Operation type — use standard values for enhanced UI (see below) |
-| `attributes` | `Record<string, string \| number \| boolean \| array>` | Key/value metadata attached to the span |
-| `startTime` | `number` | Custom start timestamp (Unix epoch, seconds) |
-| `parentSpan` | `Span` | Explicit parent — overrides the active span |
-| `onlyIfParent` | `boolean` | Skip this span if there's no active parent |
-| `forceTransaction` | `boolean` | Force the span to appear as a top-level transaction in the UI |
+| Option             | Type                                                   | Description                                                      |
+| ------------------ | ------------------------------------------------------ | ---------------------------------------------------------------- |
+| `name`             | `string`                                               | **Required.** Display name in Sentry UI                          |
+| `op`               | `string`                                               | Operation type — use standard values for enhanced UI (see below) |
+| `attributes`       | `Record<string, string \| number \| boolean \| array>` | Key/value metadata attached to the span                          |
+| `startTime`        | `number`                                               | Custom start timestamp (Unix epoch, seconds)                     |
+| `parentSpan`       | `Span`                                                 | Explicit parent — overrides the active span                      |
+| `onlyIfParent`     | `boolean`                                              | Skip this span if there's no active parent                       |
+| `forceTransaction` | `boolean`                                              | Force the span to appear as a top-level transaction in the UI    |
 
 ### Standard operation types for mobile
 
 Using well-known `op` values unlocks enhanced Sentry UI features (grouping, filtering, icons):
 
 ```typescript
-Sentry.startSpan({ name: "GET /api/products",     op: "http.client"  }, fetchProducts);
-Sentry.startSpan({ name: "SELECT * FROM users",   op: "db"           }, queryDatabase);
-Sentry.startSpan({ name: "parseProductData",      op: "function"     }, parseData);
-Sentry.startSpan({ name: "HomeScreen render",     op: "ui.render"    }, render);
-Sentry.startSpan({ name: "readProductsCache",     op: "file.read"    }, readCache);
-Sentry.startSpan({ name: "writeOrdersCache",      op: "file.write"   }, writeCache);
+Sentry.startSpan(
+  { name: "GET /api/products", op: "http.client" },
+  fetchProducts,
+);
+Sentry.startSpan({ name: "SELECT * FROM users", op: "db" }, queryDatabase);
+Sentry.startSpan({ name: "parseProductData", op: "function" }, parseData);
+Sentry.startSpan({ name: "HomeScreen render", op: "ui.render" }, render);
+Sentry.startSpan({ name: "readProductsCache", op: "file.read" }, readCache);
+Sentry.startSpan({ name: "writeOrdersCache", op: "file.write" }, writeCache);
 ```
 
 Full operation list: [develop.sentry.dev/sdk/performance/span-operations](https://develop.sentry.dev/sdk/performance/span-operations/#list-of-operations)
@@ -677,7 +697,7 @@ await Sentry.startSpan(
       "feed.has_cache": false,
     },
   },
-  loadFeed
+  loadFeed,
 );
 
 // On an existing span
@@ -701,12 +721,16 @@ const rootSpan = activeSpan ? Sentry.getRootSpan(activeSpan) : undefined;
 // Explicitly set a span as the active parent for a block
 const parent = Sentry.startInactiveSpan({ name: "parent" });
 Sentry.withActiveSpan(parent, () => {
-  Sentry.startSpan({ name: "child" }, () => { /* child attaches to parent */ });
+  Sentry.startSpan({ name: "child" }, () => {
+    /* child attaches to parent */
+  });
 });
 
 // Create a root-level span regardless of current context
 Sentry.withActiveSpan(null, () => {
-  Sentry.startSpan({ name: "isolated" }, () => { /* no parent */ });
+  Sentry.startSpan({ name: "isolated" }, () => {
+    /* no parent */
+  });
 });
 
 // Prevent a specific operation from creating spans
@@ -770,8 +794,8 @@ Profiling samples the call stack at regular intervals to surface hot code paths.
 Sentry.init({
   dsn: "YOUR_DSN",
 
-  tracesSampleRate: 1.0,    // 100% traced
-  profilesSampleRate: 1.0,  // 100% of traced → 100% profiled (dev/testing only)
+  tracesSampleRate: 1.0, // 100% traced
+  profilesSampleRate: 1.0, // 100% of traced → 100% profiled (dev/testing only)
 
   // Production example:
   // tracesSampleRate: 0.2,    // 20% traced
@@ -795,7 +819,7 @@ Sentry.init({
   profilesSampleRate: 1.0,
   integrations: [
     Sentry.hermesProfilingIntegration({
-      platformProfilers: true,  // default: true — profile native code alongside JS
+      platformProfilers: true, // default: true — profile native code alongside JS
       // Set false to profile ONLY JS (Hermes) without native code (SDK ≥ 5.33.0)
     }),
   ],
@@ -813,9 +837,9 @@ Sentry.init({
 
   _experiments: {
     profilingOptions: {
-      profileSessionSampleRate: 1.0,  // fraction of app sessions to profile
-      lifecycle: "trace",             // "trace" = profile only during active transactions
-      startOnAppStart: true,          // begin profiling from the very first frame
+      profileSessionSampleRate: 1.0, // fraction of app sessions to profile
+      lifecycle: "trace", // "trace" = profile only during active transactions
+      startOnAppStart: true, // begin profiling from the very first frame
     },
   },
 });
@@ -825,11 +849,11 @@ Sentry.init({
 
 ### Profiling version requirements
 
-| Feature | Min SDK | Platforms |
-|---|---|---|
-| `profilesSampleRate` (basic) | `5.32.0` | iOS, Android |
-| `platformProfilers: false` | `5.33.0` | iOS, Android |
-| UI Profiling (experimental) | `7.9.0` (Android) · `7.12.0` (iOS) | iOS, Android |
+| Feature                      | Min SDK                            | Platforms    |
+| ---------------------------- | ---------------------------------- | ------------ |
+| `profilesSampleRate` (basic) | `5.32.0`                           | iOS, Android |
+| `platformProfilers: false`   | `5.33.0`                           | iOS, Android |
+| UI Profiling (experimental)  | `7.9.0` (Android) · `7.12.0` (iOS) | iOS, Android |
 
 ---
 
@@ -866,10 +890,10 @@ Sentry.init({
 
 ### Head-based vs. tail-based sampling
 
-| Approach | How | Tradeoff |
-|---|---|---|
-| **Head-based** (`tracesSampleRate` / `tracesSampler`) | Decision made at trace start | Low overhead, but can't sample based on outcome |
-| **Tail-based** (Sentry Dynamic Sampling rules) | Decision made server-side after trace completes | Can prioritize errors/slow traces, requires Sentry Business plan |
+| Approach                                              | How                                             | Tradeoff                                                         |
+| ----------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------- |
+| **Head-based** (`tracesSampleRate` / `tracesSampler`) | Decision made at trace start                    | Low overhead, but can't sample based on outcome                  |
+| **Tail-based** (Sentry Dynamic Sampling rules)        | Decision made server-side after trace completes | Can prioritize errors/slow traces, requires Sentry Business plan |
 
 For most React Native apps, head-based sampling with a `tracesSampler` is sufficient.
 
@@ -879,89 +903,89 @@ For most React Native apps, head-based sampling with a `tracesSampler` is suffic
 
 ### `Sentry.init` options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `tracesSampleRate` | `number` (0–1) | `undefined` | Uniform transaction sample rate |
-| `tracesSampler` | `function` | `undefined` | Dynamic sampler — overrides `tracesSampleRate` when set |
-| `profilesSampleRate` | `number` (0–1) | `undefined` | Profile sample rate, relative to traced transactions |
-| `tracePropagationTargets` | `(string \| RegExp)[]` | `[/.*/]` on mobile | URLs/patterns that receive `sentry-trace` + `baggage` headers |
-| `enableUserInteractionTracing` | `boolean` | `false` | Capture touch interaction transactions |
-| `enableAutoPerformanceTracing` | `boolean` | `true` | Master switch for all automatic instrumentation |
-| `parentSpanIsAlwaysRootSpan` | `boolean` | `true` | Flat span hierarchy — safe for async/await contexts |
+| Option                         | Type                   | Default            | Description                                                   |
+| ------------------------------ | ---------------------- | ------------------ | ------------------------------------------------------------- |
+| `tracesSampleRate`             | `number` (0–1)         | `undefined`        | Uniform transaction sample rate                               |
+| `tracesSampler`                | `function`             | `undefined`        | Dynamic sampler — overrides `tracesSampleRate` when set       |
+| `profilesSampleRate`           | `number` (0–1)         | `undefined`        | Profile sample rate, relative to traced transactions          |
+| `tracePropagationTargets`      | `(string \| RegExp)[]` | `[/.*/]` on mobile | URLs/patterns that receive `sentry-trace` + `baggage` headers |
+| `enableUserInteractionTracing` | `boolean`              | `false`            | Capture touch interaction transactions                        |
+| `enableAutoPerformanceTracing` | `boolean`              | `true`             | Master switch for all automatic instrumentation               |
+| `parentSpanIsAlwaysRootSpan`   | `boolean`              | `true`             | Flat span hierarchy — safe for async/await contexts           |
 
 ### `reactNativeTracingIntegration` options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `beforeStartSpan` | `(context) => context` | — | Mutate span context before each navigation/pageload span |
-| `shouldCreateSpanForRequest` | `(url) => boolean` | — | Filter which outgoing requests get a span |
-| `idleTimeoutMs` | `number` | `1_000` | Ms of inactivity before ending the current transaction |
-| `finalTimeoutMs` | `number` | `600_000` | Hard maximum duration for any single transaction |
+| Option                       | Type                   | Default   | Description                                              |
+| ---------------------------- | ---------------------- | --------- | -------------------------------------------------------- |
+| `beforeStartSpan`            | `(context) => context` | —         | Mutate span context before each navigation/pageload span |
+| `shouldCreateSpanForRequest` | `(url) => boolean`     | —         | Filter which outgoing requests get a span                |
+| `idleTimeoutMs`              | `number`               | `1_000`   | Ms of inactivity before ending the current transaction   |
+| `finalTimeoutMs`             | `number`               | `600_000` | Hard maximum duration for any single transaction         |
 
 ### `reactNavigationIntegration` options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `enableTimeToInitialDisplay` | `boolean` | `false` | Auto-measure TTID per screen |
-| `routeChangeTimeoutMs` | `number` | `1_000` | Discard transaction if screen doesn't mount within this time |
-| `ignoreEmptyBackNavigationTransactions` | `boolean` | `true` | Drop back-nav transactions with no child spans |
-| `useDispatchedActionData` | `boolean` | `false` | Include navigation action data in transaction metadata |
+| Option                                  | Type      | Default | Description                                                  |
+| --------------------------------------- | --------- | ------- | ------------------------------------------------------------ |
+| `enableTimeToInitialDisplay`            | `boolean` | `false` | Auto-measure TTID per screen                                 |
+| `routeChangeTimeoutMs`                  | `number`  | `1_000` | Discard transaction if screen doesn't mount within this time |
+| `ignoreEmptyBackNavigationTransactions` | `boolean` | `true`  | Drop back-nav transactions with no child spans               |
+| `useDispatchedActionData`               | `boolean` | `false` | Include navigation action data in transaction metadata       |
 
 ### `reactNativeNavigationIntegration` options (Wix RNN)
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `navigation` | `Navigation` | **required** | The RNN Navigation object |
-| `routeChangeTimeoutMs` | `number` | `1_000` | Discard stale transactions |
-| `enableTabsInstrumentation` | `boolean` | `false` | Create transactions on tab switches |
-| `ignoreEmptyBackNavigationTransactions` | `boolean` | `true` | Drop no-span back navigations |
+| Option                                  | Type         | Default      | Description                         |
+| --------------------------------------- | ------------ | ------------ | ----------------------------------- |
+| `navigation`                            | `Navigation` | **required** | The RNN Navigation object           |
+| `routeChangeTimeoutMs`                  | `number`     | `1_000`      | Discard stale transactions          |
+| `enableTabsInstrumentation`             | `boolean`    | `false`      | Create transactions on tab switches |
+| `ignoreEmptyBackNavigationTransactions` | `boolean`    | `true`       | Drop no-span back navigations       |
 
 ### `hermesProfilingIntegration` options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `platformProfilers` | `boolean` | `true` | Profile native (Swift/ObjC/Kotlin/Java) alongside Hermes JS |
+| Option              | Type      | Default | Description                                                 |
+| ------------------- | --------- | ------- | ----------------------------------------------------------- |
+| `platformProfilers` | `boolean` | `true`  | Profile native (Swift/ObjC/Kotlin/Java) alongside Hermes JS |
 
 ---
 
 ## 16. Mobile vs Web: Feature Matrix
 
-| Capability | Web SDK | React Native SDK |
-|---|---|---|
-| App cold start tracking | ❌ | ✅ `measurements.app_start_cold` |
-| App warm start tracking | ❌ | ✅ `measurements.app_start_warm` |
-| Slow frames (Mobile Vital) | ❌ | ✅ Auto (requires `reactNativeTracingIntegration`) |
-| Frozen frames (Mobile Vital) | ❌ | ✅ Auto (requires `reactNativeTracingIntegration`) |
-| JS event loop stall tracking | ❌ | ✅ Auto (3 metrics: count, longest, total) |
-| Time to Initial Display (TTID) | ❌ | ✅ `enableTimeToInitialDisplay: true` |
-| Time to Full Display (TTFD) | ❌ | ✅ `<Sentry.TimeToFullDisplay record={...} />` |
-| Touch interaction tracing | ❌ | ✅ `enableUserInteractionTracing: true` |
-| Gesture tracing (RNGH v2) | ❌ | ✅ `sentryTraceGesture()` |
-| Hermes JS profiling | ❌ | ✅ `profilesSampleRate` + `hermesProfilingIntegration` |
-| Native platform profiling | ❌ | ✅ `platformProfilers: true` |
-| Navigation transactions | ✅ (SPA routers) | ✅ React Navigation · Expo Router · RNN |
-| Network span tracing | ✅ | ✅ fetch + XHR auto-instrumented |
-| Distributed tracing | ✅ | ✅ `tracePropagationTargets` |
-| Web Vitals (LCP, FID, CLS) | ✅ | ❌ (replaced by Mobile Vitals) |
+| Capability                     | Web SDK          | React Native SDK                                       |
+| ------------------------------ | ---------------- | ------------------------------------------------------ |
+| App cold start tracking        | ❌               | ✅ `measurements.app_start_cold`                       |
+| App warm start tracking        | ❌               | ✅ `measurements.app_start_warm`                       |
+| Slow frames (Mobile Vital)     | ❌               | ✅ Auto (requires `reactNativeTracingIntegration`)     |
+| Frozen frames (Mobile Vital)   | ❌               | ✅ Auto (requires `reactNativeTracingIntegration`)     |
+| JS event loop stall tracking   | ❌               | ✅ Auto (3 metrics: count, longest, total)             |
+| Time to Initial Display (TTID) | ❌               | ✅ `enableTimeToInitialDisplay: true`                  |
+| Time to Full Display (TTFD)    | ❌               | ✅ `<Sentry.TimeToFullDisplay record={...} />`         |
+| Touch interaction tracing      | ❌               | ✅ `enableUserInteractionTracing: true`                |
+| Gesture tracing (RNGH v2)      | ❌               | ✅ `sentryTraceGesture()`                              |
+| Hermes JS profiling            | ❌               | ✅ `profilesSampleRate` + `hermesProfilingIntegration` |
+| Native platform profiling      | ❌               | ✅ `platformProfilers: true`                           |
+| Navigation transactions        | ✅ (SPA routers) | ✅ React Navigation · Expo Router · RNN                |
+| Network span tracing           | ✅               | ✅ fetch + XHR auto-instrumented                       |
+| Distributed tracing            | ✅               | ✅ `tracePropagationTargets`                           |
+| Web Vitals (LCP, FID, CLS)     | ✅               | ❌ (replaced by Mobile Vitals)                         |
 
 ---
 
 ## 17. Troubleshooting
 
-| Issue | Cause | Solution |
-|---|---|---|
-| No transactions in Sentry | Tracing not enabled | Add `tracesSampleRate` > 0 and `reactNativeTracingIntegration()` to `integrations` |
-| App Start span missing | `Sentry.wrap(App)` not used | Wrap root component: `export default Sentry.wrap(App)` |
-| App Start time seems too long | Sentry follows platform vendor guidelines | Expected — Sentry measures the full user-perceptible start time, not internal JS init |
-| Navigation transactions not created | Integration not registered | Call `navigationIntegration.registerNavigationContainer(ref)` inside `onReady`, not before |
-| TTID/TTFD not appearing | Feature not enabled or wrong SDK version | Requires `enableTimeToInitialDisplay: true` and SDK ≥ 5.20.0, native build required |
-| TTID not firing on tab screens | Tab screens are preloaded | Add `<Sentry.TimeToInitialDisplay record={true} />` explicitly to each tab screen |
-| No interaction transactions | Missing `sentry-label` prop | Add `sentry-label="my_button"` to every interactive element you want to track |
-| `sentry-trace` header missing from requests | `tracePropagationTargets` doesn't match URL | Check the full URL against your patterns — it matches against the entire URL string |
-| Backend receives header but trace not linked | Backend SDK not initialized | Ensure your backend uses a Sentry SDK with distributed tracing support |
-| Slow/frozen frames missing on Android | Missing `androidx.core` | Don't exclude `androidx.core` from the Sentry Android dependency |
-| Profiling data not appearing | Profiling sample rate is 0 or traces not sampled | `profilesSampleRate` is relative to `tracesSampleRate` — both must be > 0 |
-| Component names minified in profiler | Production bundle minification | Configure Sentry Gradle/Xcode plugins and upload source maps |
-| Gesture spans not appearing | Wrong RNGH version | Only RNGH API v2 is supported — upgrade `react-native-gesture-handler` |
-| Stall metrics missing | `reactNativeTracingIntegration` not added | Stall tracking requires the integration — add it to `integrations: []` |
-| Transactions never finish | No idle timeout / long background spans | Adjust `idleTimeoutMs` in `reactNativeTracingIntegration` options |
+| Issue                                        | Cause                                            | Solution                                                                                   |
+| -------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| No transactions in Sentry                    | Tracing not enabled                              | Add `tracesSampleRate` > 0 and `reactNativeTracingIntegration()` to `integrations`         |
+| App Start span missing                       | `Sentry.wrap(App)` not used                      | Wrap root component: `export default Sentry.wrap(App)`                                     |
+| App Start time seems too long                | Sentry follows platform vendor guidelines        | Expected — Sentry measures the full user-perceptible start time, not internal JS init      |
+| Navigation transactions not created          | Integration not registered                       | Call `navigationIntegration.registerNavigationContainer(ref)` inside `onReady`, not before |
+| TTID/TTFD not appearing                      | Feature not enabled or wrong SDK version         | Requires `enableTimeToInitialDisplay: true` and SDK ≥ 5.20.0, native build required        |
+| TTID not firing on tab screens               | Tab screens are preloaded                        | Add `<Sentry.TimeToInitialDisplay record={true} />` explicitly to each tab screen          |
+| No interaction transactions                  | Missing `sentry-label` prop                      | Add `sentry-label="my_button"` to every interactive element you want to track              |
+| `sentry-trace` header missing from requests  | `tracePropagationTargets` doesn't match URL      | Check the full URL against your patterns — it matches against the entire URL string        |
+| Backend receives header but trace not linked | Backend SDK not initialized                      | Ensure your backend uses a Sentry SDK with distributed tracing support                     |
+| Slow/frozen frames missing on Android        | Missing `androidx.core`                          | Don't exclude `androidx.core` from the Sentry Android dependency                           |
+| Profiling data not appearing                 | Profiling sample rate is 0 or traces not sampled | `profilesSampleRate` is relative to `tracesSampleRate` — both must be > 0                  |
+| Component names minified in profiler         | Production bundle minification                   | Configure Sentry Gradle/Xcode plugins and upload source maps                               |
+| Gesture spans not appearing                  | Wrong RNGH version                               | Only RNGH API v2 is supported — upgrade `react-native-gesture-handler`                     |
+| Stall metrics missing                        | `reactNativeTracingIntegration` not added        | Stall tracking requires the integration — add it to `integrations: []`                     |
+| Transactions never finish                    | No idle timeout / long background spans          | Adjust `idleTimeoutMs` in `reactNativeTracingIntegration` options                          |

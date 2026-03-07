@@ -11,13 +11,14 @@
 
 Sentry provides three complementary approaches to collecting user feedback in React Native:
 
-| Approach | When to Use |
-|----------|-------------|
-| **Feedback Widget** | Built-in modal; minimal code; works out of the box |
-| **`FeedbackWidget` component** | Embed feedback form inline within your own screen |
-| **`captureFeedback()` API** | Full control; build your own UI and submit programmatically |
+| Approach                       | When to Use                                                 |
+| ------------------------------ | ----------------------------------------------------------- |
+| **Feedback Widget**            | Built-in modal; minimal code; works out of the box          |
+| **`FeedbackWidget` component** | Embed feedback form inline within your own screen           |
+| **`captureFeedback()` API**    | Full control; build your own UI and submit programmatically |
 
 All approaches support:
+
 - Linking feedback to specific error events via `associatedEventId`
 - Offline caching (stored on-device, sent when connectivity restores)
 - Session Replay integration (buffers last 60 seconds of activity with submitted feedback)
@@ -107,8 +108,8 @@ Sentry.init({
 
       // Pre-fill from current user context (reads Sentry user scope)
       useSentryUser: {
-        name: "username",   // maps user.username → name field
-        email: "email",     // maps user.email → email field
+        name: "username", // maps user.username → name field
+        email: "email", // maps user.email → email field
       },
     }),
   ],
@@ -117,9 +118,9 @@ Sentry.init({
 
 ### Architecture Requirements
 
-| Architecture | Support |
-|---|---|
-| Legacy (Bridge) | ✅ Fully supported |
+| Architecture              | Support                        |
+| ------------------------- | ------------------------------ |
+| Legacy (Bridge)           | ✅ Fully supported             |
 | New Architecture (Fabric) | ✅ Requires React Native ≥0.71 |
 
 ---
@@ -233,7 +234,7 @@ Sentry.captureFeedback(
         contentType: "text/plain",
       },
     ],
-  }
+  },
 );
 ```
 
@@ -310,7 +311,7 @@ function App() {
 }
 ```
 
-> **Tip:** `Sentry.lastEventId()` returns the ID of the most recent event captured during the *current* app session. For post-crash context, call it at app start before any other Sentry calls that might create a new event.
+> **Tip:** `Sentry.lastEventId()` returns the ID of the most recent event captured during the _current_ app session. For post-crash context, call it at app start before any other Sentry calls that might create a new event.
 
 ---
 
@@ -418,7 +419,7 @@ async function submitFeedbackWithScreenshot(feedbackMessage: string) {
           contentType: "image/png",
         },
       ],
-    }
+    },
   );
 }
 ```
@@ -604,19 +605,19 @@ Sentry.captureFeedback(
 
 ### `feedback` object
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `message` | `string` | ✅ | User's feedback text |
-| `name` | `string` | ❌ | User's display name |
-| `email` | `string` | ❌ | User's email address |
-| `associatedEventId` | `string` | ❌ | Links feedback to a specific Sentry event (error or message) |
+| Field               | Type     | Required | Description                                                  |
+| ------------------- | -------- | -------- | ------------------------------------------------------------ |
+| `message`           | `string` | ✅       | User's feedback text                                         |
+| `name`              | `string` | ❌       | User's display name                                          |
+| `email`             | `string` | ❌       | User's email address                                         |
+| `associatedEventId` | `string` | ❌       | Links feedback to a specific Sentry event (error or message) |
 
 ### `hint` object (optional)
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field            | Type             | Description                                               |
+| ---------------- | ---------------- | --------------------------------------------------------- |
 | `captureContext` | `CaptureContext` | Scope data to attach (tags, extra, user, level, contexts) |
-| `attachments` | `Attachment[]` | Files to attach (screenshots, logs, etc.) |
+| `attachments`    | `Attachment[]`   | Files to attach (screenshots, logs, etc.)                 |
 
 Returns the feedback event ID (or `undefined` if SDK is disabled).
 
@@ -624,49 +625,49 @@ Returns the feedback event ID (or `undefined` if SDK is disabled).
 
 ## `feedbackIntegration` Configuration Reference
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `formTitle` | `string` | `"Report a Bug"` | Widget modal title |
-| `submitButtonLabel` | `string` | `"Send Bug Report"` | Submit button text |
-| `cancelButtonLabel` | `string` | `"Cancel"` | Cancel button text |
-| `nameLabel` | `string` | `"Name"` | Name field label |
-| `namePlaceholder` | `string` | `"Your Name"` | Name field placeholder |
-| `emailLabel` | `string` | `"Email"` | Email field label |
-| `emailPlaceholder` | `string` | `"your.email@example.org"` | Email field placeholder |
-| `messageLabel` | `string` | `"Description"` | Message field label |
-| `messagePlaceholder` | `string` | `"What's the bug? What did you expect?"` | Message field placeholder |
-| `isNameRequired` | `boolean` | `false` | Make name field required |
-| `isEmailRequired` | `boolean` | `false` | Make email field required |
-| `useSentryUser` | `object` | — | Maps Sentry user scope fields to pre-fill name/email |
-| `styles` | `object` | — | Style overrides for widget UI elements |
+| Option               | Type      | Default                                  | Description                                          |
+| -------------------- | --------- | ---------------------------------------- | ---------------------------------------------------- |
+| `formTitle`          | `string`  | `"Report a Bug"`                         | Widget modal title                                   |
+| `submitButtonLabel`  | `string`  | `"Send Bug Report"`                      | Submit button text                                   |
+| `cancelButtonLabel`  | `string`  | `"Cancel"`                               | Cancel button text                                   |
+| `nameLabel`          | `string`  | `"Name"`                                 | Name field label                                     |
+| `namePlaceholder`    | `string`  | `"Your Name"`                            | Name field placeholder                               |
+| `emailLabel`         | `string`  | `"Email"`                                | Email field label                                    |
+| `emailPlaceholder`   | `string`  | `"your.email@example.org"`               | Email field placeholder                              |
+| `messageLabel`       | `string`  | `"Description"`                          | Message field label                                  |
+| `messagePlaceholder` | `string`  | `"What's the bug? What did you expect?"` | Message field placeholder                            |
+| `isNameRequired`     | `boolean` | `false`                                  | Make name field required                             |
+| `isEmailRequired`    | `boolean` | `false`                                  | Make email field required                            |
+| `useSentryUser`      | `object`  | —                                        | Maps Sentry user scope fields to pre-fill name/email |
+| `styles`             | `object`  | —                                        | Style overrides for widget UI elements               |
 
 ---
 
 ## API Summary
 
-| Method | Description |
-|--------|-------------|
-| `Sentry.showFeedbackWidget()` | Open the built-in feedback modal |
-| `Sentry.showFeedbackButton()` | Show the persistent floating feedback button |
-| `Sentry.hideFeedbackButton()` | Hide the persistent floating feedback button |
-| `Sentry.captureFeedback(feedback, hint?)` | Submit feedback programmatically |
-| `Sentry.lastEventId()` | Get the ID of the most recent captured event (for linking) |
-| `Sentry.feedbackIntegration(options)` | Configure the built-in widget |
+| Method                                    | Description                                                |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `Sentry.showFeedbackWidget()`             | Open the built-in feedback modal                           |
+| `Sentry.showFeedbackButton()`             | Show the persistent floating feedback button               |
+| `Sentry.hideFeedbackButton()`             | Hide the persistent floating feedback button               |
+| `Sentry.captureFeedback(feedback, hint?)` | Submit feedback programmatically                           |
+| `Sentry.lastEventId()`                    | Get the ID of the most recent captured event (for linking) |
+| `Sentry.feedbackIntegration(options)`     | Configure the built-in widget                              |
 
 ---
 
 ## Version Requirements
 
-| Feature | Min SDK | Notes |
-|---------|---------|-------|
-| `captureFeedback()` | ≥6.5.0 | Replaces deprecated `captureUserFeedback()` |
-| `showFeedbackWidget()` | ≥6.9.0 | Requires `Sentry.wrap(App)` |
-| `feedbackIntegration()` | ≥6.9.0 | Configure widget appearance |
-| `FeedbackWidget` component | ≥6.9.0 | Inline embedded widget |
-| `showFeedbackButton()` / `hideFeedbackButton()` | ≥6.15.0 | Floating feedback button |
-| Offline caching | Built-in | Automatic, no config needed |
-| Session Replay attachment | ≥6.9.0 | When `mobileReplayIntegration` enabled |
-| New Architecture (Fabric) support | React Native ≥0.71 | Widget works on new arch |
+| Feature                                         | Min SDK            | Notes                                       |
+| ----------------------------------------------- | ------------------ | ------------------------------------------- |
+| `captureFeedback()`                             | ≥6.5.0             | Replaces deprecated `captureUserFeedback()` |
+| `showFeedbackWidget()`                          | ≥6.9.0             | Requires `Sentry.wrap(App)`                 |
+| `feedbackIntegration()`                         | ≥6.9.0             | Configure widget appearance                 |
+| `FeedbackWidget` component                      | ≥6.9.0             | Inline embedded widget                      |
+| `showFeedbackButton()` / `hideFeedbackButton()` | ≥6.15.0            | Floating feedback button                    |
+| Offline caching                                 | Built-in           | Automatic, no config needed                 |
+| Session Replay attachment                       | ≥6.9.0             | When `mobileReplayIntegration` enabled      |
+| New Architecture (Fabric) support               | React Native ≥0.71 | Widget works on new arch                    |
 
 ---
 
@@ -731,15 +732,15 @@ Sentry.captureFeedback({
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| `showFeedbackWidget()` has no effect | Confirm `Sentry.wrap(App)` wraps your root component |
-| Widget doesn't open on New Architecture | Requires React Native ≥0.71; check architecture compatibility |
-| Feedback not appearing in Sentry dashboard | Verify DSN is correct; check network connectivity; enable `debug: true` for SDK logs |
-| `captureFeedback` not sending in Expo Go | Expected — use `captureFeedback()` (works) but not `showFeedbackWidget()` (native only) |
-| `lastEventId()` returns `undefined` | No events have been captured in the current session yet; ensure an error or message was captured first |
-| Offline feedback not delivered | Offline caching is automatic; check `maxCacheItems` (default: 30); old cache is evicted if full |
-| `captureUserFeedback` is not a function | Upgrade to `@sentry/react-native` ≥7.0.0 and replace with `captureFeedback()` |
-| Replay not attaching to feedback | Confirm `mobileReplayIntegration()` is in `integrations` and the app is running as a native build |
-| `associatedEventId` not linking correctly | Pass the exact event ID string returned by `captureException`, `captureMessage`, or `lastEventId()` |
-| Widget styles not applying | Pass `styles` config inside `feedbackIntegration({ styles: { ... } })` in `Sentry.init` |
+| Issue                                      | Solution                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `showFeedbackWidget()` has no effect       | Confirm `Sentry.wrap(App)` wraps your root component                                                   |
+| Widget doesn't open on New Architecture    | Requires React Native ≥0.71; check architecture compatibility                                          |
+| Feedback not appearing in Sentry dashboard | Verify DSN is correct; check network connectivity; enable `debug: true` for SDK logs                   |
+| `captureFeedback` not sending in Expo Go   | Expected — use `captureFeedback()` (works) but not `showFeedbackWidget()` (native only)                |
+| `lastEventId()` returns `undefined`        | No events have been captured in the current session yet; ensure an error or message was captured first |
+| Offline feedback not delivered             | Offline caching is automatic; check `maxCacheItems` (default: 30); old cache is evicted if full        |
+| `captureUserFeedback` is not a function    | Upgrade to `@sentry/react-native` ≥7.0.0 and replace with `captureFeedback()`                          |
+| Replay not attaching to feedback           | Confirm `mobileReplayIntegration()` is in `integrations` and the app is running as a native build      |
+| `associatedEventId` not linking correctly  | Pass the exact event ID string returned by `captureException`, `captureMessage`, or `lastEventId()`    |
+| Widget styles not applying                 | Pass `styles` config inside `feedbackIntegration({ styles: { ... } })` in `Sentry.init`                |

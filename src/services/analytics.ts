@@ -16,7 +16,10 @@ class AnalyticsService {
     Sentry.setUser(null);
   }
 
-  setMetadata(keyOrProperties: string | Record<string, string | number | boolean>, value?: string | number | boolean) {
+  setMetadata(
+    keyOrProperties: string | Record<string, string | number | boolean>,
+    value?: string | number | boolean,
+  ) {
     if (typeof keyOrProperties === "object") {
       for (const [k, v] of Object.entries(keyOrProperties)) {
         Sentry.setTag(k, String(v));

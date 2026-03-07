@@ -56,14 +56,14 @@ Sentry.logger.fatal("Database unavailable", { host: "db-primary" });
 
 ### Level Selection Guide
 
-| Level | When to Use |
-|-------|-------------|
+| Level   | When to Use                                                      |
+| ------- | ---------------------------------------------------------------- |
 | `trace` | Step-by-step internals, loop iterations, low-level flow tracking |
-| `debug` | Diagnostic information useful during development |
-| `info` | Business events, user actions, meaningful state transitions |
-| `warn` | Recoverable errors, degraded performance, approaching limits |
-| `error` | Failures that need investigation but don't crash the app |
-| `fatal` | Unrecoverable failures — app or critical subsystem is down |
+| `debug` | Diagnostic information useful during development                 |
+| `info`  | Business events, user actions, meaningful state transitions      |
+| `warn`  | Recoverable errors, degraded performance, approaching limits     |
+| `error` | Failures that need investigation but don't crash the app         |
+| `fatal` | Unrecoverable failures — app or critical subsystem is down       |
 
 **Attribute value types:** `string`, `number`, and `boolean` only. Other types will be dropped or coerced.
 
@@ -79,7 +79,7 @@ const productName = "Widget Pro";
 const amount = 49.99;
 
 Sentry.logger.info(
-  Sentry.logger.fmt`User ${userId} purchased ${productName} for $${amount}`
+  Sentry.logger.fmt`User ${userId} purchased ${productName} for $${amount}`,
 );
 // → message.template:    "User %s purchased %s for $%s"
 // → message.parameter.0: "user_123"
@@ -87,7 +87,7 @@ Sentry.logger.info(
 // → message.parameter.2: 49.99
 
 Sentry.logger.error(
-  Sentry.logger.fmt`Failed to load screen ${screenName}: ${error.message}`
+  Sentry.logger.fmt`Failed to load screen ${screenName}: ${error.message}`,
 );
 ```
 
@@ -130,7 +130,7 @@ Set attributes once on a scope and they are **automatically attached to all logs
 Sentry.getGlobalScope().setAttributes({
   app_version: "2.1.0",
   build_number: "42",
-  platform: Platform.OS,       // "ios" or "android"
+  platform: Platform.OS, // "ios" or "android"
   environment: __DEV__ ? "development" : "production",
 });
 ```
@@ -162,7 +162,7 @@ Sentry.init({
   enableLogs: true,
   integrations: [
     Sentry.consoleLoggingIntegration({
-      levels: ["log", "warn", "error"],  // default — adjust as needed
+      levels: ["log", "warn", "error"], // default — adjust as needed
     }),
   ],
 });
@@ -212,12 +212,12 @@ Sentry.init({
 
 The `log` object has the following shape:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `level` | `string` | `"trace"`, `"debug"`, `"info"`, `"warn"`, `"error"`, `"fatal"` |
-| `message` | `string` | The log message (template-expanded) |
-| `timestamp` | `number` | Unix timestamp |
-| `attributes` | `object` | All structured attributes |
+| Field        | Type     | Description                                                    |
+| ------------ | -------- | -------------------------------------------------------------- |
+| `level`      | `string` | `"trace"`, `"debug"`, `"info"`, `"warn"`, `"error"`, `"fatal"` |
+| `message`    | `string` | The log message (template-expanded)                            |
+| `timestamp`  | `number` | Unix timestamp                                                 |
+| `attributes` | `object` | All structured attributes                                      |
 
 ---
 
@@ -225,16 +225,16 @@ The `log` object has the following shape:
 
 The SDK automatically attaches these attributes to every log:
 
-| Attribute | Source |
-|-----------|--------|
-| `sentry.environment` | `Sentry.init({ environment })` |
-| `sentry.release` | `Sentry.init({ release })` |
-| `sentry.sdk.name` | SDK internals |
-| `sentry.sdk.version` | SDK internals |
-| `user.id`, `user.name`, `user.email` | `Sentry.setUser()` when set |
-| `sentry.message.template` | `logger.fmt` usage |
-| `sentry.message.parameter.X` | `logger.fmt` interpolated values |
-| `origin` | Identifies which integration emitted the log |
+| Attribute                            | Source                                       |
+| ------------------------------------ | -------------------------------------------- |
+| `sentry.environment`                 | `Sentry.init({ environment })`               |
+| `sentry.release`                     | `Sentry.init({ release })`                   |
+| `sentry.sdk.name`                    | SDK internals                                |
+| `sentry.sdk.version`                 | SDK internals                                |
+| `user.id`, `user.name`, `user.email` | `Sentry.setUser()` when set                  |
+| `sentry.message.template`            | `logger.fmt` usage                           |
+| `sentry.message.parameter.X`         | `logger.fmt` interpolated values             |
+| `origin`                             | Identifies which integration emitted the log |
 
 ### React Native vs Web — Attribute Differences
 
@@ -298,7 +298,7 @@ function ProductScreen({ route }) {
 
   const handlePurchase = async () => {
     Sentry.logger.info(
-      Sentry.logger.fmt`User initiated purchase for product ${productId}`
+      Sentry.logger.fmt`User initiated purchase for product ${productId}`,
     );
     try {
       const result = await purchaseProduct(productId);
@@ -321,9 +321,7 @@ function ProductScreen({ route }) {
 
 ```typescript
 async function fetchUserData(userId: string) {
-  Sentry.logger.debug(
-    Sentry.logger.fmt`Fetching user data for ${userId}`
-  );
+  Sentry.logger.debug(Sentry.logger.fmt`Fetching user data for ${userId}`);
 
   const startTime = Date.now();
 
@@ -375,11 +373,11 @@ function checkoutMiddleware(store) {
 
 ## Configuration Reference
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `enableLogs` | `boolean` | `false` | Master switch — must be `true` for all logging features |
-| `beforeSendLog` | `(log) => log \| null` | `undefined` | Filter/mutate logs before transmission |
-| `consoleLoggingIntegration` | integration | not added | Capture `console.*` calls as structured logs |
+| Option                      | Type                   | Default     | Description                                             |
+| --------------------------- | ---------------------- | ----------- | ------------------------------------------------------- |
+| `enableLogs`                | `boolean`              | `false`     | Master switch — must be `true` for all logging features |
+| `beforeSendLog`             | `(log) => log \| null` | `undefined` | Filter/mutate logs before transmission                  |
+| `consoleLoggingIntegration` | integration            | not added   | Capture `console.*` calls as structured logs            |
 
 ---
 
@@ -395,26 +393,26 @@ function checkoutMiddleware(store) {
 
 ## Known Limitations
 
-| Limitation | Details |
-|------------|---------|
-| Crash buffer loss | Logs buffered since last flush are lost on unexpected termination |
-| No per-log sampling | Use `beforeSendLog` to reduce volume; sampling is all-or-nothing |
-| 1 MB size cap | Logs larger than 1 MB are dropped server-side |
-| No `browser.*` attributes | React Native emits no browser context — these columns are empty in the Logs UI |
+| Limitation                 | Details                                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Crash buffer loss          | Logs buffered since last flush are lost on unexpected termination                                                |
+| No per-log sampling        | Use `beforeSendLog` to reduce volume; sampling is all-or-nothing                                                 |
+| 1 MB size cap              | Logs larger than 1 MB are dropped server-side                                                                    |
+| No `browser.*` attributes  | React Native emits no browser context — these columns are empty in the Logs UI                                   |
 | Session Replay not on logs | Expected — mobile replay doesn't populate this attribute on log events; replay is still linked via trace context |
 
 ---
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Logs not appearing in Sentry | Check `enableLogs: true` is set in `Sentry.init()` |
-| SDK version too old | Upgrade to `@sentry/react-native` ≥7.0.0 for `Sentry.logger`; ≥7.0.0 for `consoleLoggingIntegration`; ≥7.8.0 for scope attribute setters |
-| `logger.fmt` not creating `parameter.*` attributes | Ensure it is called as a tagged template literal: `Sentry.logger.fmt\`...\`` — not as a function `Sentry.logger.fmt(...)` |
-| Logs disappearing silently | Check Sentry org stats for rate limiting or logs exceeding 1 MB |
-| Attribute values showing `[Filtered]` | Server-side PII scrubbing rule matched — adjust **Data Scrubbing** settings in your Sentry project |
-| `console.log` calls not forwarded | Add `consoleLoggingIntegration()` to `integrations` and ensure the `levels` array includes `"log"` |
-| Too many logs in production | Use `beforeSendLog` to drop `trace`/`debug` levels when `!__DEV__` |
-| Logs not linked to traces | Enable tracing (`tracesSampleRate > 0`) and emit logs inside a `Sentry.startSpan()` callback |
-| Scope attributes not attaching | Upgrade to ≥7.8.0 for `getGlobalScope().setAttributes()` support |
+| Issue                                              | Solution                                                                                                                                 |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Logs not appearing in Sentry                       | Check `enableLogs: true` is set in `Sentry.init()`                                                                                       |
+| SDK version too old                                | Upgrade to `@sentry/react-native` ≥7.0.0 for `Sentry.logger`; ≥7.0.0 for `consoleLoggingIntegration`; ≥7.8.0 for scope attribute setters |
+| `logger.fmt` not creating `parameter.*` attributes | Ensure it is called as a tagged template literal: `Sentry.logger.fmt\`...\``— not as a function`Sentry.logger.fmt(...)`                  |
+| Logs disappearing silently                         | Check Sentry org stats for rate limiting or logs exceeding 1 MB                                                                          |
+| Attribute values showing `[Filtered]`              | Server-side PII scrubbing rule matched — adjust **Data Scrubbing** settings in your Sentry project                                       |
+| `console.log` calls not forwarded                  | Add `consoleLoggingIntegration()` to `integrations` and ensure the `levels` array includes `"log"`                                       |
+| Too many logs in production                        | Use `beforeSendLog` to drop `trace`/`debug` levels when `!__DEV__`                                                                       |
+| Logs not linked to traces                          | Enable tracing (`tracesSampleRate > 0`) and emit logs inside a `Sentry.startSpan()` callback                                             |
+| Scope attributes not attaching                     | Upgrade to ≥7.8.0 for `getGlobalScope().setAttributes()` support                                                                         |

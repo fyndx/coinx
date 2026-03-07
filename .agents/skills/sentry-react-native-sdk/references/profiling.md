@@ -81,7 +81,7 @@ Sentry.init({
 ```typescript
 Sentry.init({
   dsn: "YOUR_DSN",
-  tracesSampleRate: 0.2,   // trace 20% of transactions
+  tracesSampleRate: 0.2, // trace 20% of transactions
   profilesSampleRate: 0.5, // profile 50% of those → 10% of all transactions profiled
 });
 ```
@@ -119,7 +119,7 @@ Sentry.init({
   profilesSampleRate: 1.0,
   integrations: [
     Sentry.hermesProfilingIntegration({
-      platformProfilers: true,  // default: true — profile native code alongside Hermes JS
+      platformProfilers: true, // default: true — profile native code alongside Hermes JS
       // Set to false to profile ONLY JavaScript (Hermes), skipping native profiling
       // Useful for isolating JS performance issues or reducing overhead
       // Requires SDK ≥ 5.33.0
@@ -173,17 +173,18 @@ Sentry.init({
 
 ### In a profile
 
-| Data | Description |
-|------|-------------|
-| **Call stack samples** | Sampled JS + native stack frames at regular intervals |
-| **Flame graph** | Aggregated view of time spent in each function |
-| **Timeline** | Stack samples over time, correlated with transaction spans |
-| **Thread info** | JS thread, main thread, background threads (native) |
-| **Function names** | From JS source maps + native debug symbols |
+| Data                   | Description                                                |
+| ---------------------- | ---------------------------------------------------------- |
+| **Call stack samples** | Sampled JS + native stack frames at regular intervals      |
+| **Flame graph**        | Aggregated view of time spent in each function             |
+| **Timeline**           | Stack samples over time, correlated with transaction spans |
+| **Thread info**        | JS thread, main thread, background threads (native)        |
+| **Function names**     | From JS source maps + native debug symbols                 |
 
 ### What profiles are linked to
 
 Each profile is attached to the transaction that triggered it. In the Sentry UI you can:
+
 - View the flame graph alongside the transaction's span waterfall
 - Identify which functions were executing during slow spans
 - Click through from a slow span to the corresponding stack samples
@@ -200,14 +201,15 @@ Each profile is attached to the transaction that triggered it. In the Sentry UI 
 
 Profiling adds CPU and memory overhead. The Hermes profiler uses a sampling approach (not instrumentation), which keeps overhead lower than full instrumentation-based profilers, but it is not zero.
 
-| Factor | Impact |
-|--------|--------|
-| Hermes profiler (JS only) | Low — sampling-based, not instrumented |
-| Platform profilers (native) | Medium — involves OS-level hooks |
-| UI Profiling (continuous) | Higher — always running, not transaction-gated |
-| Sample rate in Sentry.init | Linear — 10% profiled = ~10× less overhead than 100% |
+| Factor                      | Impact                                               |
+| --------------------------- | ---------------------------------------------------- |
+| Hermes profiler (JS only)   | Low — sampling-based, not instrumented               |
+| Platform profilers (native) | Medium — involves OS-level hooks                     |
+| UI Profiling (continuous)   | Higher — always running, not transaction-gated       |
+| Sample rate in Sentry.init  | Linear — 10% profiled = ~10× less overhead than 100% |
 
 **Recommendations:**
+
 - Use `profilesSampleRate: 1.0` only in development/testing
 - In production, keep `profilesSampleRate ≤ 0.1` for most apps
 - On lower-end Android devices (< 4GB RAM), consider even lower rates
@@ -217,11 +219,11 @@ Profiling adds CPU and memory overhead. The Hermes profiler uses a sampling appr
 
 ## 7. Expo Compatibility
 
-| Feature | Expo Go | Expo (Development Build / EAS Build) |
-|---------|---------|--------------------------------------|
-| Basic profiling (`profilesSampleRate`) | ❌ Not supported | ✅ Supported |
-| Platform profilers (`platformProfilers: true`) | ❌ Not supported | ✅ Supported |
-| UI Profiling (experimental) | ❌ Not supported | ✅ Supported |
+| Feature                                        | Expo Go          | Expo (Development Build / EAS Build) |
+| ---------------------------------------------- | ---------------- | ------------------------------------ |
+| Basic profiling (`profilesSampleRate`)         | ❌ Not supported | ✅ Supported                         |
+| Platform profilers (`platformProfilers: true`) | ❌ Not supported | ✅ Supported                         |
+| UI Profiling (experimental)                    | ❌ Not supported | ✅ Supported                         |
 
 Profiling requires native modules that are not available in Expo Go. You must use a [Development Build](https://docs.expo.dev/develop/development-builds/introduction/) or a production build via EAS Build.
 
@@ -267,34 +269,34 @@ For Expo projects, make sure the Sentry Expo plugin is configured in your `app.c
 
 ### `Sentry.init` options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `profilesSampleRate` | `number` (0–1) | `undefined` | Fraction of *traced* transactions to also profile. Relative to `tracesSampleRate`. |
-| `tracesSampleRate` | `number` (0–1) | `undefined` | Required for profiling. Fraction of transactions to trace. |
+| Option               | Type           | Default     | Description                                                                        |
+| -------------------- | -------------- | ----------- | ---------------------------------------------------------------------------------- |
+| `profilesSampleRate` | `number` (0–1) | `undefined` | Fraction of _traced_ transactions to also profile. Relative to `tracesSampleRate`. |
+| `tracesSampleRate`   | `number` (0–1) | `undefined` | Required for profiling. Fraction of transactions to trace.                         |
 
 ### `hermesProfilingIntegration` options
 
-| Option | Type | Default | SDK Version | Description |
-|--------|------|---------|-------------|-------------|
-| `platformProfilers` | `boolean` | `true` | ≥ 5.32.0 | Profile native code (Swift/ObjC/Kotlin/Java) alongside Hermes JS. Set `false` for JS-only profiling. |
+| Option              | Type      | Default | SDK Version | Description                                                                                          |
+| ------------------- | --------- | ------- | ----------- | ---------------------------------------------------------------------------------------------------- |
+| `platformProfilers` | `boolean` | `true`  | ≥ 5.32.0    | Profile native code (Swift/ObjC/Kotlin/Java) alongside Hermes JS. Set `false` for JS-only profiling. |
 
 ### `_experiments.profilingOptions` (UI Profiling)
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `profileSessionSampleRate` | `number` (0–1) | — | Fraction of app sessions to profile continuously |
-| `lifecycle` | `"trace"` | — | When to profile. Currently only `"trace"` is supported. |
-| `startOnAppStart` | `boolean` | `false` | Begin profiling at the very first frame, before any transaction starts |
+| Option                     | Type           | Default | Description                                                            |
+| -------------------------- | -------------- | ------- | ---------------------------------------------------------------------- |
+| `profileSessionSampleRate` | `number` (0–1) | —       | Fraction of app sessions to profile continuously                       |
+| `lifecycle`                | `"trace"`      | —       | When to profile. Currently only `"trace"` is supported.                |
+| `startOnAppStart`          | `boolean`      | `false` | Begin profiling at the very first frame, before any transaction starts |
 
 ---
 
 ## 11. Version Requirements
 
-| Feature | Min SDK | Platforms |
-|---------|---------|-----------|
-| `profilesSampleRate` (basic profiling) | `5.32.0` | iOS, Android |
-| `platformProfilers: false` (JS-only mode) | `5.33.0` | iOS, Android |
-| UI Profiling (experimental) | `7.9.0` (Android) · `7.12.0` (iOS) | iOS, Android |
+| Feature                                   | Min SDK                            | Platforms    |
+| ----------------------------------------- | ---------------------------------- | ------------ |
+| `profilesSampleRate` (basic profiling)    | `5.32.0`                           | iOS, Android |
+| `platformProfilers: false` (JS-only mode) | `5.33.0`                           | iOS, Android |
+| UI Profiling (experimental)               | `7.9.0` (Android) · `7.12.0` (iOS) | iOS, Android |
 
 ---
 
@@ -314,15 +316,15 @@ For Expo projects, make sure the Sentry Expo plugin is configured in your `app.c
 
 ## 13. Troubleshooting
 
-| Issue | Likely Cause | Solution |
-|-------|-------------|----------|
-| No profiles appearing in Sentry | `profilesSampleRate` not set, or `tracesSampleRate` is `0` or unset | Ensure both are set to `> 0`. Check Sentry DSN is correct. |
-| JS frames show as minified names (e.g., `t`, `n`, `r`) | Source maps not uploaded | Configure the Sentry Metro plugin to upload source maps on each build |
-| Native frames show as hex addresses | dSYM (iOS) or ProGuard mapping (Android) not uploaded | Configure Sentry Xcode / Gradle plugin to upload symbols |
-| Profiling causes visible app slowdown | `profilesSampleRate` too high, or `platformProfilers: true` on slow devices | Reduce `profilesSampleRate`; try `platformProfilers: false` |
-| `hermesProfilingIntegration is not a function` | SDK version < 5.32.0 | Upgrade to `@sentry/react-native` ≥ 5.32.0 |
-| Profiling not working in Expo Go | Expo Go lacks native modules | Switch to a Development Build or EAS Build |
-| UI Profiling config has no effect | Using deprecated `androidProfilingOptions` | Migrate to `_experiments.profilingOptions` |
-| Profile data appears but flame graph is mostly "unknown" | Missing both source maps AND native symbols | Upload both source maps and dSYMs/ProGuard files |
-| Profiles appear only for some transactions | Expected behavior — `profilesSampleRate` controls the fraction | This is correct. Increase the rate if you want broader coverage. |
-| App crashes on startup after adding profiling | Hermes not enabled | Verify Hermes is enabled in your React Native config (it's the default for RN ≥ 0.70) |
+| Issue                                                    | Likely Cause                                                                | Solution                                                                              |
+| -------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| No profiles appearing in Sentry                          | `profilesSampleRate` not set, or `tracesSampleRate` is `0` or unset         | Ensure both are set to `> 0`. Check Sentry DSN is correct.                            |
+| JS frames show as minified names (e.g., `t`, `n`, `r`)   | Source maps not uploaded                                                    | Configure the Sentry Metro plugin to upload source maps on each build                 |
+| Native frames show as hex addresses                      | dSYM (iOS) or ProGuard mapping (Android) not uploaded                       | Configure Sentry Xcode / Gradle plugin to upload symbols                              |
+| Profiling causes visible app slowdown                    | `profilesSampleRate` too high, or `platformProfilers: true` on slow devices | Reduce `profilesSampleRate`; try `platformProfilers: false`                           |
+| `hermesProfilingIntegration is not a function`           | SDK version < 5.32.0                                                        | Upgrade to `@sentry/react-native` ≥ 5.32.0                                            |
+| Profiling not working in Expo Go                         | Expo Go lacks native modules                                                | Switch to a Development Build or EAS Build                                            |
+| UI Profiling config has no effect                        | Using deprecated `androidProfilingOptions`                                  | Migrate to `_experiments.profilingOptions`                                            |
+| Profile data appears but flame graph is mostly "unknown" | Missing both source maps AND native symbols                                 | Upload both source maps and dSYMs/ProGuard files                                      |
+| Profiles appear only for some transactions               | Expected behavior — `profilesSampleRate` controls the fraction              | This is correct. Increase the rate if you want broader coverage.                      |
+| App crashes on startup after adding profiling            | Hermes not enabled                                                          | Verify Hermes is enabled in your React Native config (it's the default for RN ≥ 0.70) |

@@ -1,4 +1,5 @@
 import { observer, useMount } from "@legendapp/state/react";
+import * as Sentry from "@sentry/react-native";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
@@ -11,7 +12,6 @@ import { appModel } from "@/src/LegendState/AppState/App.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
 import { themeModel } from "@/src/LegendState/Theme/Theme.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
-import * as Sentry from "@sentry/react-native";
 import { analytics } from "@/src/services/analytics";
 import "@/src/utils/date";
 import "../global.css";
