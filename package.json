@@ -91,7 +91,8 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sharp-cli": "4.2.0",
     "tailwindcss": "^4.1.18",
-    "typescript": "~5.9.2"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "expo": {
     "doctor": {

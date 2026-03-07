@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/react-native";
 class AnalyticsService {
   init() {
     Sentry.init({
-      dsn: "https://65b84b072ecf556794b373fd098a0c79@o365646.ingest.us.sentry.io/4511002627538944",
+      dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
       sendDefaultPii: false,
     });
   }
@@ -22,15 +22,24 @@ class AnalyticsService {
   ) {
     if (typeof keyOrProperties === "object") {
       for (const [k, v] of Object.entries(keyOrProperties)) {
-        Sentry.setTag(k, String(v));
+        if (v !== undefined) {
+          Sentry.setTag(k, String(v));
+        }
       }
     } else {
-      Sentry.setTag(keyOrProperties, String(value));
+      if (value !== undefined) {
+        Sentry.setTag(keyOrProperties, String(value));
+      }
     }
   }
 
   logEvent(name: string, properties?: Record<string, unknown>) {
-    Sentry.addBreadcrumb({ message: name, data: properties, level: "info" });
+    Sentry.withScope((scope) => {
+      if (properties) {
+        scope.setExtras(properties);
+      }
+      Sentry.captureMessage(name, "info");
+    });
   }
 }
 

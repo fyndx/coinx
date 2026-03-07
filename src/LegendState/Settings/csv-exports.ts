@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { File, Paths } from "expo-file-system";
+import { File } from "expo-file-system";
 import { zip } from "react-native-zip-archive";
 
 import { expoDb } from "@/db/client";
