@@ -55,14 +55,18 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "EXPO_PUBLIC_APP_ENV=development" >> .env
+            echo "EXPO_PUBLIC_APP_ENV=development" >> $GITHUB_ENV
           else
             CHANNEL="${{ inputs.environment }}"
             if [[ "$CHANNEL" == "staging" ]]; then
               echo "EXPO_PUBLIC_APP_ENV=preview" >> .env
+              echo "EXPO_PUBLIC_APP_ENV=preview" >> $GITHUB_ENV
             elif [[ "$CHANNEL" == "production" ]]; then
               echo "EXPO_PUBLIC_APP_ENV=production" >> .env
+              echo "EXPO_PUBLIC_APP_ENV=production" >> $GITHUB_ENV
             else
               echo "EXPO_PUBLIC_APP_ENV=development" >> .env
+              echo "EXPO_PUBLIC_APP_ENV=development" >> $GITHUB_ENV
             fi
           fi
 
@@ -71,6 +75,12 @@ jobs:
           echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
           echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
+
+      - name: Export environment variables
+        run: |
+          echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> $GITHUB_ENV
 
       - name: Verify .env
         run: cat .env
