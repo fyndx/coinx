@@ -51,22 +51,31 @@ jobs:
             echo "channel=${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create .env file
+      - name: Set APP_ENV
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "EXPO_PUBLIC_APP_ENV=development" >> .env
           else
             echo "EXPO_PUBLIC_APP_ENV=${{ inputs.environment }}" >> .env
           fi
+
+      - name: Append EAS Variables to .env
+        run: |
           echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
           echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
 
-      - name: Publish update
+      - name: Verify .env
+        run: cat .env
+
+      - name: Generate message with latest commit message not sha
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            MESSAGE="PR: ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
+            MESSAGE="PR: ${{ github.event.head_commit.message }}"
           else
-            MESSAGE="Manual Update to ${{ inputs.environment }}"
+            MESSAGE="Manual Update to ${{ inputs.environment }} - ${{ github.event.head_commit.message }}"
           fi
-          eas update --branch ${{ steps.channel.outputs.channel }} --message "$MESSAGE" --non-interactive
+          echo "MESSAGE=$MESSAGE" >> $GITHUB_ENV
+
+      - name: Publish update
+        run: eas update --branch ${{ steps.channel.outputs.channel }} --message "$MESSAGE" --non-interactive
