@@ -11,7 +11,8 @@
     "postinstall": "patch-package",
     "start": "expo start",
     "type-check": "tsc  --noemit",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@coinify/currency": "^1.4.2",
@@ -84,6 +85,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "drizzle-kit": "^0.31.8",
     "expo-drizzle-studio-plugin": "^0.2.1",
+    "lefthook": "^2.1.2",
     "oxfmt": "^0.35.0",
     "oxlint": "^1.50.0",
     "patch-package": "^8.0.0",
