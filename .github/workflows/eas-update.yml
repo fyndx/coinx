@@ -51,12 +51,19 @@ jobs:
             echo "channel=${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Set APP_ENV
+      - name: Create .env file
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "EXPO_PUBLIC_APP_ENV=development" >> .env
           else
-            echo "EXPO_PUBLIC_APP_ENV=${{ inputs.environment }}" >> .env
+            CHANNEL="${{ inputs.environment }}"
+            if [[ "$CHANNEL" == "staging" ]]; then
+              echo "EXPO_PUBLIC_APP_ENV=preview" >> .env
+            elif [[ "$CHANNEL" == "production" ]]; then
+              echo "EXPO_PUBLIC_APP_ENV=production" >> .env
+            else
+              echo "EXPO_PUBLIC_APP_ENV=development" >> .env
+            fi
           fi
 
       - name: Append EAS Variables to .env
