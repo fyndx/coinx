@@ -15,7 +15,7 @@ import { analytics } from "@/src/services/analytics";
 import "@/src/utils/date";
 import "../global.css";
 
-analytics.init("rj_6a98bddfc5770992340fcd3d26acef25");
+analytics.init();
 
 // Apply stored theme preference before rendering
 themeModel.initTheme();

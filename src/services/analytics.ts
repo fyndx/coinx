@@ -1,7 +1,14 @@
 import { Rejourney } from "@rejourneyco/react-native";
 
+import { env } from "@/src/services/env";
+
 class AnalyticsService {
-  init(publicKey: string) {
+  init() {
+    const publicKey = env.EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY;
+    if (!publicKey) {
+      console.warn("Analytics: Rejourney public key is missing. Analytics will be disabled.");
+      return;
+    }
     Rejourney.init(publicKey);
     Rejourney.start();
   }
