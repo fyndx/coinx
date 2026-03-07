@@ -4,12 +4,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { loadAsync } from "expo-font";
 import { getLocales } from "expo-localization";
-import { analytics } from "@/src/services/analytics";
 
 import { LatoRegular } from "@/assets/fonts";
 import { db, expoDb } from "@/db/client";
 import { runUUIDMigration } from "@/db/migrations/uuid-migration";
 import migrations from "@/drizzle/migrations";
+import { analytics } from "@/src/services/analytics";
 import { AppStorage } from "@/src/storage/mmkv";
 
 interface CurrencyData {

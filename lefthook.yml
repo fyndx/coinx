@@ -2,7 +2,7 @@ pre-commit:
   parallel: true
   jobs:
     - name: oxfmt
-      glob: "*.{js,ts,jsx,tsx}"
+      glob: "*.{js,ts,jsx,tsx,json,yaml,yml,md,css}"
       run: bunx oxfmt {staged_files}
     - name: oxlint-fix
       glob: "*.{js,ts,jsx,tsx}"

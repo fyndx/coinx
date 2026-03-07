@@ -9,7 +9,7 @@
   "arrowParens": "always",
   "bracketSameLine": false,
   "bracketSpacing": true,
-  "ignorePatterns": ["drizzle/**/*", ".expo/**/*", "node_modules/*", "*.config.*", "*.json", "tsconfig.json", "src/uniwind-types.d.ts"],
+  "ignorePatterns": ["drizzle/**/*", ".expo/**/*", "node_modules/*", "*.config.*", "*.json", "tsconfig.json", "src/uniwind-types.d.ts", ".agents/**/*"],
   "sortImports": {
     "groups": [
       "type-import",
