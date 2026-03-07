@@ -1,50 +1,57 @@
-import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
-import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import { observer } from "@legendapp/state/react";
 import { LinearGradient, useFont, vec } from "@shopify/react-native-skia";
 import { View } from "react-native";
 import { Bar, CartesianChart } from "victory-native";
 
-export const BarGraphView = observer(
-	({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
-		const font = useFont(LatoRegular, 12);
-		const graphData = insightsModel$.durationGraphData.get();
-		return (
-			<View style={{ height: 275 }}>
-				<CartesianChart
-					data={graphData}
-					xKey={"day"}
-					yKeys={["total"]}
-					domainPadding={{ left: 10, right: 10, top: 30, bottom: 0 }}
-					axisOptions={{
-						font,
-						tickCount: { x: 5, y: 6 },
-						// lineColor: "transparent",
-					}}
-				>
-					{({ points, chartBounds }) => (
-						<>
-							<Bar
-								chartBounds={chartBounds} // 👈 chartBounds is needed to know how to draw the bars
-								points={points.total} // 👈 points is an object with a property for each yKey
-								roundedCorners={{
-									topLeft: 5,
-									topRight: 5,
-								}}
-								barCount={points.total.length}
-								animate={{ type: "timing" }}
-							>
-								<LinearGradient
-									start={vec(0, 0)}
-									end={vec(0, 400)}
-									colors={["#a78bfa", "#a78bfa50"]}
-								/>
-							</Bar>
-						</>
-					)}
-				</CartesianChart>
-			</View>
-		);
-	},
-);
+import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 
+import LatoRegular from "@/assets/fonts/Lato/Lato-Regular.ttf";
+import { useResolvedTheme } from "@/src/hooks/useResolvedTheme";
+
+export const BarGraphView = observer(
+  ({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
+    const font = useFont(LatoRegular, 12);
+    const graphData = insightsModel$.durationGraphData.get();
+    const { isDark } = useResolvedTheme();
+    const chartColors = isDark
+      ? ["#a78bfa", "#a78bfa50"] // Purple for dark
+      : ["#7c3aed", "#7c3aed50"]; // Darker purple for light
+
+    return (
+      <View style={{ height: 275 }}>
+        <CartesianChart
+          data={graphData}
+          xKey={"day"}
+          yKeys={["total"]}
+          domainPadding={{ left: 10, right: 10, top: 30, bottom: 0 }}
+          axisOptions={{
+            font,
+            tickCount: { x: 5, y: 6 },
+            // lineColor: "transparent",
+          }}
+        >
+          {({ points, chartBounds }) => (
+            <>
+              <Bar
+                chartBounds={chartBounds} // 👈 chartBounds is needed to know how to draw the bars
+                points={points.total} // 👈 points is an object with a property for each yKey
+                roundedCorners={{
+                  topLeft: 5,
+                  topRight: 5,
+                }}
+                barCount={points.total.length}
+                animate={{ type: "timing" }}
+              >
+                <LinearGradient
+                  start={vec(0, 0)}
+                  end={vec(0, 400)}
+                  colors={chartColors}
+                />
+              </Bar>
+            </>
+          )}
+        </CartesianChart>
+      </View>
+    );
+  },
+);

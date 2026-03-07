@@ -1,15 +1,16 @@
 /**
  * UUID Migration Script
- * 
+ *
  * This script handles the migration from integer IDs to UUIDs.
  * It must be run BEFORE the schema migration for existing users with data.
- * 
+ *
  * For new installs (empty database), this script does nothing - Drizzle
  * will create the tables with UUID columns directly.
  */
 
 import type { SQLiteDatabase } from "expo-sqlite";
-import * as Crypto from 'expo-crypto';
+
+import * as Crypto from "expo-crypto";
 
 /**
  * Generate a UUID v4
@@ -25,7 +26,7 @@ async function needsMigration(db: SQLiteDatabase): Promise<boolean> {
   try {
     // Check if the old schema exists by looking at the column type
     const result = await db.getFirstAsync<{ type: string }>(
-      `SELECT type FROM pragma_table_info('coinx_category') WHERE name = 'id'`
+      `SELECT type FROM pragma_table_info('coinx_category') WHERE name = 'id'`,
     );
     // If 'id' column type is INTEGER, we need migration
     return result?.type === "INTEGER";
@@ -40,20 +41,24 @@ async function needsMigration(db: SQLiteDatabase): Promise<boolean> {
  */
 export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
   const migrationNeeded = await needsMigration(db);
-  
+
   if (!migrationNeeded) {
-    console.log("[UUID Migration] Not needed - fresh install or already migrated");
+    console.log(
+      "[UUID Migration] Not needed - fresh install or already migrated",
+    );
     return;
   }
-  
-  console.log("[UUID Migration] Starting migration from integer IDs to UUIDs...");
-  
+
+  console.log(
+    "[UUID Migration] Starting migration from integer IDs to UUIDs...",
+  );
+
   await db.execAsync("PRAGMA foreign_keys = OFF;");
-  
+
   try {
     // Wrap entire migration in a transaction for atomicity
     await db.execAsync("BEGIN TRANSACTION;");
-    
+
     // Step 1: Create UUID mapping tables
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS _uuid_map_categories (old_id INTEGER PRIMARY KEY, new_id TEXT);
@@ -63,7 +68,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       CREATE TABLE IF NOT EXISTS _uuid_map_product_listings (old_id INTEGER PRIMARY KEY, new_id TEXT);
       CREATE TABLE IF NOT EXISTS _uuid_map_product_listings_history (old_id INTEGER PRIMARY KEY, new_id TEXT);
     `);
-    
+
     // Step 2: Generate UUIDs for all existing records
     const tables = [
       { map: "_uuid_map_categories", source: "coinx_category" },
@@ -71,20 +76,27 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       { map: "_uuid_map_products", source: "coinx_product" },
       { map: "_uuid_map_stores", source: "coinx_store" },
       { map: "_uuid_map_product_listings", source: "coinx_product_listing" },
-      { map: "_uuid_map_product_listings_history", source: "coinx_product_listing_history" },
+      {
+        map: "_uuid_map_product_listings_history",
+        source: "coinx_product_listing_history",
+      },
     ];
-    
+
     for (const { map, source } of tables) {
-      const rows = await db.getAllAsync<{ id: number }>(`SELECT id FROM ${source}`);
+      const rows = await db.getAllAsync<{ id: number }>(
+        `SELECT id FROM ${source}`,
+      );
       for (const row of rows) {
-        await db.runAsync(
-          `INSERT INTO ${map} (old_id, new_id) VALUES (?, ?)`,
-          [row.id, generateUUID()]
-        );
+        await db.runAsync(`INSERT INTO ${map} (old_id, new_id) VALUES (?, ?)`, [
+          row.id,
+          generateUUID(),
+        ]);
       }
-      console.log(`[UUID Migration] Generated ${rows.length} UUIDs for ${source}`);
+      console.log(
+        `[UUID Migration] Generated ${rows.length} UUIDs for ${source}`,
+      );
     }
-    
+
     // Step 3: Migrate categories
     await db.execAsync(`
       CREATE TABLE coinx_category_new (
@@ -104,7 +116,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       FROM coinx_category c
       JOIN _uuid_map_categories m ON c.id = m.old_id;
     `);
-    
+
     // Step 4: Migrate transactions
     await db.execAsync(`
       CREATE TABLE coinx_transaction_new (
@@ -127,7 +139,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       JOIN _uuid_map_transactions tm ON t.id = tm.old_id
       JOIN _uuid_map_categories cm ON t.category_id = cm.old_id;
     `);
-    
+
     // Step 5: Migrate products
     await db.execAsync(`
       CREATE TABLE coinx_product_new (
@@ -147,7 +159,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       FROM coinx_product p
       JOIN _uuid_map_products m ON p.id = m.old_id;
     `);
-    
+
     // Step 6: Migrate stores
     await db.execAsync(`
       CREATE TABLE coinx_store_new (
@@ -165,7 +177,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       FROM coinx_store s
       JOIN _uuid_map_stores m ON s.id = m.old_id;
     `);
-    
+
     // Step 7: Migrate product listings
     await db.execAsync(`
       CREATE TABLE coinx_product_listing_new (
@@ -192,7 +204,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       JOIN _uuid_map_products pm ON pl.product_id = pm.old_id
       JOIN _uuid_map_stores sm ON pl.store_id = sm.old_id;
     `);
-    
+
     // Step 8: Migrate product listings history
     await db.execAsync(`
       CREATE TABLE coinx_product_listing_history_new (
@@ -215,7 +227,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       JOIN _uuid_map_products pm ON h.product_id = pm.old_id
       JOIN _uuid_map_product_listings plm ON h.product_listing_id = plm.old_id;
     `);
-    
+
     // Step 9: Drop old tables and rename new ones
     await db.execAsync(`
       DROP TABLE coinx_transaction;
@@ -232,7 +244,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       ALTER TABLE coinx_product_listing_new RENAME TO coinx_product_listing;
       ALTER TABLE coinx_product_listing_history_new RENAME TO coinx_product_listing_history;
     `);
-    
+
     // Step 10: Create indexes
     await db.execAsync(`
       CREATE UNIQUE INDEX coinx_category_name_unique ON coinx_category (name);
@@ -245,7 +257,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       CREATE INDEX idx_product_listings_history_product_listing_id ON coinx_product_listing_history (product_listing_id);
       CREATE INDEX idx_product_listings_history_recorded_at ON coinx_product_listing_history (recorded_at);
     `);
-    
+
     // Step 11: Cleanup mapping tables
     await db.execAsync(`
       DROP TABLE _uuid_map_categories;
@@ -255,7 +267,7 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
       DROP TABLE _uuid_map_product_listings;
       DROP TABLE _uuid_map_product_listings_history;
     `);
-    
+
     // Step 12: Mark the Drizzle UUID migration as applied
     // This prevents Drizzle from trying to run it again
     await db.execAsync(`
@@ -265,27 +277,26 @@ export async function runUUIDMigration(db: SQLiteDatabase): Promise<void> {
         created_at INTEGER
       );
     `);
-    
+
     // Insert the migration hash for 0001_flaky_senator_kelly
     // The hash is derived from the migration file content
     const migrationHash = "0001_flaky_senator_kelly";
     const existingMigration = await db.getFirstAsync<{ hash: string }>(
       "SELECT hash FROM __drizzle_migrations WHERE hash = ?",
-      [migrationHash]
+      [migrationHash],
     );
-    
+
     if (!existingMigration) {
       await db.runAsync(
         "INSERT INTO __drizzle_migrations (hash, created_at) VALUES (?, ?)",
-        [migrationHash, Date.now()]
+        [migrationHash, Date.now()],
       );
       console.log("[UUID Migration] Marked Drizzle migration as applied");
     }
-    
+
     // Commit the transaction
     await db.execAsync("COMMIT;");
     console.log("[UUID Migration] Migration completed successfully!");
-    
   } catch (error) {
     // Rollback on any error
     console.error("[UUID Migration] Migration failed, rolling back:", error);

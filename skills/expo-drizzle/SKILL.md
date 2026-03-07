@@ -30,10 +30,14 @@ export const items = sqliteTable("items", {
   id: text("id").primaryKey(), // UUID
   name: text("name").notNull(),
   amount: real("amount").notNull(),
-  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
   updatedAt: text("updated_at"),
   // Sync fields
-  syncStatus: text("sync_status", { enum: ["pending", "synced"] }).default("pending"),
+  syncStatus: text("sync_status", { enum: ["pending", "synced"] }).default(
+    "pending",
+  ),
   deletedAt: text("deleted_at"),
 });
 ```
@@ -45,12 +49,15 @@ export const items = sqliteTable("items", {
 ```typescript
 import { generateUUID } from "@/src/utils/uuid";
 
-await db.insert(items).values({
-  id: generateUUID(),
-  name: "Item",
-  amount: 100,
-  syncStatus: "pending",
-}).returning();
+await db
+  .insert(items)
+  .values({
+    id: generateUUID(),
+    name: "Item",
+    amount: 100,
+    syncStatus: "pending",
+  })
+  .returning();
 ```
 
 ### Query
@@ -62,10 +69,7 @@ import { eq, and, between } from "drizzle-orm";
 const all = await db.select().from(items);
 
 // With conditions
-const filtered = await db
-  .select()
-  .from(items)
-  .where(eq(items.name, "Item"));
+const filtered = await db.select().from(items).where(eq(items.name, "Item"));
 
 // With joins
 const joined = await db
@@ -79,7 +83,7 @@ const joined = await db
 ```typescript
 await db
   .update(items)
-  .set({ 
+  .set({
     name: "Updated",
     updatedAt: new Date().toISOString(),
     syncStatus: "pending",
@@ -146,10 +150,12 @@ export const listings = sqliteTable("listings", {
 ```typescript
 export const items = sqliteTable(
   "items",
-  { /* columns */ },
+  {
+    /* columns */
+  },
   (table) => ({
     nameIdx: index("idx_items_name").on(table.name),
     uniqueConstraint: unique("unique_name").on(table.name, table.type),
-  })
+  }),
 );
 ```

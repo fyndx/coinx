@@ -1,4 +1,4 @@
-name: Lint TS (Biome)
+name: Code Quality
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    name: Lint TS (Biome)
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -20,14 +20,8 @@ jobs:
       - name: 📦 Setup Node + Bun + Install Dependencies
         uses: ./.github/actions/setup-node-bun-install
 
-      - name: 🏃‍♂️ Run Biome PR
-        if: github.event_name == 'pull_request'
-        uses: mongolyy/reviewdog-action-biome@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          fail_on_error: true
+      - name: 🏃‍♂️ Run Oxlint
+        uses: oxc-project/oxlint-action@v1
 
-      - name: 🏃‍♂️ Run Biome PR
-        if: github.event_name != 'pull_request'
-        run: bun run lint
+      - name: 🏃‍♂️ Run Oxfmt
+        run: bun run format --check

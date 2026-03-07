@@ -82,7 +82,7 @@ import { FlashList } from "@shopify/flash-list";
   renderItem={({ item }) => <ItemComponent item={item} />}
   estimatedItemSize={50}
   keyExtractor={(item) => item.id}
-/>
+/>;
 ```
 
 ### FlatList
@@ -96,7 +96,7 @@ import { FlatList } from "react-native";
   keyExtractor={(item) => item.id}
   ItemSeparatorComponent={() => <Separator />}
   ListEmptyComponent={<EmptyState />}
-/>
+/>;
 ```
 
 ## Keyboard Handling
@@ -109,7 +109,7 @@ import { KeyboardAvoidingView, Platform } from "react-native";
   style={{ flex: 1 }}
 >
   {/* Form content */}
-</KeyboardAvoidingView>
+</KeyboardAvoidingView>;
 ```
 
 ## Gestures
@@ -120,7 +120,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 // Wrap app root
 <GestureHandlerRootView style={{ flex: 1 }}>
   <App />
-</GestureHandlerRootView>
+</GestureHandlerRootView>;
 ```
 
 ## Performance Best Practices
@@ -131,7 +131,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { memo, useCallback, useMemo } from "react";
 
 // Memoize components
-const Item = memo(({ data, onPress }) => { /* ... */ });
+const Item = memo(({ data, onPress }) => {
+  /* ... */
+});
 
 // Memoize callbacks
 const handlePress = useCallback(() => {
@@ -148,11 +150,11 @@ const sortedData = useMemo(() => {
 
 ```tsx
 // ❌ Bad - creates new function every render
-<Button onPress={() => handlePress(item.id)} />
+<Button onPress={() => handlePress(item.id)} />;
 
 // ✅ Good - stable reference
 const onPress = useCallback(() => handlePress(item.id), [item.id]);
-<Button onPress={onPress} />
+<Button onPress={onPress} />;
 ```
 
 ### Image Optimization
@@ -164,7 +166,7 @@ import { Image } from "react-native";
   source={{ uri: imageUrl }}
   style={{ width: 100, height: 100 }}
   resizeMode="cover"
-/>
+/>;
 ```
 
 ## Navigation (Expo Router)
@@ -182,7 +184,7 @@ router.back();
 const { id } = useLocalSearchParams();
 
 // Declarative link
-<Link href="/details">Go to Details</Link>
+<Link href="/details">Go to Details</Link>;
 ```
 
 ## Storage
@@ -208,7 +210,7 @@ const num = storage.getNumber("number");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 await AsyncStorage.setItem("key", JSON.stringify(data));
-const data = JSON.parse(await AsyncStorage.getItem("key") || "null");
+const data = JSON.parse((await AsyncStorage.getItem("key")) || "null");
 ```
 
 ## Debugging Tips

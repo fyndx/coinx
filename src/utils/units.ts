@@ -1,4 +1,4 @@
-import configureMeasurements, { Measure } from "convert-units";
+import configureMeasurements, { type Measure } from "convert-units";
 import length from "convert-units/lib/cjs/definitions/length";
 import mass from "convert-units/lib/cjs/definitions/mass";
 import pieces from "convert-units/lib/cjs/definitions/pieces";
@@ -16,19 +16,16 @@ import volume from "convert-units/lib/cjs/definitions/volume";
  * convert().from('kg').to('g').amount(1) // 1000
  */
 export const convert = configureMeasurements({
-	volume,
-	// @ts-expect-error
-	mass,
-	// @ts-expect-error
-	length,
-	// @ts-expect-error
-	pieces, // Quantity
+  volume,
+  mass,
+  length,
+  pieces, // Quantity
 });
 
 export const MeasurementUnits = convert().measures();
 
 export const isValidUnitCategory = (
-	unit: (typeof MeasurementUnits)[number],
+  unit: (typeof MeasurementUnits)[number],
 ) => {
-	return MeasurementUnits.includes(unit);
+  return MeasurementUnits.includes(unit);
 };

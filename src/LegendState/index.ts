@@ -1,3 +1,5 @@
+import { Effect } from "effect";
+
 import { AddProductScreenModel } from "@/src/LegendState/AddProduct/AddProduct.model";
 import { AddProductListingModel } from "@/src/LegendState/AddProductListing/AddProductListing.model";
 import { appModel } from "@/src/LegendState/AppState/App.model";
@@ -10,52 +12,69 @@ import { ProductsModel } from "@/src/LegendState/Products/Products.model";
 import { ProductsListingsModel } from "@/src/LegendState/ProductsListings.model";
 import { TransactionModel } from "@/src/LegendState/Transaction.model";
 import { TransactionsScreenModel } from "@/src/LegendState/TransactionsScreen.model";
+import { syncManager } from "@/src/services/sync";
+
 import { storeModel$ } from "./Store/Store.model";
 
 class RootStore {
-	// Database
-	categoryModel: CategoryModel;
-	transactionModel: TransactionModel;
-	insightsModel: InsightsModel;
-	productsModel: ProductsModel;
-	productsListingsModel: ProductsListingsModel;
-	productListingHistoryModel: ProductsListingHistoryModel;
-	// Screens
-	transactionsScreenModel: TransactionsScreenModel;
-	addProductScreenModel: AddProductScreenModel;
-	addProductListingModel: AddProductListingModel;
-	editProductListingModel: EditProductListing;
+  // Database
+  categoryModel: CategoryModel;
+  transactionModel: TransactionModel;
+  insightsModel: InsightsModel;
+  productsModel: ProductsModel;
+  productsListingsModel: ProductsListingsModel;
+  productListingHistoryModel: ProductsListingHistoryModel;
+  // Screens
+  transactionsScreenModel: TransactionsScreenModel;
+  addProductScreenModel: AddProductScreenModel;
+  addProductListingModel: AddProductListingModel;
+  editProductListingModel: EditProductListing;
 
-	constructor() {
-		this.categoryModel = new CategoryModel();
-		this.transactionModel = new TransactionModel();
-		this.transactionsScreenModel = new TransactionsScreenModel();
-		this.insightsModel = new InsightsModel();
-		this.productsModel = new ProductsModel();
-		this.productListingHistoryModel = new ProductsListingHistoryModel();
-		this.productsListingsModel = new ProductsListingsModel();
-		this.addProductScreenModel = new AddProductScreenModel();
-		this.addProductListingModel = new AddProductListingModel();
-		this.editProductListingModel = new EditProductListing();
-	}
+  constructor() {
+    this.categoryModel = new CategoryModel();
+    this.transactionModel = new TransactionModel();
+    this.transactionsScreenModel = new TransactionsScreenModel();
+    this.insightsModel = new InsightsModel();
+    this.productsModel = new ProductsModel();
+    this.productListingHistoryModel = new ProductsListingHistoryModel();
+    this.productsListingsModel = new ProductsListingsModel();
+    this.addProductScreenModel = new AddProductScreenModel();
+    this.addProductListingModel = new AddProductListingModel();
+    this.editProductListingModel = new EditProductListing();
+  }
 
-	private startServices = async () => {
-		await appModel.actions.startServices();
+  private startServices = async () => {
+    await appModel.actions.startServices();
 
-		// Initialize auth (restore session, start listener)
-		await authModel.actions.initialize();
+    // Initialize auth (restore session, start listener)
+    await authModel.actions.initialize();
 
-		const isFirstLaunch = await appModel.checkFirstLaunch();
-		if (isFirstLaunch) {
-			await this.categoryModel.createDefaultCategories();
-			await this.productsModel.createDefaultProducts();
-			await storeModel$.createDefaultStores();
-		}
-	};
+    // Initialize sync manager (restores deviceId, starts foreground listener)
+    await Effect.runPromise(
+      syncManager.initialize().pipe(
+        Effect.tapError((err) =>
+          Effect.sync(() =>
+            console.warn("Sync manager initialization failed:", err),
+          ),
+        ),
+        Effect.catchAll(() => Effect.void),
+      ),
+    );
 
-	actions = {
-		startServices: this.startServices,
-	};
+    const isFirstLaunch = await appModel.checkFirstLaunch();
+    if (isFirstLaunch) {
+      await this.categoryModel.createDefaultCategories();
+      await this.productsModel.createDefaultProducts();
+      await storeModel$.createDefaultStores();
+    }
+
+    // Trigger initial sync if user is authenticated
+    syncManager.syncIfAuthenticated();
+  };
+
+  actions = {
+    startServices: this.startServices,
+  };
 }
 
 export const rootStore = new RootStore();

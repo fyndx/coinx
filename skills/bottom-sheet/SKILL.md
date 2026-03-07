@@ -20,7 +20,7 @@ const MySheet = () => {
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      index={-1}  // Start closed
+      index={-1} // Start closed
       snapPoints={snapPoints}
       enablePanDownToClose
     >
@@ -38,8 +38,8 @@ const MySheet = () => {
 const bottomSheetRef = useRef<BottomSheet>(null);
 
 // Open to snap point
-bottomSheetRef.current?.snapToIndex(0);  // 25%
-bottomSheetRef.current?.snapToIndex(1);  // 50%
+bottomSheetRef.current?.snapToIndex(0); // 25%
+bottomSheetRef.current?.snapToIndex(1); // 50%
 
 // Expand fully
 bottomSheetRef.current?.expand();
@@ -69,7 +69,7 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
   )}
 >
   {/* Content */}
-</BottomSheet>
+</BottomSheet>;
 ```
 
 ## Scrollable Content
@@ -101,12 +101,9 @@ import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
 <BottomSheet snapPoints={snapPoints}>
   <BottomSheetView>
-    <BottomSheetTextInput
-      placeholder="Enter text"
-      style={styles.input}
-    />
+    <BottomSheetTextInput placeholder="Enter text" style={styles.input} />
   </BottomSheetView>
-</BottomSheet>
+</BottomSheet>;
 ```
 
 ## Callbacks
@@ -131,14 +128,9 @@ const snapPoints = useMemo(() => {
 }, [contentHeight]);
 
 // Or use dynamic sizing
-<BottomSheet
-  enableDynamicSizing
-  maxDynamicContentSize={500}
->
-  <BottomSheetView>
-    {/* Content determines height */}
-  </BottomSheetView>
-</BottomSheet>
+<BottomSheet enableDynamicSizing maxDynamicContentSize={500}>
+  <BottomSheetView>{/* Content determines height */}</BottomSheetView>
+</BottomSheet>;
 ```
 
 ## Common Pattern
@@ -154,7 +146,7 @@ const ParentScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <Button onPress={openSheet}>Open Sheet</Button>
-      
+
       <BottomSheet
         ref={sheetRef}
         index={-1}

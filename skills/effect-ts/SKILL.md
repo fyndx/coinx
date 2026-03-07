@@ -61,23 +61,27 @@ export const updateItem = (item: InsertItem) =>
   pipe(
     // Start with the input
     Effect.succeed(item),
-    
+
     // Validate
     Effect.filterOrFail(
       (val) => val.id !== undefined && val.id.length > 0,
       () => new InvalidIdError({ message: "Invalid ID" }),
     ),
-    
+
     // Perform operation
     Effect.flatMap((validated) =>
       Effect.tryPromise(() =>
-        db.update(items).set(validated).where(eq(items.id, validated.id!)).execute()
-      )
+        db
+          .update(items)
+          .set(validated)
+          .where(eq(items.id, validated.id!))
+          .execute(),
+      ),
     ),
-    
+
     // Log errors
     Effect.tapError((error) =>
-      Effect.sync(() => console.error("Update failed:", error))
+      Effect.sync(() => console.error("Update failed:", error)),
     ),
   );
 ```
@@ -88,9 +92,9 @@ export const updateItem = (item: InsertItem) =>
 
 ```typescript
 Effect.filterOrFail(
-  (value) => value > 0,  // Predicate
-  () => new InvalidValueError({ message: "Must be positive" })  // Error if false
-)
+  (value) => value > 0, // Predicate
+  () => new InvalidValueError({ message: "Must be positive" }), // Error if false
+);
 ```
 
 ### FlatMap (Chain Operations)
@@ -100,7 +104,7 @@ pipe(
   getItem(id),
   Effect.flatMap((item) => updateItem({ ...item, name: "New" })),
   Effect.flatMap((updated) => logChange(updated)),
-)
+);
 ```
 
 ### TapError (Side Effects on Error)
@@ -110,8 +114,8 @@ Effect.tapError((error) =>
   Effect.sync(() => {
     console.error("Operation failed:", error);
     // Could also send to error tracking
-  })
-)
+  }),
+);
 ```
 
 ## Running Effects
@@ -153,11 +157,11 @@ export const deleteItem = (id: string) =>
     ),
     Effect.flatMap((validId) =>
       Effect.tryPromise(() =>
-        db.delete(items).where(eq(items.id, validId)).execute()
-      )
+        db.delete(items).where(eq(items.id, validId)).execute(),
+      ),
     ),
     Effect.tapError((error) =>
-      Effect.sync(() => console.error("Delete failed:", error))
+      Effect.sync(() => console.error("Delete failed:", error)),
     ),
   );
 ```
@@ -168,7 +172,7 @@ export const deleteItem = (id: string) =>
 class ItemModel {
   deleteItem = async (id: string) => {
     this.isLoading.set(true);
-    
+
     Effect.runPromise(deleteItemRepo(id))
       .then(() => {
         Burnt.toast({ title: "Deleted successfully" });

@@ -1,24 +1,27 @@
-import {
-	DarkTheme,
-	DefaultTheme,
-	ThemeProvider as NavigationThemeProvider,
-} from "@react-navigation/native";
-import { HeroUINativeProvider } from "heroui-native";
-import { useColorScheme } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import "../../global.css";
+import type { ReactNode } from "react";
 
-export const RootProvider = ({ children }: { children: React.ReactNode }) => {
-	const colorScheme = useColorScheme();
-	return (
-		<SafeAreaProvider>
-			<HeroUINativeProvider>
-				<NavigationThemeProvider
-					value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-				>
-					{children}
-				</NavigationThemeProvider>
-			</HeroUINativeProvider>
-		</SafeAreaProvider>
-	);
+import { ThemeProvider } from "@react-navigation/native";
+import { HeroUINativeProvider } from "heroui-native";
+import { StatusBar } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+
+import { useThemeConfig } from "../hooks/useThemeConfig";
+
+export const RootProvider = ({ children }: { children: ReactNode }) => {
+  const theme = useThemeConfig();
+  return (
+    <GestureHandlerRootView
+      style={{ flex: 1 }}
+      // eslint-disable-next-line better-tailwindcss/no-unknown-classes
+      className={theme.dark ? `dark` : undefined}
+    >
+      <StatusBar />
+      <KeyboardProvider>
+        <HeroUINativeProvider>
+          <ThemeProvider value={theme}>{children}</ThemeProvider>
+        </HeroUINativeProvider>
+      </KeyboardProvider>
+    </GestureHandlerRootView>
+  );
 };

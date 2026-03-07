@@ -75,7 +75,7 @@ import { withSequence, withDelay, withRepeat } from "react-native-reanimated";
 // Sequence
 scale.value = withSequence(
   withTiming(1.2, { duration: 100 }),
-  withTiming(1, { duration: 100 })
+  withTiming(1, { duration: 100 }),
 );
 
 // Delay
@@ -85,7 +85,7 @@ opacity.value = withDelay(500, withTiming(1));
 rotation.value = withRepeat(
   withTiming(360, { duration: 1000 }),
   -1, // infinite
-  false // don't reverse
+  false, // don't reverse
 );
 ```
 
@@ -113,9 +113,9 @@ import { interpolate, Extrapolate } from "react-native-reanimated";
 const animatedStyle = useAnimatedStyle(() => {
   const opacity = interpolate(
     scrollY.value,
-    [0, 100],           // input range
-    [1, 0],             // output range
-    Extrapolate.CLAMP   // clamp output
+    [0, 100], // input range
+    [1, 0], // output range
+    Extrapolate.CLAMP, // clamp output
   );
 
   return { opacity };
@@ -142,10 +142,7 @@ const MyComponent = () => {
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: x.value },
-      { translateY: y.value },
-    ],
+    transform: [{ translateX: x.value }, { translateY: y.value }],
   }));
 
   return (
@@ -177,8 +174,10 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 
 // Smooth layout changes
 <Animated.View layout={LinearTransition.springify()}>
-  {items.map(item => <Item key={item.id} />)}
-</Animated.View>
+  {items.map((item) => (
+    <Item key={item.id} />
+  ))}
+</Animated.View>;
 ```
 
 ## Callbacks

@@ -29,12 +29,12 @@ const fromTs = dayjs(1705276800000);
 ## Formatting
 
 ```typescript
-dayjs().format("YYYY-MM-DD");        // 2024-01-15
-dayjs().format("DD MMM YYYY");       // 15 Jan 2024
-dayjs().format("h:mm A");            // 2:30 PM
-dayjs().format("DD MMMM YYYY");      // 15 January 2024
-dayjs().format("D MMM");             // 15 Jan
-dayjs().format("MMM YY");            // Jan 24
+dayjs().format("YYYY-MM-DD"); // 2024-01-15
+dayjs().format("DD MMM YYYY"); // 15 Jan 2024
+dayjs().format("h:mm A"); // 2:30 PM
+dayjs().format("DD MMMM YYYY"); // 15 January 2024
+dayjs().format("D MMM"); // 15 Jan
+dayjs().format("MMM YY"); // Jan 24
 ```
 
 ## Parsing
@@ -64,13 +64,13 @@ dayjs().subtract(1, "day");
 dayjs().subtract(30, "minute");
 
 // Start/End of
-dayjs().startOf("day");     // 00:00:00
-dayjs().startOf("week");    // Start of week
-dayjs().startOf("month");   // First day of month
-dayjs().startOf("year");    // Jan 1
+dayjs().startOf("day"); // 00:00:00
+dayjs().startOf("week"); // Start of week
+dayjs().startOf("month"); // First day of month
+dayjs().startOf("year"); // Jan 1
 
-dayjs().endOf("day");       // 23:59:59
-dayjs().endOf("month");     // Last day of month
+dayjs().endOf("day"); // 23:59:59
+dayjs().endOf("month"); // Last day of month
 ```
 
 ## Comparison
@@ -79,10 +79,10 @@ dayjs().endOf("month");     // Last day of month
 const date1 = dayjs("2024-01-15");
 const date2 = dayjs("2024-01-20");
 
-date1.isBefore(date2);           // true
-date1.isAfter(date2);            // false
-date1.isSame(date2);             // false
-date1.isSame(date2, "month");    // true (same month)
+date1.isBefore(date2); // true
+date1.isAfter(date2); // false
+date1.isSame(date2); // false
+date1.isSame(date2, "month"); // true (same month)
 
 // Between (with plugin)
 date1.isBetween("2024-01-01", "2024-01-31");
@@ -93,13 +93,13 @@ date1.isBetween("2024-01-01", "2024-01-31");
 ```typescript
 const d = dayjs("2024-01-15");
 
-d.year();        // 2024
-d.month();       // 0 (January, 0-indexed)
-d.date();        // 15
-d.day();         // 1 (Monday, 0 = Sunday)
-d.hour();        // 0
-d.minute();      // 0
-d.second();      // 0
+d.year(); // 2024
+d.month(); // 0 (January, 0-indexed)
+d.date(); // 15
+d.day(); // 1 (Monday, 0 = Sunday)
+d.hour(); // 0
+d.minute(); // 0
+d.second(); // 0
 
 d.daysInMonth(); // 31
 ```
@@ -110,9 +110,9 @@ d.daysInMonth(); // 31
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
-dayjs().from(dayjs("2024-01-01"));     // "14 days ago"
-dayjs().fromNow();                      // "a few seconds ago"
-dayjs("2024-02-01").toNow();           // "in 17 days"
+dayjs().from(dayjs("2024-01-01")); // "14 days ago"
+dayjs().fromNow(); // "a few seconds ago"
+dayjs("2024-02-01").toNow(); // "in 17 days"
 ```
 
 ## IsToday/IsYesterday (Plugin)
@@ -126,9 +126,9 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(isTomorrow);
 
-dayjs().isToday();                     // true
+dayjs().isToday(); // true
 dayjs().subtract(1, "day").isYesterday(); // true
-dayjs().add(1, "day").isTomorrow();    // true
+dayjs().add(1, "day").isTomorrow(); // true
 ```
 
 ## Localization
@@ -137,7 +137,7 @@ dayjs().add(1, "day").isTomorrow();    // true
 import "dayjs/locale/de";
 
 dayjs.locale("de");
-dayjs().format("MMMM");  // "Januar"
+dayjs().format("MMMM"); // "Januar"
 
 // Per-instance
 dayjs().locale("fr").format("MMMM");
@@ -149,11 +149,11 @@ dayjs().locale("fr").format("MMMM");
 // Transaction date display
 const formatTransactionDate = (date: string) => {
   const d = dayjs(date, "DD-MM-YYYY");
-  
+
   if (d.isToday()) return "Today";
   if (d.isYesterday()) return "Yesterday";
   if (d.isTomorrow()) return "Tomorrow";
-  
+
   return d.format("DD MMMM YYYY");
 };
 
