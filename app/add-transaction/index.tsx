@@ -10,7 +10,6 @@ import { CheckSquare, Delete } from "lucide-react-native";
 import { useMemo, useRef } from "react";
 import {
   Alert,
-  Dimensions,
   type GestureResponderEvent,
   Pressable,
   StyleSheet,
@@ -30,6 +29,7 @@ import { Input } from "@/src/Components/ui/Input";
 import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
+import { analytics } from "@/src/services/analytics";
 
 const TransactionType = observer(
   ({ transactionModel$ }: { transactionModel$: TransactionModel }) => {
@@ -218,11 +218,11 @@ const DatePicker = observer(
 const CategoryPicker = observer(
   ({
     transactionModel$,
-    categoryModel$,
+    _categoryModel$,
     categorySheetRef,
   }: {
     transactionModel$: TransactionModel;
-    categoryModel$: CategoryModel;
+    _categoryModel$: CategoryModel;
     categorySheetRef: React.RefObject<BottomSheet | null>;
   }) => {
     const onCategoryPressed = async (category: ICategory) => {
@@ -308,8 +308,6 @@ const AddTransaction = () => {
     note: string;
   }>();
 
-  const params = useLocalSearchParams();
-
   // TODO: Fix multiplying time by 1000
   const transactionTime = stringTransactionTime
     ? dayjs(stringTransactionTime)
@@ -354,6 +352,15 @@ const AddTransaction = () => {
       }
 
       await transactionModel$.createTransaction();
+
+      try {
+        analytics.logEvent("transaction_added", {
+          type: transactionModel$.transaction.transactionType.peek(),
+        });
+      } catch (e) {
+        console.log(e);
+      }
+
       navigation.goBack();
     } catch (error) {
       console.log("Error", error);
@@ -388,7 +395,7 @@ const AddTransaction = () => {
         />
         <CategoryPicker
           transactionModel$={transactionModel$}
-          categoryModel$={categoryModel$}
+          _categoryModel$={categoryModel$}
           categorySheetRef={categorySheetRef}
         />
       </View>
