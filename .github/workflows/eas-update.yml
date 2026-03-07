@@ -63,4 +63,10 @@ jobs:
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
 
       - name: Publish update
-        run: eas update --branch ${{ steps.channel.outputs.channel }} --message "${{ github.event.head_commit.message }}" --non-interactive
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            MESSAGE="PR: ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
+          else
+            MESSAGE="Manual Update to ${{ inputs.environment }}"
+          fi
+          eas update --branch ${{ steps.channel.outputs.channel }} --message "$MESSAGE" --non-interactive
