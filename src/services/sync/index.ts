@@ -11,29 +11,29 @@
 
 // Types
 export type {
-	SyncableRecord,
-	ChangeSet,
-	ChangeSetWithIds,
-	SyncChanges,
-	SyncChangesWithIds,
-	PushedIds,
-	SyncPushResponse,
-	SyncPullResponse,
-	SyncStatus_Type,
-	SyncState,
+  SyncableRecord,
+  ChangeSet,
+  ChangeSetWithIds,
+  SyncChanges,
+  SyncChangesWithIds,
+  PushedIds,
+  SyncPushResponse,
+  SyncPullResponse,
+  SyncStatus_Type,
+  SyncState,
 } from "./types";
 export { STORAGE_KEYS, getIdColumn } from "./types";
 
 // Errors
 export {
-	SyncInitializationError,
-	DeviceRegistrationError,
-	SyncPushError,
-	SyncPullError,
-	DatabaseError,
-	StorageError,
-	AuthenticationError,
-	SyncCancelledError,
+  SyncInitializationError,
+  DeviceRegistrationError,
+  SyncPushError,
+  SyncPullError,
+  DatabaseError,
+  StorageError,
+  AuthenticationError,
+  SyncCancelledError,
 } from "./errors";
 
 // Storage Effects
@@ -47,10 +47,10 @@ export { apiPost } from "./api";
 
 // Database Effects
 export {
-	collectPendingRecords,
-	markRecordsSyncedForTable,
-	applyTableChanges,
-	splitChanges,
+  collectPendingRecords,
+  markRecordsSyncedForTable,
+  applyTableChanges,
+  splitChanges,
 } from "./database";
 
 // Sync Manager

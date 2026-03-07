@@ -13,8 +13,8 @@ Expo SDK modules used in CoinX.
 import * as FileSystem from "expo-file-system";
 
 // App directories
-const docDir = FileSystem.documentDirectory;      // Persistent
-const cacheDir = FileSystem.cacheDirectory;       // Temporary
+const docDir = FileSystem.documentDirectory; // Persistent
+const cacheDir = FileSystem.cacheDirectory; // Temporary
 
 // Read file
 const content = await FileSystem.readAsStringAsync(uri);
@@ -24,7 +24,9 @@ await FileSystem.writeAsStringAsync(uri, content);
 
 // Check if exists
 const info = await FileSystem.getInfoAsync(uri);
-if (info.exists) { /* ... */ }
+if (info.exists) {
+  /* ... */
+}
 
 // Delete
 await FileSystem.deleteAsync(uri);
@@ -96,7 +98,7 @@ const uuid = Crypto.randomUUID();
 // Hash
 const hash = await Crypto.digestStringAsync(
   Crypto.CryptoDigestAlgorithm.SHA256,
-  "data"
+  "data",
 );
 ```
 

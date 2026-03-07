@@ -1,6 +1,3 @@
-import { ProductListingGraph } from "@/src/Containers/ProductListings/Containers/ProductListingGraph";
-import { ProductListingTable } from "@/src/Containers/ProductListings/Containers/ProductListingTable";
-import { rootStore } from "@/src/LegendState";
 import { useMount } from "@legendapp/state/react";
 import { Link, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { PlusCircle } from "lucide-react-native";
@@ -8,64 +5,71 @@ import { useCallback } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ProductListingGraph } from "@/src/Containers/ProductListings/Containers/ProductListingGraph";
+import { ProductListingTable } from "@/src/Containers/ProductListings/Containers/ProductListingTable";
+import { rootStore } from "@/src/LegendState";
+
 const ProductListings = () => {
-	const { id, name } = useLocalSearchParams();
-	const productId = id as string;
+  const { id, name } = useLocalSearchParams();
+  const productId = id as string;
 
-	const {
-		productsListingsModel: productListing$,
-		productListingHistoryModel: productListingHistoryModel$,
-	} = rootStore;
+  const {
+    productsListingsModel: productListing$,
+    productListingHistoryModel: productListingHistoryModel$,
+  } = rootStore;
 
-	useMount(() => {
-		return () => {
-			productListing$.reset();
-			productListingHistoryModel$.onUnmount();
-		};
-	});
+  useMount(() => {
+    return () => {
+      productListing$.reset();
+      productListingHistoryModel$.onUnmount();
+    };
+  });
 
-	useFocusEffect(
-		// biome-ignore lint/correctness/useExhaustiveDependencies: legend state methods are not necessary
-		useCallback(() => {
-			productListing$.getProductListingsByProductId(productId);
-			productListingHistoryModel$.getProductListingsHistoryByProductId(
-				productId,
-			);
-		}, [productId]),
-	);
+  useFocusEffect(
+    // biome-ignore lint/correctness/useExhaustiveDependencies: legend state methods are not necessary
+    useCallback(() => {
+      productListing$.getProductListingsByProductId(productId);
+      productListingHistoryModel$.getProductListingsHistoryByProductId(
+        productId,
+      );
+    }, [productId]),
+  );
 
-	return (
-		<SafeAreaView style={styles.container}>
-			<Stack.Screen
-				options={{ headerTitle: (name as string) ?? "Product Listings" }}
-			/>
-			<View className="flex-1 p-3 bg-background">
-				<ProductListingTable
-					data={productListing$.productListingsTable as never}
-				/>
-				<View className="h-6" />
-				<ProductListingGraph
-					productListingHistoryModel$={productListingHistoryModel$}
-				/>
-			</View>
-			<View className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full shadow-md">
-				<Link
-					href={{ pathname: "/add-product-listing", params: { id, name } }}
-					asChild
-				>
-					<Pressable>
-						<PlusCircle size={32} color="#2563eb" />
-					</Pressable>
-				</Link>
-			</View>
-		</SafeAreaView>
-	);
+  return (
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerTitle: (name as string) ?? "Product Listings",
+          headerBackTitle: "Back",
+        }}
+      />
+      <View className="flex-1 bg-background">
+        <ProductListingTable
+          data={productListing$.productListingsTable as never}
+        />
+        <View className="h-6" />
+        <ProductListingGraph
+          productListingHistoryModel$={productListingHistoryModel$}
+        />
+      </View>
+      <View className="absolute right-6 bottom-6 bg-blue-100 p-2 rounded-full shadow-md">
+        <Link
+          href={{ pathname: "/add-product-listing", params: { id, name } }}
+          asChild
+        >
+          <Pressable>
+            <PlusCircle size={32} color="#2563eb" />
+          </Pressable>
+        </Link>
+      </View>
+    </SafeAreaView>
+  );
 };
 
 export default ProductListings;
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
+  container: {
+    flex: 1,
+  },
 });

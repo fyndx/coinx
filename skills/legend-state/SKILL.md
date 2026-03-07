@@ -74,7 +74,7 @@ obs.amount.set((prev) => prev + 10);
 
 ```typescript
 const obs = observable({
-  user: { name: "John", settings: { theme: "dark" } }
+  user: { name: "John", settings: { theme: "dark" } },
 });
 
 // Direct access
@@ -93,7 +93,7 @@ const list = observable<Item[]>([]);
 list.push(newItem);
 
 // Filter (returns new array, doesn't mutate)
-const filtered = list.get().filter(item => item.active);
+const filtered = list.get().filter((item) => item.active);
 
 // Set filtered result
 list.set(filtered);
@@ -146,7 +146,7 @@ For form states with optional IDs:
 
 ```typescript
 interface ItemDraft {
-  id?: string;  // Optional for new items
+  id?: string; // Optional for new items
   name: string;
   amount: number;
 }
@@ -179,7 +179,7 @@ class ItemFormModel {
 class RootStore {
   itemModel = new ItemModel();
   categoryModel = new CategoryModel();
-  
+
   actions = {
     startServices: async () => {
       await Promise.all([

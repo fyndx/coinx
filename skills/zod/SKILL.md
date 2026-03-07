@@ -60,10 +60,10 @@ if (result.success) {
 ```typescript
 const schema = z.object({
   required: z.string(),
-  optional: z.string().optional(),      // string | undefined
-  nullable: z.string().nullable(),      // string | null
-  nullish: z.string().nullish(),        // string | null | undefined
-  withDefault: z.string().default(""),  // defaults to ""
+  optional: z.string().optional(), // string | undefined
+  nullable: z.string().nullable(), // string | null
+  nullish: z.string().nullish(), // string | null | undefined
+  withDefault: z.string().default(""), // defaults to ""
 });
 ```
 
@@ -90,7 +90,10 @@ const status = z.enum(["pending", "synced"]);
 type Status = z.infer<typeof status>; // "pending" | "synced"
 
 // Native enum
-enum Role { Admin = "admin", User = "user" }
+enum Role {
+  Admin = "admin",
+  User = "user",
+}
 const roleSchema = z.nativeEnum(Role);
 ```
 
@@ -115,7 +118,7 @@ const trimmed = z.string().transform((s) => s.trim());
 
 // Coerce types
 const coercedNumber = z.coerce.number(); // "42" -> 42
-const coercedDate = z.coerce.date();     // string -> Date
+const coercedDate = z.coerce.date(); // string -> Date
 ```
 
 ## Drizzle Integration
@@ -157,9 +160,11 @@ const validateForm = (data: unknown) => {
 
 ```typescript
 const schema = z.object({
-  name: z.string({ required_error: "Name is required" })
+  name: z
+    .string({ required_error: "Name is required" })
     .min(1, { message: "Name cannot be empty" }),
-  age: z.number({ invalid_type_error: "Age must be a number" })
+  age: z
+    .number({ invalid_type_error: "Age must be a number" })
     .positive({ message: "Age must be positive" }),
 });
 ```

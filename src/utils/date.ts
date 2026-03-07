@@ -1,4 +1,5 @@
 import type { Dayjs, ManipulateType } from "dayjs";
+
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import isToday from "dayjs/plugin/isToday";
@@ -27,17 +28,21 @@ dayjs.extend(minMax);
  * ```
  */
 export function dayjsRange({
-	start,
-	end,
-	unit,
-}: { start: Dayjs; end: Dayjs; unit: ManipulateType }) {
-	const range = [];
-	let current = start;
-	while (!current.isAfter(end)) {
-		range.push(current);
-		current = current.add(1, unit);
-	}
-	return range;
+  start,
+  end,
+  unit,
+}: {
+  start: Dayjs;
+  end: Dayjs;
+  unit: ManipulateType;
+}) {
+  const range = [];
+  let current = start;
+  while (!current.isAfter(end)) {
+    range.push(current);
+    current = current.add(1, unit);
+  }
+  return range;
 }
 
 export const dayjsLocaleDataInstance = dayjs().localeData();

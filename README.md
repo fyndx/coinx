@@ -5,6 +5,7 @@
 - `npx expo install --check` to upgrade deps
 
 # To Try Beta
+
 - `npx expo@next install --fix` run this
 - `npx expo prebuild --clean` clean the build
 - `yarn ios` run the iOS app

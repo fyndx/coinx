@@ -16,16 +16,16 @@ import volume from "convert-units/lib/cjs/definitions/volume";
  * convert().from('kg').to('g').amount(1) // 1000
  */
 export const convert = configureMeasurements({
-	volume,
-	mass,
-	length,
-	pieces, // Quantity
+  volume,
+  mass,
+  length,
+  pieces, // Quantity
 });
 
 export const MeasurementUnits = convert().measures();
 
 export const isValidUnitCategory = (
-	unit: (typeof MeasurementUnits)[number],
+  unit: (typeof MeasurementUnits)[number],
 ) => {
-	return MeasurementUnits.includes(unit);
+  return MeasurementUnits.includes(unit);
 };
