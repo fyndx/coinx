@@ -58,10 +58,14 @@ export class AuthModel {
       this.obs.user.set(session?.user ?? null);
       this.obs.isAuthenticated.set(!!session);
       
-      if (session?.user?.id) {
-        analytics.setUserIdentity(session.user.id);
-      } else {
-        analytics.clearUserIdentity();
+      try {
+        if (session?.user?.id) {
+          analytics.setUserIdentity(session.user.id);
+        } else {
+          analytics.clearUserIdentity();
+        }
+      } catch (error) {
+        console.warn("Analytics error during auth state change:", error);
       }
     });
   };

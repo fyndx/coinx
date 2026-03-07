@@ -4,33 +4,53 @@ import { env } from "@/src/services/env";
 
 class AnalyticsService {
   init() {
-    const publicKey = env.EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY;
-    if (!publicKey) {
-      console.warn("Analytics: Rejourney public key is missing. Analytics will be disabled.");
-      return;
+    try {
+      const publicKey = env.EXPO_PUBLIC_REJOURNEY_PUBLIC_KEY;
+      if (!publicKey) {
+        console.warn("Analytics: Rejourney public key is missing. Analytics will be disabled.");
+        return;
+      }
+      Rejourney.init(publicKey);
+      Rejourney.start();
+    } catch (e) {
+      console.warn("Analytics: Failed to initialize Rejourney", e);
     }
-    Rejourney.init(publicKey);
-    Rejourney.start();
   }
 
   setUserIdentity(userId: string) {
-    Rejourney.setUserIdentity(userId);
+    try {
+      Rejourney.setUserIdentity(userId);
+    } catch (e) {
+      console.warn("Analytics: Failed to set user identity", e);
+    }
   }
 
   clearUserIdentity() {
-    Rejourney.clearUserIdentity();
+    try {
+      Rejourney.clearUserIdentity();
+    } catch (e) {
+      console.warn("Analytics: Failed to clear user identity", e);
+    }
   }
 
   setMetadata(keyOrProperties: string | Record<string, string | number | boolean>, value?: string | number | boolean) {
-    if (typeof keyOrProperties === 'object') {
-      Rejourney.setMetadata(keyOrProperties);
-    } else {
-      Rejourney.setMetadata(keyOrProperties, value);
+    try {
+      if (typeof keyOrProperties === "object") {
+        Rejourney.setMetadata(keyOrProperties);
+      } else {
+        Rejourney.setMetadata(keyOrProperties, value);
+      }
+    } catch (e) {
+      console.warn("Analytics: Failed to set metadata", e);
     }
   }
 
   logEvent(name: string, properties?: Record<string, unknown>) {
-    Rejourney.logEvent(name, properties);
+    try {
+      Rejourney.logEvent(name, properties);
+    } catch (e) {
+      console.warn("Analytics: Failed to log event", e);
+    }
   }
 }
 
