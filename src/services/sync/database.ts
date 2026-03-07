@@ -95,25 +95,40 @@ export const applyTableChanges = (
         // Upsert records
         if (changeSet.upserted.length > 0) {
           for (const record of changeSet.upserted) {
-            const localRecord: Record<string, unknown> = { ...record };
-            // Convert string amounts back to numbers for local storage
-            if (typeof localRecord.amount === "string") {
-              const parsed = Number.parseFloat(localRecord.amount);
-              localRecord.amount = Number.isNaN(parsed) ? 0 : parsed;
-            }
-            if (typeof localRecord.price === "string") {
-              const parsed = Number.parseFloat(localRecord.price);
-              localRecord.price = Number.isNaN(parsed) ? 0 : parsed;
-            }
-            localRecord.syncStatus = "synced";
+            try {
+              const localRecord: Record<string, unknown> = { ...record };
+              // Convert string amounts back to numbers for local storage
+              if (typeof localRecord.amount === "string") {
+                const parsed = Number.parseFloat(localRecord.amount);
+                localRecord.amount = Number.isNaN(parsed) ? 0 : parsed;
+              }
+              if (typeof localRecord.price === "string") {
+                const parsed = Number.parseFloat(localRecord.price);
+                localRecord.price = Number.isNaN(parsed) ? 0 : parsed;
+              }
+              localRecord.syncStatus = "synced";
 
-            const { id, ...updatePayload } = localRecord;
+              const { id: _id, ...updatePayload } = localRecord;
 
-            await tx.insert(table).values(localRecord).onConflictDoUpdate({
-              target: idColumn,
-              set: updatePayload,
-            });
-            count++;
+              await tx.insert(table).values(localRecord).onConflictDoUpdate({
+                target: idColumn,
+                set: updatePayload,
+              });
+              count++;
+            } catch (recordError) {
+              console.error(
+                `[Database] Failed to upsert record with id ${record.id}:`,
+                {
+                  error:
+                    recordError instanceof Error
+                      ? recordError.message
+                      : String(recordError),
+                  recordId: record.id,
+                  tableName: (table as { name?: string }).name,
+                },
+              );
+              throw recordError; // Re-throw to fail the transaction
+            }
           }
         }
 
@@ -136,12 +151,25 @@ export const applyTableChanges = (
 
       return count;
     },
-    catch: (error) =>
-      new DatabaseError({
-        message: "Failed to apply table changes",
+    catch: (error) => {
+      // Log detailed error information for debugging
+      console.error("[Database] Failed to apply table changes:", {
+        error: error instanceof Error ? error.message : String(error),
+        tableName: (table as { name?: string }).name,
+        changeSetSize: {
+          upserted: changeSet.upserted.length,
+          deleted: changeSet.deleted.length,
+        },
+      });
+      if (error instanceof Error && error.stack) {
+        console.error("[Database] Stack trace:", error.stack);
+      }
+      return new DatabaseError({
+        message: `Failed to apply table changes: ${error instanceof Error ? error.message : String(error)}`,
         operation: "applyTableChanges",
         cause: error,
-      }),
+      });
+    },
   });
 
 /**
@@ -162,7 +190,11 @@ export function splitChanges(records: SyncableRecord[]): {
     if (record.deletedAt) {
       deleted.push(record.id);
     } else {
-      const { syncStatus, deletedAt, ...rest } = record;
+      const {
+        syncStatus: _syncStatus,
+        deletedAt: _deletedAt,
+        ...rest
+      } = record;
       // Convert amount/price from number to string for backend
       if (typeof rest.amount === "number") {
         rest.amount = String(rest.amount);

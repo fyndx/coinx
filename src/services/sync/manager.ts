@@ -187,6 +187,17 @@ export class SyncManager {
    * Safe to call from anywhere — silently no-ops if not logged in.
    */
   syncIfAuthenticated = async (): Promise<void> => {
+    // Early return for web platform
+    if (Platform.OS === "web") {
+      return;
+    }
+
+    // Early return if sync already in progress
+    if (this.syncInProgress) {
+      this.hasPendingSync = true;
+      return;
+    }
+
     const syncEffect = pipe(
       checkAuthentication(),
       Effect.flatMap(() => this.sync()),
@@ -224,33 +235,15 @@ export class SyncManager {
 
   /**
    * Full sync: push local changes, then pull remote changes.
-   * Returns silently if sync is already in progress.
+   * Caller must check if sync is already in progress.
    */
   private sync = () =>
     pipe(
       Effect.sync(() => {
-        // Skip sync for web platform
-        if (Platform.OS === "web") {
-          return false;
-        }
-
-        if (this.syncInProgress) {
-          this.hasPendingSync = true;
-          return false;
-        }
-
         this.syncInProgress = true;
         this.syncCancelled = false;
         this.updateState({ status: "pushing", error: null });
-        return true;
       }),
-      Effect.filterOrFail(
-        (shouldContinue) => shouldContinue,
-        () =>
-          new SyncCancelledError({
-            message: "Sync already in progress or platform unsupported",
-          }),
-      ),
       Effect.flatMap(() => this.ensureDevice()),
       Effect.flatMap((deviceId) =>
         pipe(
@@ -422,6 +415,39 @@ export class SyncManager {
               pushedIds,
             });
           }),
+          Effect.catchAll((error) => {
+            // Handle 409 Conflict - records already exist on server
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            if (errorMessage.includes("(409)")) {
+              console.warn(
+                "[Sync Push] 409 conflict: Records already exist on server.",
+              );
+              console.warn(
+                "[Sync Push] This likely means the app crashed after push succeeded but before marking records as synced.",
+              );
+              console.warn(
+                "[Sync Push] Treating as success and marking local records as synced to resolve conflict.",
+              );
+              if (__DEV__) {
+                console.log(
+                  "[Sync Push] Conflicting record count:",
+                  totalChanges,
+                );
+              }
+              // PRAGMATIC FIX: Records exist on server, so mark them as synced locally
+              // This resolves the infinite retry loop
+              // TODO: Backend should implement UPSERT (INSERT ... ON CONFLICT DO UPDATE)
+              // to handle this gracefully without 409 errors
+              return Effect.succeed({
+                upserted: totalChanges,
+                deleted: 0,
+                pushedIds,
+              });
+            }
+            // Re-throw other errors
+            return Effect.fail(error);
+          }),
         );
       }),
       Effect.tapError((error) =>
@@ -535,9 +561,16 @@ export class SyncManager {
   /**
    * Apply pulled changes to local database.
    * Applies in dependency order to maintain referential integrity.
+   * Must be sequential to respect foreign key constraints:
+   * 1. categories, stores (no dependencies)
+   * 2. products (no dependencies)
+   * 3. transactions (depends on categories)
+   * 4. product_listings (depends on products and stores)
+   * 5. product_listings_history (depends on products)
    */
   private applyRemoteChanges = (changes: SyncChanges) =>
     pipe(
+      // Step 1: Base tables (no dependencies) - can run in parallel
       Effect.all([
         applyTableChanges(
           categories,
@@ -551,19 +584,27 @@ export class SyncManager {
           products,
           changes.products ?? { upserted: [], deleted: [] },
         ),
-        applyTableChanges(
-          transactions,
-          changes.transactions ?? { upserted: [], deleted: [] },
-        ),
-        applyTableChanges(
-          product_listings,
-          changes.productListings ?? { upserted: [], deleted: [] },
-        ),
-        applyTableChanges(
-          product_listings_history,
-          changes.productListingHistory ?? { upserted: [], deleted: [] },
-        ),
       ]),
+      // Step 2: Tables that depend on step 1 - can run in parallel with each other
+      Effect.flatMap((counts1) =>
+        pipe(
+          Effect.all([
+            applyTableChanges(
+              transactions,
+              changes.transactions ?? { upserted: [], deleted: [] },
+            ),
+            applyTableChanges(
+              product_listings,
+              changes.productListings ?? { upserted: [], deleted: [] },
+            ),
+            applyTableChanges(
+              product_listings_history,
+              changes.productListingHistory ?? { upserted: [], deleted: [] },
+            ),
+          ]),
+          Effect.map((counts2) => [...counts1, ...counts2]),
+        ),
+      ),
       Effect.map((counts) => counts.reduce((sum, count) => sum + count, 0)),
     );
 

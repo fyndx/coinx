@@ -1,0 +1,1 @@
+DROP INDEX `unique_store_name_location`;
