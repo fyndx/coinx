@@ -23,7 +23,10 @@ const envSchema = z.object({
   // Sentry
   SENTRY_ORG: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
-  SENTRY_DSN: z.string().url("SENTRY_DSN must be a valid URL").optional(),
+  EXPO_PUBLIC_SENTRY_DSN: z
+    .string()
+    .url("EXPO_PUBLIC_SENTRY_DSN must be a valid URL")
+    .optional(),
 
   // only available for app.config.ts usage
   APP_BUILD_ONLY_VAR: z.string().optional(),
@@ -67,7 +70,7 @@ const _env: z.infer<typeof envSchema> = {
   EXPO_PUBLIC_BACKEND_URL: process.env.EXPO_PUBLIC_BACKEND_URL ?? "",
   SENTRY_ORG: process.env.SENTRY_ORG,
   SENTRY_PROJECT: process.env.SENTRY_PROJECT,
-  SENTRY_DSN: process.env.SENTRY_DSN,
+  EXPO_PUBLIC_SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN,
   APP_BUILD_ONLY_VAR: process.env.APP_BUILD_ONLY_VAR,
 };
 

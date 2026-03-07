@@ -14,11 +14,11 @@ on:
       environment:
         description: "Environment to deploy to"
         required: true
-        default: "staging"
+        default: "preview"
         type: choice
         options:
           - development
-          - staging
+          - preview
           - production
 
 jobs:
@@ -42,57 +42,37 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Determine channel
-        id: channel
+      - name: Determine environment
+        id: env
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "channel=development" >> $GITHUB_OUTPUT
+            echo "name=development" >> $GITHUB_OUTPUT
           else
-            echo "channel=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create .env file
+      - name: Set environment variables
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "EXPO_PUBLIC_APP_ENV=development" >> .env
-            echo "EXPO_PUBLIC_APP_ENV=development" >> $GITHUB_ENV
-          else
-            CHANNEL="${{ inputs.environment }}"
-            if [[ "$CHANNEL" == "staging" ]]; then
-              echo "EXPO_PUBLIC_APP_ENV=preview" >> .env
-              echo "EXPO_PUBLIC_APP_ENV=preview" >> $GITHUB_ENV
-            elif [[ "$CHANNEL" == "production" ]]; then
-              echo "EXPO_PUBLIC_APP_ENV=production" >> .env
-              echo "EXPO_PUBLIC_APP_ENV=production" >> $GITHUB_ENV
-            else
-              echo "EXPO_PUBLIC_APP_ENV=development" >> .env
-              echo "EXPO_PUBLIC_APP_ENV=development" >> $GITHUB_ENV
-            fi
-          fi
-
-      - name: Append EAS Variables to .env
-        run: |
+          ENV_NAME="${{ steps.env.outputs.name }}"
+          echo "EXPO_PUBLIC_APP_ENV=$ENV_NAME" >> .env
+          echo "EXPO_PUBLIC_APP_ENV=$ENV_NAME" >> $GITHUB_ENV
           echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> .env
-          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
-          echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
-
-      - name: Export environment variables
-        run: |
           echo "EXPO_PUBLIC_SUPABASE_URL=${{ vars.EXPO_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> .env
           echo "EXPO_PUBLIC_BACKEND_URL=${{ vars.EXPO_PUBLIC_BACKEND_URL }}" >> $GITHUB_ENV
-
-      - name: Verify .env
-        run: cat .env
-
-      - name: Generate message with latest commit message not sha
+      - name: Generate update message
         run: |
+          ENV_NAME="${{ steps.env.outputs.name }}"
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            MESSAGE="PR: ${{ github.event.head_commit.message }}"
+            MESSAGE="PR #${{ github.event.pull_request.number }}: $(git log -1 --pretty=%s)"
           else
-            MESSAGE="Manual Update to ${{ inputs.environment }} - ${{ github.event.head_commit.message }}"
+            MESSAGE="Deploy to $ENV_NAME: $(git log -1 --pretty=%s)"
           fi
           echo "MESSAGE=$MESSAGE" >> $GITHUB_ENV
 
       - name: Publish update
-        run: eas update --branch ${{ steps.channel.outputs.channel }} --environment ${{ steps.channel.outputs.channel }} --message "$MESSAGE" --non-interactive
+        run: |
+          ENV_NAME="${{ steps.env.outputs.name }}"
+          eas update --branch $ENV_NAME --environment $ENV_NAME --message "$MESSAGE" --non-interactive
