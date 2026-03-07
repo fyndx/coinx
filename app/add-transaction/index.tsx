@@ -5,7 +5,7 @@ import BottomSheet, {
 import { observer, useMount, useUnmount } from "@legendapp/state/react";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { Button } from "heroui-native";
+import { Button, Tabs } from "heroui-native";
 import { CheckSquare, Delete } from "lucide-react-native";
 import { useMemo, useRef } from "react";
 import {
@@ -36,31 +36,24 @@ const TransactionType = observer(
     const type = transactionModel$.transaction.transactionType.get();
     return (
       <View className="justify-center items-center py-6">
-        <View className="flex-row bg-muted rounded-md p-1">
-          {["Expense", "Income"].map((value) => (
-            <Pressable
-              key={value}
-              onPress={() =>
-                transactionModel$.transaction.transactionType.set(
-                  value as "Expense" | "Income",
-                )
-              }
-              className={`px-4 py-2 rounded-sm ${
-                type === value ? "bg-background shadow-sm" : ""
-              }`}
-            >
-              <Text
-                className={`${
-                  type === value
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {value}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <Tabs
+          value={type}
+          onValueChange={(value: string) =>
+            transactionModel$.transaction.transactionType.set(
+              value as "Expense" | "Income",
+            )
+          }
+        >
+          <Tabs.List>
+            <Tabs.Indicator />
+            <Tabs.Trigger value="Expense">
+              <Tabs.Label>Expense</Tabs.Label>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="Income">
+              <Tabs.Label>Income</Tabs.Label>
+            </Tabs.Trigger>
+          </Tabs.List>
+        </Tabs>
       </View>
     );
   },

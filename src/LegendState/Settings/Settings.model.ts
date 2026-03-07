@@ -1,6 +1,6 @@
 import { observable } from "@legendapp/state";
 import { Effect } from "effect";
-import { Directory, File, Paths } from "expo-file-system/next";
+import { Directory, File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { defaultDatabaseDirectory } from "expo-sqlite";
 

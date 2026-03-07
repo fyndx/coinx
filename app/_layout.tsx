@@ -1,4 +1,5 @@
 import { observer, useMount } from "@legendapp/state/react";
+import * as Sentry from "@sentry/react-native";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
@@ -151,4 +152,4 @@ const RootLayout = observer(() => {
   return <RootLayoutNav />;
 });
 
-export default RootLayout;
+export default Sentry.wrap(RootLayout);

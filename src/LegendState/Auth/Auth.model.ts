@@ -3,11 +3,11 @@ import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
 import { Effect } from "effect";
 
+import { analytics } from "@/src/services/analytics";
 import { api } from "@/src/services/api";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
 import { claimAnonymousData } from "@/src/services/sync/migration";
-import { analytics } from "@/src/services/analytics";
 
 type AuthState = {
   user: User | null;
@@ -57,7 +57,7 @@ export class AuthModel {
       this.obs.session.set(session);
       this.obs.user.set(session?.user ?? null);
       this.obs.isAuthenticated.set(!!session);
-      
+
       try {
         if (session?.user?.id) {
           analytics.setUserIdentity(session.user.id);

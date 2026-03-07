@@ -1,11 +1,13 @@
 import { Tabs } from "expo-router";
 import { Notebook, Package } from "lucide-react-native";
 import { Image } from "react-native";
-import { useCSSVariable } from "uniwind";
+
+import { useThemeConfig } from "@/src/hooks/useThemeConfig";
 
 export default function RootLayout() {
-  const surfaceColor = useCSSVariable("--color-surface") as string;
-  const accentColor = useCSSVariable("--color-accent") as string;
+  const theme = useThemeConfig();
+  const surfaceColor = theme.colors.card;
+  const accentColor = theme.colors.primary;
 
   return (
     <Tabs

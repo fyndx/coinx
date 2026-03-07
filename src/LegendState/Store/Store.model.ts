@@ -6,7 +6,6 @@ import {
 import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
-import { analytics } from "@/src/services/analytics";
 
 import type { InsertStore, SelectStore } from "@/db/schema";
 
@@ -16,6 +15,7 @@ import {
   editStore,
   getStores,
 } from "@/src/database/Stores/StoresRepo";
+import { analytics } from "@/src/services/analytics";
 
 import { DEFAULT_STORES } from "./stores-list";
 
