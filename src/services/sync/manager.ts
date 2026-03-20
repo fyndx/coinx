@@ -167,7 +167,8 @@ export class SyncManager {
             ) {
               return Effect.fail(
                 new DeviceRegistrationError({
-                  message: "Failed to register device: invalid or missing ID in response",
+                  message:
+                    "Failed to register device: invalid or missing ID in response",
                 }),
               );
             }
@@ -193,7 +194,11 @@ export class SyncManager {
                 error instanceof Error
                   ? error.message
                   : "Device registration failed";
-              this.logStructuredError("device_registration", errorMessage, error);
+              this.logStructuredError(
+                "device_registration",
+                errorMessage,
+                error,
+              );
             }),
           ),
         );
@@ -342,14 +347,19 @@ export class SyncManager {
         Effect.sync(() => {
           const message =
             error instanceof Error ? error.message : "Sync failed";
-          
+
           if (!this.syncCancelled && !(error instanceof SyncCancelledError)) {
             this.lastSyncHadError = true;
             // Determine context based on current status
-            const context = this.state.status === "pushing" ? "push" : this.state.status === "pulling" ? "pull" : "sync";
+            const context =
+              this.state.status === "pushing"
+                ? "push"
+                : this.state.status === "pulling"
+                  ? "pull"
+                  : "sync";
             this.logStructuredError(context, message, error);
-            this.updateState({ 
-              status: "error", 
+            this.updateState({
+              status: "error",
               error: message,
               consecutiveFailures: this.state.consecutiveFailures + 1,
               lastErrorTimestamp: new Date().toISOString(),
@@ -517,7 +527,8 @@ export class SyncManager {
       }),
       Effect.tapError((error) =>
         Effect.sync(() => {
-          const errorMessage = error instanceof Error ? error.message : "Push failed";
+          const errorMessage =
+            error instanceof Error ? error.message : "Push failed";
           this.logStructuredError("push", errorMessage, error);
         }),
       ),
@@ -570,17 +581,23 @@ export class SyncManager {
       { table: products, ids: pushedIds.products },
       { table: stores, ids: pushedIds.stores },
       { table: product_listings, ids: pushedIds.product_listings },
-      { table: product_listings_history, ids: pushedIds.product_listings_history },
+      {
+        table: product_listings_history,
+        ids: pushedIds.product_listings_history,
+      },
     ] as const;
 
     // Map to effects, only processing tables with IDs
     const effects = tableOperations.map(({ table, ids }) =>
       ids.length > 0
         ? markRecordsSyncedForTable(table, ids)
-        : Effect.succeed(undefined)
+        : Effect.succeed(undefined),
     );
 
-    return pipe(Effect.all(effects), Effect.map(() => undefined));
+    return pipe(
+      Effect.all(effects),
+      Effect.map(() => undefined),
+    );
   };
 
   // ─── Pull ────────────────────────────────────────────────
@@ -623,7 +640,8 @@ export class SyncManager {
       }),
       Effect.tapError((error) =>
         Effect.sync(() => {
-          const errorMessage = error instanceof Error ? error.message : "Pull failed";
+          const errorMessage =
+            error instanceof Error ? error.message : "Pull failed";
           this.logStructuredError("pull", errorMessage, error);
         }),
       ),
@@ -795,7 +813,8 @@ export class SyncManager {
       ),
       Effect.catchAll((error) =>
         Effect.sync(() => {
-          const errorMessage = error instanceof Error ? error.message : "Reset failed";
+          const errorMessage =
+            error instanceof Error ? error.message : "Reset failed";
           this.logStructuredError("reset", errorMessage, error);
         }),
       ),

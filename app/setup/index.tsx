@@ -103,10 +103,7 @@ const SetupScreen = observer(() => {
       </View>
 
       {!isRunning && (
-        <Pressable
-          onPress={() => authModel.actions.signOut()}
-          className="mt-4"
-        >
+        <Pressable onPress={() => authModel.actions.signOut()} className="mt-4">
           <Text className="text-center text-muted-foreground text-sm">
             Use another account
           </Text>

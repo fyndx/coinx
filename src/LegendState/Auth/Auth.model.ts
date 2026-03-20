@@ -3,8 +3,8 @@ import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
 import { Effect } from "effect";
 
-import { analytics } from "@/src/services/analytics";
 import { setupModel } from "@/src/LegendState/Setup/Setup.model";
+import { analytics } from "@/src/services/analytics";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
 

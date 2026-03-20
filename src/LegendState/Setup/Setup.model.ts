@@ -124,7 +124,7 @@ export class SetupModel {
 
       try {
         this.setStep("connecting-account");
-        await api.post("/api/auth/register");
+        await api.post("/api/auth/register", {});
 
         this.setStep("syncing-data");
         await syncManager.syncAuthenticated();
