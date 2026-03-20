@@ -17,9 +17,9 @@ export type SyncStatus = (typeof syncStatusEnum)[number];
 
 export const categories = sqliteTable("coinx_category", {
   id: text("id").primaryKey(), // UUID
-  name: text("name").notNull().unique(),
-  icon: text("icon").notNull().unique(),
-  color: text("color").notNull().unique(),
+  name: text("name").notNull(),
+  icon: text("icon").notNull(),
+  color: text("color").notNull(),
   type: text("type", { enum: ["Income", "Expense"] }).notNull(),
 
   createdAt: text("created_at")
@@ -96,32 +96,21 @@ export const productsRelations = relations(products, ({ many }) => ({
 
 // ─── Stores ──────────────────────────────────────────────────
 
-export const stores = sqliteTable(
-  "coinx_store",
-  {
-    id: text("id").primaryKey(), // UUID
-    name: text("name").notNull(),
-    location: text("location"),
+export const stores = sqliteTable("coinx_store", {
+  id: text("id").primaryKey(), // UUID
+  name: text("name").notNull(),
+  location: text("location"),
 
-    createdAt: text("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: text("updated_at"),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: text("updated_at"),
 
-    // Sync fields
-    syncStatus: text("sync_status", { enum: syncStatusEnum }).default(
-      "pending",
-    ),
-    deletedAt: text("deleted_at"),
-    localOwnerId: text("local_owner_id"),
-  },
-  (table) => ({
-    uniqueNameAndLocation: unique("unique_store_name_location").on(
-      table.name,
-      table.location,
-    ),
-  }),
-);
+  // Sync fields
+  syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+  deletedAt: text("deleted_at"),
+  localOwnerId: text("local_owner_id"),
+});
 
 export const storesRelations = relations(stores, ({ many }) => ({
   product_listings: many(product_listings),

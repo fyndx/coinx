@@ -9,6 +9,7 @@ import {
   stores,
   transactions,
 } from "@/db/schema";
+import { getHttpStatusFromError } from "@/src/utils/http";
 
 import type {
   PushedIds,
@@ -47,6 +48,9 @@ export class SyncManager {
     error: null,
     lastPushCount: 0,
     lastPullCount: 0,
+    consecutiveFailures: 0,
+    lastErrorTimestamp: null,
+    lastErrorContext: null,
   };
 
   private syncInProgress = false;
@@ -91,11 +95,15 @@ export class SyncManager {
       }),
       Effect.tapError((error) =>
         Effect.sync(() => {
-          console.error("Initialization error:", error);
+          const errorMessage =
+            error instanceof Error ? error.message : "Initialization failed";
+          this.logStructuredError("init", errorMessage, error);
           this.updateState({
             status: "error",
-            error:
-              error instanceof Error ? error.message : "Initialization failed",
+            error: errorMessage,
+            consecutiveFailures: this.state.consecutiveFailures + 1,
+            lastErrorTimestamp: new Date().toISOString(),
+            lastErrorContext: "init",
           });
         }),
       ),
@@ -148,14 +156,23 @@ export class SyncManager {
             });
           }),
           Effect.flatMap((response) => {
-            const deviceId = response?.data?.id;
-            if (!deviceId) {
+            // Strict type guard for API response
+            if (
+              !response ||
+              !response.data ||
+              typeof response.data !== "object" ||
+              !response.data.id ||
+              typeof response.data.id !== "string" ||
+              response.data.id.trim() === ""
+            ) {
               return Effect.fail(
                 new DeviceRegistrationError({
-                  message: "Failed to register device: no ID returned",
+                  message:
+                    "Failed to register device: invalid or missing ID in response",
                 }),
               );
             }
+            const deviceId = response.data.id;
             return pipe(
               setStorageItem(KEYS.DEVICE_ID, deviceId),
               Effect.map(() => {
@@ -172,9 +189,17 @@ export class SyncManager {
             );
           }),
           Effect.tapError((error) =>
-            Effect.sync(() =>
-              console.error("Device registration failed:", error),
-            ),
+            Effect.sync(() => {
+              const errorMessage =
+                error instanceof Error
+                  ? error.message
+                  : "Device registration failed";
+              this.logStructuredError(
+                "device_registration",
+                errorMessage,
+                error,
+              );
+            }),
           ),
         );
       }),
@@ -187,20 +212,65 @@ export class SyncManager {
    * Safe to call from anywhere — silently no-ops if not logged in.
    */
   syncIfAuthenticated = async (): Promise<void> => {
+    // Early return for web platform
+    if (Platform.OS === "web") {
+      return;
+    }
+
+    // Early return if sync already in progress
+    if (this.syncInProgress) {
+      this.hasPendingSync = true;
+      return;
+    }
+
     const syncEffect = pipe(
       checkAuthentication(),
       Effect.flatMap(() => this.sync()),
-      Effect.catchAll((error) =>
+      Effect.catchAll((error: unknown) =>
         Effect.sync(() => {
-          // Silently ignore auth errors
+          // Silently ignore auth errors (user not logged in is expected state)
+          // This allows sync to be called freely without checking auth state first
           if (!(error instanceof AuthenticationError)) {
-            console.error("syncIfAuthenticated error:", error);
+            const errorMessage =
+              error instanceof Error ? error.message : "Sync failed";
+            this.logStructuredError("sync_trigger", errorMessage, error);
           }
         }),
       ),
     );
 
     await Effect.runPromise(syncEffect);
+  };
+
+  /**
+   * Run an authenticated sync and surface any failure to the caller.
+   * Intended for explicit flows such as post-auth setup.
+   */
+  syncAuthenticated = async (): Promise<void> => {
+    if (Platform.OS === "web") {
+      return;
+    }
+
+    if (this.syncInProgress) {
+      this.hasPendingSync = true;
+      return;
+    }
+
+    await Effect.runPromise(
+      pipe(
+        checkAuthentication(),
+        Effect.flatMap(() => this.sync()),
+      ),
+    );
+  };
+
+  getAuthenticatedUserId = async (): Promise<string> => {
+    return Effect.runPromise(
+      pipe(
+        checkAuthentication(),
+        Effect.map((session) => session!.user.id),
+      ),
+    );
   };
 
   /**
@@ -224,33 +294,15 @@ export class SyncManager {
 
   /**
    * Full sync: push local changes, then pull remote changes.
-   * Returns silently if sync is already in progress.
+   * Caller must check if sync is already in progress.
    */
   private sync = () =>
     pipe(
       Effect.sync(() => {
-        // Skip sync for web platform
-        if (Platform.OS === "web") {
-          return false;
-        }
-
-        if (this.syncInProgress) {
-          this.hasPendingSync = true;
-          return false;
-        }
-
         this.syncInProgress = true;
         this.syncCancelled = false;
         this.updateState({ status: "pushing", error: null });
-        return true;
       }),
-      Effect.filterOrFail(
-        (shouldContinue) => shouldContinue,
-        () =>
-          new SyncCancelledError({
-            message: "Sync already in progress or platform unsupported",
-          }),
-      ),
       Effect.flatMap(() => this.ensureDevice()),
       Effect.flatMap((deviceId) =>
         pipe(
@@ -292,6 +344,9 @@ export class SyncManager {
                 lastPushCount: result.pushCount,
                 lastPullCount: result.pullCount,
                 error: null,
+                consecutiveFailures: 0, // Reset on success
+                lastErrorTimestamp: null,
+                lastErrorContext: null,
               });
             }),
           ),
@@ -301,10 +356,24 @@ export class SyncManager {
         Effect.sync(() => {
           const message =
             error instanceof Error ? error.message : "Sync failed";
-          console.error("Sync error:", message);
+
           if (!this.syncCancelled && !(error instanceof SyncCancelledError)) {
             this.lastSyncHadError = true;
-            this.updateState({ status: "error", error: message });
+            // Determine context based on current status
+            const context =
+              this.state.status === "pushing"
+                ? "push"
+                : this.state.status === "pulling"
+                  ? "pull"
+                  : "sync";
+            this.logStructuredError(context, message, error);
+            this.updateState({
+              status: "error",
+              error: message,
+              consecutiveFailures: this.state.consecutiveFailures + 1,
+              lastErrorTimestamp: new Date().toISOString(),
+              lastErrorContext: context,
+            });
           }
         }),
       ),
@@ -410,10 +479,19 @@ export class SyncManager {
             changes,
           }),
           Effect.flatMap((response) => {
-            if (!response?.data) {
+            // Strict type guard for API response
+            if (
+              !response ||
+              !response.data ||
+              typeof response.data !== "object" ||
+              !response.data.counts ||
+              typeof response.data.counts !== "object" ||
+              typeof response.data.counts.upserted !== "number" ||
+              typeof response.data.counts.deleted !== "number"
+            ) {
               return Effect.fail(
                 new SyncPushError({
-                  message: "Push failed: no response data",
+                  message: "Push failed: invalid or missing response data",
                 }),
               );
             }
@@ -422,10 +500,46 @@ export class SyncManager {
               pushedIds,
             });
           }),
+          Effect.catchAll((error) => {
+            // Handle 409 Conflict - records already exist on server
+            const statusCode = getHttpStatusFromError(error);
+            if (statusCode === 409) {
+              console.warn(
+                "[Sync Push] 409 conflict: Records already exist on server.",
+              );
+              console.warn(
+                "[Sync Push] This likely means the app crashed after push succeeded but before marking records as synced.",
+              );
+              console.warn(
+                "[Sync Push] Treating as success and marking local records as synced to resolve conflict.",
+              );
+              if (__DEV__) {
+                console.log(
+                  "[Sync Push] Conflicting record count:",
+                  totalChanges,
+                );
+              }
+              // PRAGMATIC FIX: Records exist on server, so mark them as synced locally
+              // This resolves the infinite retry loop
+              // TODO: Backend should implement UPSERT (INSERT ... ON CONFLICT DO UPDATE)
+              // to handle this gracefully without 409 errors
+              return Effect.succeed({
+                upserted: totalChanges,
+                deleted: 0,
+                pushedIds,
+              });
+            }
+            // Re-throw other errors
+            return Effect.fail(error);
+          }),
         );
       }),
       Effect.tapError((error) =>
-        Effect.sync(() => console.error("Push error:", error)),
+        Effect.sync(() => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Push failed";
+          this.logStructuredError("push", errorMessage, error);
+        }),
       ),
     );
 
@@ -466,37 +580,34 @@ export class SyncManager {
 
   /**
    * Mark all pushed records as synced.
+   * Uses a data-driven approach to reduce duplication.
    */
-  private markAllRecordsSynced = (pushedIds: PushedIds) =>
-    pipe(
-      Effect.all([
-        pushedIds.transactions.length > 0
-          ? markRecordsSyncedForTable(transactions, pushedIds.transactions)
-          : Effect.succeed(undefined),
-        pushedIds.categories.length > 0
-          ? markRecordsSyncedForTable(categories, pushedIds.categories)
-          : Effect.succeed(undefined),
-        pushedIds.products.length > 0
-          ? markRecordsSyncedForTable(products, pushedIds.products)
-          : Effect.succeed(undefined),
-        pushedIds.stores.length > 0
-          ? markRecordsSyncedForTable(stores, pushedIds.stores)
-          : Effect.succeed(undefined),
-        pushedIds.product_listings.length > 0
-          ? markRecordsSyncedForTable(
-              product_listings,
-              pushedIds.product_listings,
-            )
-          : Effect.succeed(undefined),
-        pushedIds.product_listings_history.length > 0
-          ? markRecordsSyncedForTable(
-              product_listings_history,
-              pushedIds.product_listings_history,
-            )
-          : Effect.succeed(undefined),
-      ]),
+  private markAllRecordsSynced = (pushedIds: PushedIds) => {
+    // Define table-to-ids mapping for reduced duplication
+    const tableOperations = [
+      { table: transactions, ids: pushedIds.transactions },
+      { table: categories, ids: pushedIds.categories },
+      { table: products, ids: pushedIds.products },
+      { table: stores, ids: pushedIds.stores },
+      { table: product_listings, ids: pushedIds.product_listings },
+      {
+        table: product_listings_history,
+        ids: pushedIds.product_listings_history,
+      },
+    ] as const;
+
+    // Map to effects, only processing tables with IDs
+    const effects = tableOperations.map(({ table, ids }) =>
+      ids.length > 0
+        ? markRecordsSyncedForTable(table, ids)
+        : Effect.succeed(undefined),
+    );
+
+    return pipe(
+      Effect.all(effects),
       Effect.map(() => undefined),
     );
+  };
 
   // ─── Pull ────────────────────────────────────────────────
 
@@ -507,10 +618,19 @@ export class SyncManager {
         lastSyncedAt: this.state.lastSyncedAt,
       }),
       Effect.flatMap((response) => {
-        if (!response?.data) {
+        // Strict type guard for API response
+        if (
+          !response ||
+          !response.data ||
+          typeof response.data !== "object" ||
+          !response.data.syncedAt ||
+          typeof response.data.syncedAt !== "string" ||
+          !response.data.changes ||
+          typeof response.data.changes !== "object"
+        ) {
           return Effect.fail(
             new SyncPullError({
-              message: "Pull failed: no response data",
+              message: "Pull failed: invalid or missing response data",
             }),
           );
         }
@@ -528,16 +648,27 @@ export class SyncManager {
         );
       }),
       Effect.tapError((error) =>
-        Effect.sync(() => console.error("Pull error:", error)),
+        Effect.sync(() => {
+          const errorMessage =
+            error instanceof Error ? error.message : "Pull failed";
+          this.logStructuredError("pull", errorMessage, error);
+        }),
       ),
     );
 
   /**
    * Apply pulled changes to local database.
    * Applies in dependency order to maintain referential integrity.
+   * Must be sequential to respect foreign key constraints:
+   * 1. categories, stores (no dependencies)
+   * 2. products (no dependencies)
+   * 3. transactions (depends on categories)
+   * 4. product_listings (depends on products and stores)
+   * 5. product_listings_history (depends on products)
    */
   private applyRemoteChanges = (changes: SyncChanges) =>
     pipe(
+      // Step 1: Base tables (no dependencies) - can run in parallel
       Effect.all([
         applyTableChanges(
           categories,
@@ -551,19 +682,27 @@ export class SyncManager {
           products,
           changes.products ?? { upserted: [], deleted: [] },
         ),
-        applyTableChanges(
-          transactions,
-          changes.transactions ?? { upserted: [], deleted: [] },
-        ),
-        applyTableChanges(
-          product_listings,
-          changes.productListings ?? { upserted: [], deleted: [] },
-        ),
-        applyTableChanges(
-          product_listings_history,
-          changes.productListingHistory ?? { upserted: [], deleted: [] },
-        ),
       ]),
+      // Step 2: Tables that depend on step 1 - can run in parallel with each other
+      Effect.flatMap((counts1) =>
+        pipe(
+          Effect.all([
+            applyTableChanges(
+              transactions,
+              changes.transactions ?? { upserted: [], deleted: [] },
+            ),
+            applyTableChanges(
+              product_listings,
+              changes.productListings ?? { upserted: [], deleted: [] },
+            ),
+            applyTableChanges(
+              product_listings_history,
+              changes.productListingHistory ?? { upserted: [], deleted: [] },
+            ),
+          ]),
+          Effect.map((counts2) => [...counts1, ...counts2]),
+        ),
+      ),
       Effect.map((counts) => counts.reduce((sum, count) => sum + count, 0)),
     );
 
@@ -572,6 +711,33 @@ export class SyncManager {
   private updateState(partial: Partial<SyncState>): void {
     this.state = { ...this.state, ...partial };
     this.notifyListeners();
+  }
+
+  /**
+   * Log structured error with context for better debugging.
+   * Includes timestamp, operation, device ID, and error details.
+   */
+  private logStructuredError(
+    context: string,
+    message: string,
+    error: unknown,
+  ): void {
+    const timestamp = new Date().toISOString();
+    const errorDetails = {
+      timestamp,
+      context,
+      message,
+      deviceId: this.state.deviceId,
+      lastSyncedAt: this.state.lastSyncedAt,
+      consecutiveFailures: this.state.consecutiveFailures + 1,
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+      stack: error instanceof Error ? error.stack : undefined,
+    };
+
+    console.error(`[SyncManager Error] ${context}:`, message);
+    if (__DEV__) {
+      console.error("Error details:", errorDetails);
+    }
   }
 
   /**
@@ -647,13 +813,18 @@ export class SyncManager {
             error: null,
             lastPushCount: 0,
             lastPullCount: 0,
+            consecutiveFailures: 0,
+            lastErrorTimestamp: null,
+            lastErrorContext: null,
           };
           this.notifyListeners();
         }),
       ),
       Effect.catchAll((error) =>
         Effect.sync(() => {
-          console.error("Reset error:", error);
+          const errorMessage =
+            error instanceof Error ? error.message : "Reset failed";
+          this.logStructuredError("reset", errorMessage, error);
         }),
       ),
     );

@@ -60,16 +60,6 @@ class RootStore {
         Effect.catchAll(() => Effect.void),
       ),
     );
-
-    const isFirstLaunch = await appModel.checkFirstLaunch();
-    if (isFirstLaunch) {
-      await this.categoryModel.createDefaultCategories();
-      await this.productsModel.createDefaultProducts();
-      await storeModel$.createDefaultStores();
-    }
-
-    // Trigger initial sync if user is authenticated
-    syncManager.syncIfAuthenticated();
   };
 
   actions = {

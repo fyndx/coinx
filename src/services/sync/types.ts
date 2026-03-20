@@ -109,6 +109,10 @@ export interface SyncState {
   error: string | null;
   lastPushCount: number;
   lastPullCount: number;
+  // Retry metadata for diagnosing sync issues
+  consecutiveFailures: number;
+  lastErrorTimestamp: string | null;
+  lastErrorContext: string | null; // e.g., "push", "pull", "init", "device_registration"
 }
 
 // ─── Storage Keys ────────────────────────────────────────────

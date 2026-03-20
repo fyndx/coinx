@@ -34,6 +34,7 @@ const SignUp = observer(() => {
       return;
     }
 
+    authModel.actions.clearError();
     const result = await authModel.actions.signUp(email.trim(), password);
     if (result.success) {
       if (result.needsConfirmation) {
@@ -43,7 +44,7 @@ const SignUp = observer(() => {
           [{ text: "OK", onPress: () => router.replace("/(auth)/sign-in") }],
         );
       } else {
-        router.replace("/(tabs)" as const as "/");
+        router.replace("/setup");
       }
     }
   };
@@ -132,15 +133,6 @@ const SignUp = observer(() => {
             </Pressable>
           </Link>
         </View>
-
-        <Pressable
-          onPress={() => router.replace("/(tabs)" as const as "/")}
-          className="mt-4"
-        >
-          <Text className="text-muted-foreground text-center text-sm">
-            Skip for now
-          </Text>
-        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );

@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "main": "./index",
   "scripts": {
-   "android": "expo run:android",
-    "generate": "drizzle-kit generate",
-    "ios": "expo run:ios",
-    "lint": "oxlint",
-    "format": "oxfmt",
-    "postinstall": "patch-package",
     "start": "expo start",
-    "type-check": "tsc  --noemit",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
-    "prepare": "lefthook install"
+    "prebuild": "expo prebuild",
+    "db:generate": "drizzle-kit generate",
+    "postinstall": "patch-package",
+    "prepare": "lefthook install",
+    "type-check": "tsc  --noemit",
+    "lint": "oxlint",
+    "format": "oxfmt"
   },
   "dependencies": {
     "@coinify/currency": "^1.4.2",

@@ -10,6 +10,7 @@ import { Splash } from "@/src/Components/Splash";
 import { rootStore } from "@/src/LegendState";
 import { appModel } from "@/src/LegendState/AppState/App.model";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
+import { setupModel } from "@/src/LegendState/Setup/Setup.model";
 import { themeModel } from "@/src/LegendState/Theme/Theme.model";
 import { RootProvider } from "@/src/Providers/RootProvider";
 import { analytics } from "@/src/services/analytics";
@@ -42,17 +43,32 @@ const useProtectedRoute = () => {
   const router = useRouter();
   const isAuthenticated = authModel.obs.isAuthenticated.get();
   const isAuthLoading = authModel.obs.isLoading.get();
+  const setupStatus = setupModel.obs.status.get();
 
   useEffect(() => {
     if (isAuthLoading) return;
 
     const inAuthGroup = segments[0] === "(auth)";
+    const inSetupRoute = String(segments[0]) === "setup";
 
-    // If user just signed in and is still on auth screens, redirect to app
-    if (isAuthenticated && inAuthGroup) {
-      router.replace("/(tabs)" as const as "/");
+    if (!isAuthenticated) {
+      if (!inAuthGroup) {
+        router.replace("/(auth)/sign-in");
+      }
+      return;
     }
-  }, [isAuthenticated, isAuthLoading, segments, router]);
+
+    if (setupStatus !== "success") {
+      if (!inSetupRoute) {
+        router.replace("/setup");
+      }
+      return;
+    }
+
+    if (inAuthGroup || inSetupRoute) {
+      router.replace("/" as const);
+    }
+  }, [isAuthenticated, isAuthLoading, router, segments, setupStatus]);
 };
 
 const RootLayoutNav = observer(() => {
@@ -63,6 +79,7 @@ const RootLayoutNav = observer(() => {
       <Stack screenOptions={{ statusBarStyle: "auto" }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="setup/index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="add-category/index"

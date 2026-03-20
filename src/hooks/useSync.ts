@@ -15,7 +15,7 @@ export function useSync() {
 
   return {
     ...state,
-    sync: () => syncManager.syncIfAuthenticated(),
+    sync: () => syncManager.syncAuthenticated(),
     isSyncing: state.status === "pushing" || state.status === "pulling",
   };
 }
