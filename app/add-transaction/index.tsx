@@ -69,7 +69,7 @@ const NumberButton = ({
   return (
     <Pressable
       onPress={(event) => onPress(event, text)}
-      className="w-24 h-16 bg-green-500 active:bg-green-700 justify-center items-center rounded-md"
+      className="w-24 h-16 bg-accent justify-center items-center rounded-md"
     >
       <Text className="text-white text-xl font-bold">{String(text)}</Text>
     </Pressable>
@@ -80,7 +80,7 @@ const SubmitButton = ({ onPress }: { onPress: () => void }) => {
   return (
     <Pressable
       onPress={onPress}
-      className="w-24 h-16 bg-green-500 active:bg-green-700 justify-center items-center rounded-md"
+      className="w-24 h-16 bg-accent justify-center items-center rounded-md"
     >
       <CheckSquare size={24} color="white" />
     </Pressable>
@@ -153,7 +153,7 @@ const CategoryAndDateButtons = observer(
       <View className="flex-row gap-3 px-4">
         <Button
           variant="secondary"
-          className="flex-3 bg-green-500 active:bg-green-700 border-0"
+          className="flex-3 bg-accent border-0"
           onPress={openDatepicker}
         >
           <Text className="text-white">
@@ -164,7 +164,7 @@ const CategoryAndDateButtons = observer(
         </Button>
         <Button
           variant="secondary"
-          className="flex-2 bg-green-500 active:bg-green-700 border-0"
+          className="flex-2 bg-accent border-0"
           onPress={openCategoryPicker}
         >
           <Text className="text-white">{category}</Text>
