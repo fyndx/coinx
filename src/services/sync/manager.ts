@@ -264,6 +264,15 @@ export class SyncManager {
     );
   };
 
+  getAuthenticatedUserId = async (): Promise<string> => {
+    return Effect.runPromise(
+      pipe(
+        checkAuthentication(),
+        Effect.map((session) => session!.user.id),
+      ),
+    );
+  };
+
   /**
    * Debounced sync — call after local changes.
    * Waits 2 seconds after last call before syncing.

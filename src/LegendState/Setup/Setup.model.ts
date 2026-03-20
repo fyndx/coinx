@@ -7,6 +7,7 @@ import { DEFAULT_CATEGORIES } from "@/src/LegendState/Category.model";
 import { DEFAULT_PRODUCTS } from "@/src/LegendState/Products/DefaultProducts";
 import { DEFAULT_STORES } from "@/src/LegendState/Store/stores-list";
 import { api } from "@/src/services/api";
+import { AppStorage } from "@/src/storage/mmkv";
 import { syncManager } from "@/src/services/sync";
 import { generateUUID } from "@/src/utils/uuid";
 
@@ -44,6 +45,25 @@ export class SetupModel {
 
   private setupPromise: Promise<{ success: boolean; error?: string }> | null =
     null;
+
+  private getCompletionKey = (userId: string) => `setup_complete:${userId}`;
+
+  getStatusForUser = (userId: string): SetupStatus => {
+    const isComplete = AppStorage.getBoolean(this.getCompletionKey(userId));
+    return isComplete ? "success" : "needsSetup";
+  };
+
+  markCompleteForUser = (userId: string) => {
+    AppStorage.set(this.getCompletionKey(userId), true);
+  };
+
+  clearPersistedCompletion = () => {
+    for (const key of AppStorage.getAllKeys()) {
+      if (key.startsWith("setup_complete:")) {
+        AppStorage.delete(key);
+      }
+    }
+  };
 
   private getSeedCounts = async () => {
     const [categoryRows, productRows, storeRows] = await Promise.all([
@@ -147,6 +167,8 @@ export class SetupModel {
         this.obs.status.set("success");
         this.obs.step.set("idle");
         this.obs.error.set(null);
+        const currentUserId = await syncManager.getAuthenticatedUserId();
+        this.markCompleteForUser(currentUserId);
         return { success: true };
       } catch (error) {
         const message =
@@ -166,6 +188,7 @@ export class SetupModel {
     run: this.run,
     reset: this.reset,
     clearError: this.clearError,
+    clearPersistedCompletion: this.clearPersistedCompletion,
   };
 }
 

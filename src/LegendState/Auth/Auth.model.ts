@@ -3,6 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { observable } from "@legendapp/state";
 import { Effect } from "effect";
 
+import { clearLocalDatabase } from "@/db/client";
 import { setupModel } from "@/src/LegendState/Setup/Setup.model";
 import { analytics } from "@/src/services/analytics";
 import { supabase } from "@/src/services/supabase";
@@ -44,7 +45,7 @@ export class AuthModel {
         this.obs.user.set(session.user);
         this.obs.session.set(session);
         this.obs.isAuthenticated.set(true);
-        setupModel.actions.reset("needsSetup");
+        setupModel.actions.reset(setupModel.getStatusForUser(session.user.id));
       }
     } catch (error) {
       console.error("Auth initialization error:", error);
@@ -61,7 +62,7 @@ export class AuthModel {
       if (event === "SIGNED_OUT" || !session) {
         setupModel.actions.reset("idle");
       } else if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-        setupModel.actions.reset("needsSetup");
+        setupModel.actions.reset(setupModel.getStatusForUser(session.user.id));
       }
 
       try {
@@ -142,6 +143,8 @@ export class AuthModel {
     this.obs.isLoading.set(true);
     try {
       await supabase.auth.signOut();
+      await clearLocalDatabase();
+      setupModel.actions.clearPersistedCompletion();
       await Effect.runPromise(syncManager.reset());
     } catch (error) {
       console.error("Sign out error:", error);
