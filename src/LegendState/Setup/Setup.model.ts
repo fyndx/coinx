@@ -7,8 +7,8 @@ import { DEFAULT_CATEGORIES } from "@/src/LegendState/Category.model";
 import { DEFAULT_PRODUCTS } from "@/src/LegendState/Products/DefaultProducts";
 import { DEFAULT_STORES } from "@/src/LegendState/Store/stores-list";
 import { api } from "@/src/services/api";
-import { AppStorage } from "@/src/storage/mmkv";
 import { syncManager } from "@/src/services/sync";
+import { AppStorage } from "@/src/storage/mmkv";
 import { generateUUID } from "@/src/utils/uuid";
 
 export type SetupStatus =
