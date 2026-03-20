@@ -4,10 +4,9 @@ import { observable } from "@legendapp/state";
 import { Effect } from "effect";
 
 import { analytics } from "@/src/services/analytics";
-import { api } from "@/src/services/api";
+import { setupModel } from "@/src/LegendState/Setup/Setup.model";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
-import { claimAnonymousData } from "@/src/services/sync/migration";
 
 type AuthState = {
   user: User | null;
@@ -45,6 +44,7 @@ export class AuthModel {
         this.obs.user.set(session.user);
         this.obs.session.set(session);
         this.obs.isAuthenticated.set(true);
+        setupModel.actions.reset("needsSetup");
       }
     } catch (error) {
       console.error("Auth initialization error:", error);
@@ -53,10 +53,16 @@ export class AuthModel {
     }
 
     // Listen for auth state changes (sign in, sign out, token refresh)
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
       this.obs.session.set(session);
       this.obs.user.set(session?.user ?? null);
       this.obs.isAuthenticated.set(!!session);
+
+      if (event === "SIGNED_OUT" || !session) {
+        setupModel.actions.reset("idle");
+      } else if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        setupModel.actions.reset("needsSetup");
+      }
 
       try {
         if (session?.user?.id) {
@@ -89,26 +95,6 @@ export class AuthModel {
         return { success: false, error: error.message };
       }
 
-      // Register profile on backend
-      if (data.session) {
-        const userId = data.session.user.id;
-
-        // Claim any anonymous local data for this user before syncing
-        await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
-          console.warn("Failed to claim anonymous data on sign up");
-        });
-
-        try {
-          await api.post("/api/auth/register");
-        } catch (e) {
-          console.warn("Backend profile registration failed:", e);
-          // Don't block auth — backend profile can be created later
-        }
-
-        // Trigger initial sync after sign up (will push newly claimed records)
-        syncManager.syncIfAuthenticated();
-      }
-
       return { success: true, needsConfirmation: !data.session };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Sign up failed";
@@ -136,25 +122,6 @@ export class AuthModel {
       if (error) {
         this.obs.error.set(error.message);
         return { success: false, error: error.message };
-      }
-
-      if (data.session) {
-        const userId = data.session.user.id;
-
-        // Claim any anonymous local data for this user before syncing
-        await Effect.runPromise(claimAnonymousData(userId)).catch(() => {
-          console.warn("Failed to claim anonymous data on sign in");
-        });
-
-        // Ensure profile exists on backend
-        try {
-          await api.post("/api/auth/register");
-        } catch (e) {
-          console.warn("Backend profile registration failed:", e);
-        }
-
-        // Trigger sync after sign in (will push newly claimed records)
-        syncManager.syncIfAuthenticated();
       }
 
       return { success: true };
@@ -189,7 +156,6 @@ export class AuthModel {
   clearError = () => {
     this.obs.error.set(null);
   };
-
   actions = {
     initialize: this.initialize,
     signUp: this.signUp,

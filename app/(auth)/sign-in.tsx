@@ -17,9 +17,10 @@ const SignIn = observer(() => {
   const handleSignIn = async () => {
     if (!email.trim() || !password.trim()) return;
 
+    authModel.actions.clearError();
     const result = await authModel.actions.signIn(email.trim(), password);
     if (result.success) {
-      router.replace("/");
+      router.replace("/setup");
     }
   };
 
@@ -88,15 +89,6 @@ const SignIn = observer(() => {
             </Pressable>
           </Link>
         </View>
-
-        <Pressable
-          onPress={() => router.replace("/(tabs)" as const as "/")}
-          className="mt-4"
-        >
-          <Text className="text-muted-foreground text-center text-sm">
-            Skip for now
-          </Text>
-        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );

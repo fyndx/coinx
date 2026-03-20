@@ -11,7 +11,7 @@ import { db as database } from "@/db/client";
 import { categories as categoriesRepo } from "@/db/schema";
 import { generateUUID } from "@/src/utils/uuid";
 
-const DEFAULT_CATEGORIES = [
+export const DEFAULT_CATEGORIES = [
   {
     name: "Food",
     color: "#FFC542",
