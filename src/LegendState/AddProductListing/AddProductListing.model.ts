@@ -13,6 +13,7 @@ import {
 import { addProductListingsHistory } from "@/src/database/Products/ProductListingsHistoryRepo";
 import { addProductListing } from "@/src/database/Products/ProductsListingsRepo";
 import { findProductById } from "@/src/database/Products/ProductsRepo";
+import { syncManager } from "@/src/services/sync";
 import { convert } from "@/src/utils/units";
 
 import { appModel } from "../AppState/App.model";
@@ -93,6 +94,7 @@ export class AddProductListingModel {
           price: createdProductListing.price,
         }),
       );
+      syncManager.scheduleSyncAfterChange();
       Burnt.toast({ title: "Product added successfully" });
       router.back();
     } catch (error) {

@@ -11,6 +11,7 @@ import {
   updateProduct,
 } from "@/src/database/Products/ProductsRepo";
 import { analytics } from "@/src/services/analytics";
+import { syncManager } from "@/src/services/sync";
 import { type MeasurementUnits, isValidUnitCategory } from "@/src/utils/units";
 
 // Draft type for product form (id is optional for new products)
@@ -86,6 +87,7 @@ export class AddProductScreenModel {
       );
 
       if (createdProduct.length > 0) {
+        syncManager.scheduleSyncAfterChange();
         Burnt.toast({ title: "Product added successfully" });
         analytics.logEvent("product_added");
         this.product.set({
@@ -125,6 +127,7 @@ export class AddProductScreenModel {
 
     Effect.runPromise(updateProduct({ ...product, id: product.id }))
       .then((_result) => {
+        syncManager.scheduleSyncAfterChange();
         Burnt.toast({ title: "Product updated successfully" });
         this.resetProduct();
         router.back();

@@ -15,6 +15,7 @@ import {
   getProductListingById,
   updateProductListingById,
 } from "@/src/database/Products/ProductsListingsRepo";
+import { syncManager } from "@/src/services/sync";
 
 import { appModel } from "../AppState/App.model";
 
@@ -117,6 +118,7 @@ export class EditProductListing {
       const addedProductListingHistory = await Effect.runPromise(
         addProductListingsHistory(productListingHistory),
       );
+      syncManager.scheduleSyncAfterChange();
       this.editProductDraft.status.set("success");
       Burnt.toast({
         title: "Price Updated Successfully",
