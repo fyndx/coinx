@@ -1,7 +1,7 @@
 import Currency from "@coinify/currency";
 import { computed, observable } from "@legendapp/state";
 import dayjs from "dayjs";
-import { Effect, pipe } from "effect";
+import { Effect } from "effect";
 
 import type { AsyncInterface } from "@/src/utils/async-interface";
 

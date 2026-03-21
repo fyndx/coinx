@@ -1,7 +1,7 @@
 import { type VariantProps, cva } from "class-variance-authority";
 import { Loader2 } from "lucide-react-native";
 import * as React from "react";
-import { Pressable, type PressableProps, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 
 import { cn } from "@/src/utils/cn";
 

@@ -1,13 +1,9 @@
 import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm/_relations";
-import {
-  index,
-  real,
-  sqliteTable,
-  text,
-  unique,
-} from "drizzle-orm/sqlite-core";
+import { defineRelations } from "drizzle-orm";
+import { index, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-orm/zod";
+
+import { generateUUID } from "@/src/utils/uuid";
 
 // ─── Sync Status Enum ────────────────────────────────────────
 export const syncStatusEnum = ["pending", "synced"] as const;
@@ -16,7 +12,9 @@ export type SyncStatus = (typeof syncStatusEnum)[number];
 // ─── Categories ──────────────────────────────────────────────
 
 export const categories = sqliteTable("coinx_category", {
-  id: text("id").primaryKey(), // UUID
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateUUID()), // UUID
   name: text("name").notNull(),
   icon: text("icon").notNull(),
   color: text("color").notNull(),
@@ -33,14 +31,12 @@ export const categories = sqliteTable("coinx_category", {
   localOwnerId: text("local_owner_id"),
 });
 
-export const categoriesRelations = relations(categories, ({ many }) => ({
-  transactions: many(transactions),
-}));
-
 // ─── Transactions ────────────────────────────────────────────
 
 export const transactions = sqliteTable("coinx_transaction", {
-  id: text("id").primaryKey(), // UUID
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateUUID()), // UUID
   transactionTime: text("transaction_time").notNull(),
   amount: real("amount").notNull(),
   note: text("note"),
@@ -62,17 +58,12 @@ export const transactions = sqliteTable("coinx_transaction", {
   localOwnerId: text("local_owner_id"),
 });
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-  category: one(categories, {
-    fields: [transactions.categoryId],
-    references: [categories.id],
-  }),
-}));
-
 // ─── Products ────────────────────────────────────────────────
 
 export const products = sqliteTable("coinx_product", {
-  id: text("id").primaryKey(), // UUID
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateUUID()), // UUID
   name: text("name").notNull(),
   image: text("image"),
   notes: text("notes"),
@@ -89,15 +80,12 @@ export const products = sqliteTable("coinx_product", {
   localOwnerId: text("local_owner_id"),
 });
 
-export const productsRelations = relations(products, ({ many }) => ({
-  product_listings: many(product_listings),
-  product_listings_history: many(product_listings_history),
-}));
-
 // ─── Stores ──────────────────────────────────────────────────
 
 export const stores = sqliteTable("coinx_store", {
-  id: text("id").primaryKey(), // UUID
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateUUID()), // UUID
   name: text("name").notNull(),
   location: text("location"),
 
@@ -112,16 +100,14 @@ export const stores = sqliteTable("coinx_store", {
   localOwnerId: text("local_owner_id"),
 });
 
-export const storesRelations = relations(stores, ({ many }) => ({
-  product_listings: many(product_listings),
-}));
-
 // ─── Product Listings ────────────────────────────────────────
 
 export const product_listings = sqliteTable(
   "coinx_product_listing",
   {
-    id: text("id").primaryKey(), // UUID
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateUUID()), // UUID
     productId: text("product_id") // UUID reference
       .references(() => products.id, { onDelete: "cascade" })
       .notNull(),
@@ -146,25 +132,10 @@ export const product_listings = sqliteTable(
     deletedAt: text("deleted_at"),
     localOwnerId: text("local_owner_id"),
   },
-  (table) => ({
-    productIdIdx: index("idx_product_listings_product_id").on(table.productId),
-    storeIdIdx: index("idx_product_listings_store_id").on(table.storeId),
-  }),
-);
-
-export const productListingsRelations = relations(
-  product_listings,
-  ({ one, many }) => ({
-    product: one(products, {
-      fields: [product_listings.productId],
-      references: [products.id],
-    }),
-    store: one(stores, {
-      fields: [product_listings.storeId],
-      references: [stores.id],
-    }),
-    product_listings_history: many(product_listings_history),
-  }),
+  (table) => [
+    index("idx_product_listings_product_id").on(table.productId),
+    index("idx_product_listings_store_id").on(table.storeId),
+  ],
 );
 
 // ─── Product Listings History ────────────────────────────────
@@ -172,7 +143,9 @@ export const productListingsRelations = relations(
 export const product_listings_history = sqliteTable(
   "coinx_product_listing_history",
   {
-    id: text("id").primaryKey(), // UUID
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateUUID()), // UUID
     productId: text("product_id") // UUID reference
       .references(() => products.id, { onDelete: "cascade" })
       .notNull(),
@@ -192,30 +165,62 @@ export const product_listings_history = sqliteTable(
     deletedAt: text("deleted_at"),
     localOwnerId: text("local_owner_id"),
   },
-  (table) => ({
-    productIdIdx: index("idx_product_listings_history_product_id").on(
-      table.productId,
+  (table) => [
+    index("idx_product_listings_history_product_id").on(table.productId),
+    index("idx_product_listings_history_product_listing_id").on(
+      table.productListingId,
     ),
-    productListingIdIdx: index(
-      "idx_product_listings_history_product_listing_id",
-    ).on(table.productListingId),
-    recordedAtIdx: index("idx_product_listings_history_recorded_at").on(
-      table.recordedAt,
-    ),
-  }),
+    index("idx_product_listings_history_recorded_at").on(table.recordedAt),
+  ],
 );
 
-export const productListingHistoryRelations = relations(
-  product_listings_history,
-  ({ one }) => ({
-    product: one(products, {
-      fields: [product_listings_history.productId],
-      references: [products.id],
-    }),
-    product_listing: one(product_listings, {
-      fields: [product_listings_history.productListingId],
-      references: [product_listings.id],
-    }),
+export const schemaRelations = defineRelations(
+  {
+    categories,
+    transactions,
+    products,
+    stores,
+    product_listings,
+    product_listings_history,
+  },
+  (r) => ({
+    categories: {
+      transactions: r.many.transactions(),
+    },
+    transactions: {
+      category: r.one.categories({
+        from: r.transactions.categoryId,
+        to: r.categories.id,
+      }),
+    },
+    products: {
+      product_listings: r.many.product_listings(),
+      product_listings_history: r.many.product_listings_history(),
+    },
+    stores: {
+      product_listings: r.many.product_listings(),
+    },
+    product_listings: {
+      product: r.one.products({
+        from: r.product_listings.productId,
+        to: r.products.id,
+      }),
+      store: r.one.stores({
+        from: r.product_listings.storeId,
+        to: r.stores.id,
+      }),
+      product_listings_history: r.many.product_listings_history(),
+    },
+    product_listings_history: {
+      product: r.one.products({
+        from: r.product_listings_history.productId,
+        to: r.products.id,
+      }),
+      product_listing: r.one.product_listings({
+        from: r.product_listings_history.productListingId,
+        to: r.product_listings.id,
+      }),
+    },
   }),
 );
 

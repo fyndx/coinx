@@ -1,20 +1,16 @@
-// This file is required for Expo/React Native SQLite migrations - https://orm.drizzle.team/quick-sqlite/expo
-
-import journal from './meta/_journal.json';
-import m0000 from './0000_flashy_morlocks.sql';
-import m0001 from './0001_flaky_senator_kelly.sql';
-import m0002 from './0002_stale_lester.sql';
-import m0003 from './0003_typical_blonde_phantom.sql';
-import m0004 from './0004_silent_dagger.sql';
+import m0000 from './20250107183308_flashy_morlocks/migration.sql';
+import m0001 from './20260128134158_flaky_senator_kelly/migration.sql';
+import m0002 from './20260217040622_stale_lester/migration.sql';
+import m0003 from './20260307190845_typical_blonde_phantom/migration.sql';
+import m0004 from './20260307193140_silent_dagger/migration.sql';
 
   export default {
-    journal,
     migrations: {
-      m0000,
-m0001,
-m0002,
-m0003,
-m0004
-    }
+      "20250107183308_flashy_morlocks": m0000,
+"20260128134158_flaky_senator_kelly": m0001,
+"20260217040622_stale_lester": m0002,
+"20260307190845_typical_blonde_phantom": m0003,
+"20260307193140_silent_dagger": m0004
+}
   }
   

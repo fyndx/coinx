@@ -1,4 +1,3 @@
-import type { Dayjs } from "dayjs";
 import type { DateType } from "react-native-ui-datepicker";
 
 import { type ObservableListenerDispose, observable } from "@legendapp/state";

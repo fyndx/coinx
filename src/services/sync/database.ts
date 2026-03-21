@@ -82,8 +82,8 @@ export const applyTableChanges = (
   table: SQLiteTable,
   changeSet: ChangeSet<SyncableRecord>,
 ) =>
-  Effect.tryPromise({
-    try: async () => {
+  Effect.try({
+    try: () => {
       if (changeSet.upserted.length === 0 && changeSet.deleted.length === 0) {
         return 0;
       }
@@ -91,7 +91,7 @@ export const applyTableChanges = (
       let count = 0;
       const idColumn = getIdColumn(table);
 
-      await database.transaction(async (tx) => {
+      database.transaction((tx) => {
         // Upsert records
         if (changeSet.upserted.length > 0) {
           for (const record of changeSet.upserted) {
@@ -110,7 +110,7 @@ export const applyTableChanges = (
 
               const { id: _id, ...updatePayload } = localRecord;
 
-              await tx.insert(table).values(localRecord).onConflictDoUpdate({
+              tx.insert(table).values(localRecord).onConflictDoUpdate({
                 target: idColumn,
                 set: updatePayload,
               });
@@ -143,7 +143,7 @@ export const applyTableChanges = (
               syncStatus,
             };
 
-            await tx.update(table).set(updatePayload).where(eq(idColumn, id));
+            tx.update(table).set(updatePayload).where(eq(idColumn, id));
             count++;
           }
         }

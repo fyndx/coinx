@@ -104,7 +104,7 @@ export class CategoryModel {
   category: ObservableObject<ICategoryDraft>;
   categories: CategoriesListObservable;
 
-  colors = new Array(6).fill("#fff").map(() => colorKit.randomRgbColor().hex());
+  colors = Array.from({ length: 6 }).map(() => colorKit.randomRgbColor().hex());
 
   constructor() {
     this.category = observable<ICategoryDraft>({

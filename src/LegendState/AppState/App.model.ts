@@ -7,7 +7,6 @@ import { getLocales } from "expo-localization";
 
 import { LatoRegular } from "@/assets/fonts";
 import { db, expoDb } from "@/db/client";
-import { runUUIDMigration } from "@/db/migrations/uuid-migration";
 import migrations from "@/drizzle/migrations";
 import { analytics } from "@/src/services/analytics";
 import { AppStorage } from "@/src/storage/mmkv";
@@ -33,11 +32,6 @@ export class AppModel {
 
   runDatabaseMigrations = async () => {
     try {
-      // Run custom UUID migration first (converts integer IDs to UUIDs for existing users)
-      // This is a no-op for fresh installs
-      await runUUIDMigration(expoDb);
-
-      // Then run Drizzle schema migrations
       await migrate(db, migrations);
       console.log("Database migrations ran successfully");
     } catch (error) {

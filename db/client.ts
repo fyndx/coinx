@@ -1,9 +1,11 @@
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite";
 
+import * as schema from "./schema";
+
 export const COINX_DATABASE_NAME = "coinx.db";
 export const expoDb = openDatabaseSync(COINX_DATABASE_NAME);
-export const db = drizzle(expoDb);
+export const db = drizzle(expoDb, { schema });
 
 /**
  * Wipe all user-generated local data while preserving schema and migrations.

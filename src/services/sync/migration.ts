@@ -36,34 +36,29 @@ import {
  * @param userId - Supabase user ID to assign ownership to
  */
 export const claimAnonymousData = (userId: string) =>
-  Effect.tryPromise({
-    try: () =>
-      db.transaction(async (tx) => {
-        await tx
-          .update(categories)
+  Effect.try({
+    try: () => {
+      db.transaction((tx) => {
+        tx.update(categories)
           .set({ localOwnerId: userId, syncStatus: "pending" })
           .where(isNull(categories.localOwnerId));
-        await tx
-          .update(transactions)
+        tx.update(transactions)
           .set({ localOwnerId: userId, syncStatus: "pending" })
           .where(isNull(transactions.localOwnerId));
-        await tx
-          .update(products)
+        tx.update(products)
           .set({ localOwnerId: userId, syncStatus: "pending" })
           .where(isNull(products.localOwnerId));
-        await tx
-          .update(stores)
+        tx.update(stores)
           .set({ localOwnerId: userId, syncStatus: "pending" })
           .where(isNull(stores.localOwnerId));
-        await tx
-          .update(product_listings)
+        tx.update(product_listings)
           .set({ localOwnerId: userId, syncStatus: "pending" })
           .where(isNull(product_listings.localOwnerId));
-        await tx
-          .update(product_listings_history)
+        tx.update(product_listings_history)
           .set({ localOwnerId: userId, syncStatus: "pending" })
           .where(isNull(product_listings_history.localOwnerId));
-      }),
+      });
+    },
     catch: (error) =>
       new Error(`Failed to claim anonymous data: ${String(error)}`),
   });
