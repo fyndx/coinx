@@ -1,5 +1,6 @@
-import { StyleSheet, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import { Select, Separator, SearchField } from "heroui-native";
+import React, { useState } from "react";
+import { View } from "react-native";
 
 import { MeasurementUnits } from "@/src/utils/units";
 
@@ -12,54 +13,65 @@ export const DefaultUnitSelect = ({
   onValueChange,
   value,
 }: DefaultUnitSelectProps) => {
-  const data = MeasurementUnits.map((unit) => ({ label: unit, value: unit }));
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const selectValue = value ? { value, label: value } : undefined;
+
+  const filteredUnits = MeasurementUnits.filter((unit) =>
+    unit.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <View className="w-full">
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={data}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="Select a Unit *"
-        searchPlaceholder="Search..."
-        value={value}
-        onChange={(item) => {
-          onValueChange?.(item.value);
+      <Select
+        value={selectValue}
+        onValueChange={(selected) => {
+          if (selected && !Array.isArray(selected)) {
+            onValueChange?.(
+              selected.value as (typeof MeasurementUnits)[number],
+            );
+            setSearchQuery(""); // clear search on selection
+          }
         }}
-      />
+        presentation="bottom-sheet"
+      >
+        <Select.Trigger>
+          <Select.Value placeholder="Select a Unit *" />
+          <Select.TriggerIndicator />
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Overlay />
+          <Select.Content
+            presentation="bottom-sheet"
+            snapPoints={["75%", "90%"]}
+          >
+            <Select.ListLabel className="px-4 py-2 font-semibold">
+              Measurement Units
+            </Select.ListLabel>
+            <View className="px-4 pb-2">
+              <SearchField value={searchQuery} onChange={setSearchQuery}>
+                <SearchField.Group>
+                  <SearchField.SearchIcon />
+                  <SearchField.Input placeholder="Search units..." />
+                  <SearchField.ClearButton />
+                </SearchField.Group>
+              </SearchField>
+            </View>
+            {filteredUnits.length > 0 ? (
+              filteredUnits.map((unit, index) => (
+                <React.Fragment key={unit}>
+                  <Select.Item value={unit} label={unit} />
+                  {index < filteredUnits.length - 1 && <Separator />}
+                </React.Fragment>
+              ))
+            ) : (
+              <Select.ListLabel className="px-4 py-4 text-center">
+                No units found
+              </Select.ListLabel>
+            )}
+          </Select.Content>
+        </Select.Portal>
+      </Select>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  dropdown: {
-    height: 50,
-    backgroundColor: "transparent",
-    borderBottomColor: "gray",
-    borderBottomWidth: 0.5,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});

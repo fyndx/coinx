@@ -1,13 +1,13 @@
-import { StyleSheet, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import { Select as HeroUISelect, Separator, SearchField } from "heroui-native";
+import React, { useState } from "react";
+import { View } from "react-native";
 
-import { Text } from "./ui/Text";
-
-interface DefaultUnitSelectProps<T> {
+interface CustomSelectProps<T> {
   placeholder: string;
   data: T[];
   displayField?: keyof T | ((item: T) => string);
   onValueChange?: (value: string) => void;
+  value?: string;
 }
 
 export const Select = <T extends {}>({
@@ -15,7 +15,10 @@ export const Select = <T extends {}>({
   data,
   onValueChange,
   displayField,
-}: DefaultUnitSelectProps<T>) => {
+  value,
+}: CustomSelectProps<T>) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   const getDisplayValue = (item: T) => {
     if (!displayField) {
       return String(item);
@@ -23,7 +26,7 @@ export const Select = <T extends {}>({
     if (typeof displayField === "function") {
       return displayField(item);
     }
-    return String(item[displayField]);
+    return String(item[displayField as keyof T]);
   };
 
   const formattedData = data.map((item) => {
@@ -31,51 +34,60 @@ export const Select = <T extends {}>({
     return { label, value: label, original: item };
   });
 
+  const filteredData = formattedData.filter((item) =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const selectValue = value ? { value, label: value } : undefined;
+
   return (
     <View className="w-full">
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={formattedData}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={placeholder}
-        searchPlaceholder="Search..."
-        onChange={(item) => {
-          onValueChange?.(item.value);
+      <HeroUISelect
+        value={selectValue}
+        onValueChange={(selected) => {
+          if (selected && !Array.isArray(selected)) {
+            onValueChange?.(selected.value);
+            setSearchQuery(""); // clear search on selection
+          }
         }}
-      />
+      >
+        <HeroUISelect.Trigger>
+          <HeroUISelect.Value placeholder={placeholder} />
+          <HeroUISelect.TriggerIndicator />
+        </HeroUISelect.Trigger>
+        <HeroUISelect.Portal>
+          <HeroUISelect.Overlay />
+          <HeroUISelect.Content
+            presentation="bottom-sheet"
+            snapPoints={["75%", "90%"]}
+          >
+            <HeroUISelect.ListLabel className="px-4 py-2 font-semibold">
+              {placeholder}
+            </HeroUISelect.ListLabel>
+            <View className="px-4 pb-2">
+              <SearchField value={searchQuery} onChange={setSearchQuery}>
+                <SearchField.Group>
+                  <SearchField.SearchIcon />
+                  <SearchField.Input placeholder="Search..." />
+                  <SearchField.ClearButton />
+                </SearchField.Group>
+              </SearchField>
+            </View>
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
+                <React.Fragment key={item.value}>
+                  <HeroUISelect.Item value={item.value} label={item.label} />
+                  {index < filteredData.length - 1 && <Separator />}
+                </React.Fragment>
+              ))
+            ) : (
+              <HeroUISelect.ListLabel className="px-4 py-4 text-center">
+                No results found
+              </HeroUISelect.ListLabel>
+            )}
+          </HeroUISelect.Content>
+        </HeroUISelect.Portal>
+      </HeroUISelect>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  dropdown: {
-    height: 50,
-    backgroundColor: "transparent",
-    borderBottomColor: "gray",
-    borderBottomWidth: 0.5,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});

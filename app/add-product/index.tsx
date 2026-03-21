@@ -1,10 +1,14 @@
 import { observer, useMount } from "@legendapp/state/react";
-import { Button } from "heroui-native";
-import { Keyboard, StyleSheet, TextInput, View } from "react-native";
+import { Button, Input } from "heroui-native";
+import {
+  Keyboard,
+  StyleSheet,
+  View,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Input } from "@/src/Components/ui/Input";
-import { Text } from "@/src/Components/ui/Text";
+import { Text } from "@/components/ui/text";
 import { DefaultUnitSelect } from "@/src/Containers/AddProduct/Components/DefaultUnitSelect";
 import { rootStore } from "@/src/LegendState";
 
@@ -27,11 +31,11 @@ const AddProduct = observer(() => {
   });
 
   const handleProductNameChange = (value: string) => {
-    addProductScreenModel$.product.name.set(value.trim());
+    addProductScreenModel$.product.name.set(value);
   };
 
   const handleProductNotesChange = (value: string) => {
-    addProductScreenModel$.product.notes.set(value.trim());
+    addProductScreenModel$.product.notes.set(value);
   };
 
   const handleUnitCategoryChange = (value: string) => {
@@ -49,43 +53,42 @@ const AddProduct = observer(() => {
   return (
     // TODO: Add error messages for input and select
     <SafeAreaView style={styles.container}>
-      <View
-        className="flex-1 p-4 justify-between"
-        onTouchEnd={Keyboard.dismiss}
-      >
-        <View className="gap-3">
-          <Input
-            placeholder={"Product Name *"}
-            value={name}
-            onChangeText={handleProductNameChange}
-            editable={!isAddProductInProgress}
-            autoFocus
-          />
-          <Input
-            placeholder={
-              "Notes\n(eg. Describe your expectations, quality, usage etc.)"
-            }
-            value={notes ?? ""}
-            onChangeText={handleProductNotesChange}
-            editable={!isAddProductInProgress}
-            multiline
-            numberOfLines={4}
-            className="min-h-[100px] text-top"
-          />
-          {/* Default Unit Select */}
-          <DefaultUnitSelect
-            value={defaultUnitCategory}
-            onValueChange={handleUnitCategoryChange}
-          />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View className="flex-1 p-4 justify-between">
+          <View className="gap-3">
+            <Input
+              placeholder={"Product Name *"}
+              value={name}
+              onChangeText={handleProductNameChange}
+              editable={!isAddProductInProgress}
+              autoFocus
+            />
+            <Input
+              placeholder={
+                "Notes\n(eg. Describe your expectations, quality, usage etc.)"
+              }
+              value={notes ?? ""}
+              onChangeText={handleProductNotesChange}
+              editable={!isAddProductInProgress}
+              multiline
+              numberOfLines={4}
+              className="min-h-[100px] text-top"
+            />
+            {/* Default Unit Select */}
+            <DefaultUnitSelect
+              value={defaultUnitCategory}
+              onValueChange={handleUnitCategoryChange}
+            />
+          </View>
+          <Button
+            onPress={handleSubmit}
+            // TODO: Disable Button unless input and select is valid
+            isDisabled={isAddProductInProgress}
+          >
+            <Text>{id ? "Edit Product" : "Add Product"}</Text>
+          </Button>
         </View>
-        <Button
-          onPress={handleSubmit}
-          // TODO: Disable Button unless input and select is valid
-          isDisabled={isAddProductInProgress}
-        >
-          <Text>{id ? "Edit Product" : "Add Product"}</Text>
-        </Button>
-      </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 });
