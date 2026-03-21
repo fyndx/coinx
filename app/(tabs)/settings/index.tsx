@@ -6,10 +6,13 @@ import { Fragment } from "react";
 import { Pressable, View } from "react-native";
 
 import { Button } from "@/src/Components/ui/Button";
+import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
 import { Text } from "@/src/Components/ui/Text";
 import { authModel } from "@/src/LegendState/Auth/Auth.model";
-import { type ThemeMode, themeModel } from "@/src/LegendState/Theme/Theme.model";
-import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
+import {
+  type ThemeMode,
+  themeModel,
+} from "@/src/LegendState/Theme/Theme.model";
 
 const SettingsItem = ({
   title,
@@ -26,7 +29,9 @@ const SettingsItem = ({
     <View className="bg-background p-4 flex-row justify-between items-center bg-card rounded-lg mb-1">
       <Text className="text-lg">{title}</Text>
       <View className="flex-row items-center">
-        {subTitle && <Text className="text-muted-foreground mr-2">{subTitle}</Text>}
+        {subTitle && (
+          <Text className="text-muted-foreground mr-2">{subTitle}</Text>
+        )}
         {icon && <ChevronRight size={20} color="gray" />}
       </View>
     </View>
@@ -48,7 +53,11 @@ const AccountSection = observer(() => {
         <Text className="text-muted-foreground text-sm mb-3">
           Sign in to sync your data across devices
         </Text>
-        <Button variant="default" size="sm" onPress={() => router.push("/(auth)/sign-in")}>
+        <Button
+          variant="default"
+          size="sm"
+          onPress={() => router.push("/(auth)/sign-in")}
+        >
           Sign In
         </Button>
       </View>
@@ -114,7 +123,9 @@ const AppearanceSection = observer(() => {
                 )}
                 <Text className="text-foreground text-base">{label}</Text>
               </View>
-              {isActive && <Check size={20} className="text-primary color-primary" />}
+              {isActive && (
+                <Check size={20} className="text-primary color-primary" />
+              )}
             </Pressable>
           );
         })}
