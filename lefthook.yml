@@ -4,6 +4,7 @@ pre-commit:
     - name: oxfmt
       glob: "*.{js,ts,jsx,tsx,json,yaml,yml,md,css}"
       run: bunx oxfmt {staged_files}
+      stage_fixed: true
     - name: oxlint-fix
       glob: "*.{js,ts,jsx,tsx}"
       run: bunx oxlint --fix {staged_files}
