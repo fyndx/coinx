@@ -1,6 +1,12 @@
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/_relations";
-import { index, real, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  real,
+  sqliteTable,
+  text,
+  unique,
+} from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-orm/zod";
 
 // ─── Sync Status Enum ────────────────────────────────────────
@@ -134,7 +140,9 @@ export const product_listings = sqliteTable(
     updatedAt: text("updated_at"),
 
     // Sync fields
-    syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+    syncStatus: text("sync_status", { enum: syncStatusEnum }).default(
+      "pending",
+    ),
     deletedAt: text("deleted_at"),
     localOwnerId: text("local_owner_id"),
   },
@@ -144,17 +152,20 @@ export const product_listings = sqliteTable(
   }),
 );
 
-export const productListingsRelations = relations(product_listings, ({ one, many }) => ({
-  product: one(products, {
-    fields: [product_listings.productId],
-    references: [products.id],
+export const productListingsRelations = relations(
+  product_listings,
+  ({ one, many }) => ({
+    product: one(products, {
+      fields: [product_listings.productId],
+      references: [products.id],
+    }),
+    store: one(stores, {
+      fields: [product_listings.storeId],
+      references: [stores.id],
+    }),
+    product_listings_history: many(product_listings_history),
   }),
-  store: one(stores, {
-    fields: [product_listings.storeId],
-    references: [stores.id],
-  }),
-  product_listings_history: many(product_listings_history),
-}));
+);
 
 // ─── Product Listings History ────────────────────────────────
 
@@ -175,29 +186,38 @@ export const product_listings_history = sqliteTable(
     updatedAt: text("updated_at"),
 
     // Sync fields
-    syncStatus: text("sync_status", { enum: syncStatusEnum }).default("pending"),
+    syncStatus: text("sync_status", { enum: syncStatusEnum }).default(
+      "pending",
+    ),
     deletedAt: text("deleted_at"),
     localOwnerId: text("local_owner_id"),
   },
   (table) => ({
-    productIdIdx: index("idx_product_listings_history_product_id").on(table.productId),
-    productListingIdIdx: index("idx_product_listings_history_product_listing_id").on(
-      table.productListingId,
+    productIdIdx: index("idx_product_listings_history_product_id").on(
+      table.productId,
     ),
-    recordedAtIdx: index("idx_product_listings_history_recorded_at").on(table.recordedAt),
+    productListingIdIdx: index(
+      "idx_product_listings_history_product_listing_id",
+    ).on(table.productListingId),
+    recordedAtIdx: index("idx_product_listings_history_recorded_at").on(
+      table.recordedAt,
+    ),
   }),
 );
 
-export const productListingHistoryRelations = relations(product_listings_history, ({ one }) => ({
-  product: one(products, {
-    fields: [product_listings_history.productId],
-    references: [products.id],
+export const productListingHistoryRelations = relations(
+  product_listings_history,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [product_listings_history.productId],
+      references: [products.id],
+    }),
+    product_listing: one(product_listings, {
+      fields: [product_listings_history.productListingId],
+      references: [product_listings.id],
+    }),
   }),
-  product_listing: one(product_listings, {
-    fields: [product_listings_history.productListingId],
-    references: [product_listings.id],
-  }),
-}));
+);
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -230,11 +250,17 @@ export const selectProductListingSchema = createSelectSchema(product_listings);
 export const insertProductListingSchema = createInsertSchema(product_listings);
 
 // Product Listings History Types
-export type SelectProductListingHistory = typeof product_listings_history.$inferSelect;
-export type InsertProductListingHistory = typeof product_listings_history.$inferInsert;
+export type SelectProductListingHistory =
+  typeof product_listings_history.$inferSelect;
+export type InsertProductListingHistory =
+  typeof product_listings_history.$inferInsert;
 
-export const selectProductListingHistorySchema = createSelectSchema(product_listings_history);
-export const insertProductListingHistorySchema = createInsertSchema(product_listings_history);
+export const selectProductListingHistorySchema = createSelectSchema(
+  product_listings_history,
+);
+export const insertProductListingHistorySchema = createInsertSchema(
+  product_listings_history,
+);
 
 // Store Types
 export type SelectStore = typeof stores.$inferSelect;

@@ -13,10 +13,10 @@ import {
   View,
 } from "react-native";
 
+import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
 import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
-import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
 
 const AddProductListing = observer(() => {
   const { id } = useLocalSearchParams();
@@ -43,7 +43,9 @@ const AddProductListing = observer(() => {
     };
   });
 
-  const handleUnitChange = (selectedUnit: { label: string; value: string } | undefined) => {
+  const handleUnitChange = (
+    selectedUnit: { label: string; value: string } | undefined,
+  ) => {
     if (!selectedUnit) {
       return;
     }
@@ -51,14 +53,18 @@ const AddProductListing = observer(() => {
     productModel$.productDetailsDraft.unit.set(selectedUnit.value);
   };
 
-  const handleStoreChange = (selectedStore: { label: string; value: string } | undefined) => {
+  const handleStoreChange = (
+    selectedStore: { label: string; value: string } | undefined,
+  ) => {
     if (!selectedStore) {
       return;
     }
 
     const stores = storeModel$.storesList.peek();
 
-    const storeIndex = stores.findIndex((store) => store.id === selectedStore.value);
+    const storeIndex = stores.findIndex(
+      (store) => store.id === selectedStore.value,
+    );
 
     const storeId = stores[storeIndex].id;
     productModel$.productDetailsDraft.storeId.set(storeId);
@@ -88,7 +94,9 @@ const AddProductListing = observer(() => {
             aria-label={"Product Name"}
             returnKeyType="next"
             onSubmitEditing={() => priceRef.current?.focus()}
-            onChangeText={(text) => productModel$.productDetailsDraft.name.set(text.trim())}
+            onChangeText={(text) =>
+              productModel$.productDetailsDraft.name.set(text.trim())
+            }
           />
           <Input
             ref={priceRef}
@@ -124,10 +132,17 @@ const AddProductListing = observer(() => {
             </Select.Trigger>
             <Select.Portal>
               <Select.Overlay />
-              <Select.Content presentation="popover" className="max-h-[50%] w-full bg-background">
+              <Select.Content
+                presentation="popover"
+                className="max-h-[50%] w-full bg-background"
+              >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                   {productModel$.units.get().map((unit) => (
-                    <Select.Item key={unit.value} value={unit.value} label={unit.label} />
+                    <Select.Item
+                      key={unit.value}
+                      value={unit.value}
+                      label={unit.label}
+                    />
                   ))}
                 </ScrollView>
               </Select.Content>
@@ -142,7 +157,10 @@ const AddProductListing = observer(() => {
               </Select.Trigger>
               <Select.Portal>
                 <Select.Overlay />
-                <Select.Content presentation="popover" className="max-h-[50%] w-full bg-background">
+                <Select.Content
+                  presentation="popover"
+                  className="max-h-[50%] w-full bg-background"
+                >
                   <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     {storeModel$.storesList.get().map((store) => (
                       <Select.Item
@@ -170,7 +188,9 @@ const AddProductListing = observer(() => {
             placeholder="URL"
             returnKeyType="done"
             onSubmitEditing={Keyboard.dismiss}
-            onChangeText={(text) => productModel$.productDetailsDraft.url.set(text.trim())}
+            onChangeText={(text) =>
+              productModel$.productDetailsDraft.url.set(text.trim())
+            }
           />
         </View>
         <View>

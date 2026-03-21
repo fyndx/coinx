@@ -53,10 +53,12 @@ export class AddProductListingModel {
       return;
     }
 
-    const unitsList = convert().list(defaultUnit).map((unit) => ({
-      label: `${unit.plural} (${unit.abbr})`,
-      value: unit.abbr,
-    }));
+    const unitsList = convert()
+      .list(defaultUnit)
+      .map((unit) => ({
+        label: `${unit.plural} (${unit.abbr})`,
+        value: unit.abbr,
+      }));
     console.log("Available units for product:", unitsList);
     this.units.set(unitsList);
   };
@@ -71,9 +73,8 @@ export class AddProductListingModel {
         appModel.obs.currency.code.peek(),
       ) as number;
 
-      const validationResult = insertProductListingSchema.safeParse(
-        productListing,
-      );
+      const validationResult =
+        insertProductListingSchema.safeParse(productListing);
 
       console.log("Validation result for product listing:", validationResult);
 
