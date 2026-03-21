@@ -1,23 +1,22 @@
 import { observer, useMount } from "@legendapp/state/react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Button } from "heroui-native";
+import { Button, Input, Select } from "heroui-native";
 import { PlusCircle } from "lucide-react-native";
 import { useRef } from "react";
 import {
   ActivityIndicator,
   Keyboard,
   Pressable,
+  ScrollView,
   StyleSheet,
   type TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Select } from "@/src/Components/Select";
-import { Input } from "@/src/Components/ui/Input";
 import { Text } from "@/src/Components/ui/Text";
 import { rootStore } from "@/src/LegendState";
 import { storeModel$ } from "@/src/LegendState/Store/Store.model";
+import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
 
 const AddProductListing = observer(() => {
   const { id } = useLocalSearchParams();
@@ -44,16 +43,22 @@ const AddProductListing = observer(() => {
     };
   });
 
-  const handleUnitChange = (value: string) => {
-    productModel$.productDetailsDraft.unit.set(value);
+  const handleUnitChange = (selectedUnit: { label: string; value: string } | undefined) => {
+    if (!selectedUnit) {
+      return;
+    }
+
+    productModel$.productDetailsDraft.unit.set(selectedUnit.value);
   };
 
-  const handleStoreChange = (value: string) => {
+  const handleStoreChange = (selectedStore: { label: string; value: string } | undefined) => {
+    if (!selectedStore) {
+      return;
+    }
+
     const stores = storeModel$.storesList.peek();
 
-    const storeIndex = stores.findIndex(
-      (store) => `${store.name} - ${store.location}` === value,
-    );
+    const storeIndex = stores.findIndex((store) => store.id === selectedStore.value);
 
     const storeId = stores[storeIndex].id;
     productModel$.productDetailsDraft.storeId.set(storeId);
@@ -65,7 +70,7 @@ const AddProductListing = observer(() => {
 
   if (productModel$.product?.defaultUnitCategory?.get() === undefined) {
     return (
-      <SafeAreaView>
+      <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
         <View className="p-4 gap-2">
           <Text>Loading...</Text>
           <ActivityIndicator />
@@ -75,7 +80,7 @@ const AddProductListing = observer(() => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <View className="flex-1 p-4 justify-between">
         <View className="gap-2">
           <Input
@@ -83,9 +88,7 @@ const AddProductListing = observer(() => {
             aria-label={"Product Name"}
             returnKeyType="next"
             onSubmitEditing={() => priceRef.current?.focus()}
-            onChangeText={(text) =>
-              productModel$.productDetailsDraft.name.set(text.trim())
-            }
+            onChangeText={(text) => productModel$.productDetailsDraft.name.set(text.trim())}
           />
           <Input
             ref={priceRef}
@@ -113,23 +116,46 @@ const AddProductListing = observer(() => {
               }
             }}
           />
-          <Select
-            placeholder={"Unit *"}
-            data={productModel$.units.get()}
-            onValueChange={handleUnitChange}
-          />
+          {/* Unit selection */}
+          <Select onValueChange={handleUnitChange}>
+            <Select.Trigger>
+              <Select.Value placeholder="Unit *" />
+              <Select.TriggerIndicator />
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Overlay />
+              <Select.Content presentation="popover" className="max-h-[50%] w-full bg-background">
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                  {productModel$.units.get().map((unit) => (
+                    <Select.Item key={unit.value} value={unit.value} label={unit.label} />
+                  ))}
+                </ScrollView>
+              </Select.Content>
+            </Select.Portal>
+          </Select>
+          {/* Store selection */}
           <View className="flex-row items-center gap-2">
-            <View className="flex-1">
-              <Select
-                placeholder={"Store *"}
-                data={storeModel$.storesList.get()}
-                displayField={(item: {
-                  name: string;
-                  location: string | null;
-                }) => `${item.name} - ${item.location}`}
-                onValueChange={handleStoreChange}
-              />
-            </View>
+            <Select className="flex-1" onValueChange={handleStoreChange}>
+              <Select.Trigger>
+                <Select.Value placeholder="Store *" />
+                <Select.TriggerIndicator />
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Overlay />
+                <Select.Content presentation="popover" className="max-h-[50%] w-full bg-background">
+                  <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    {storeModel$.storesList.get().map((store) => (
+                      <Select.Item
+                        key={store.id}
+                        value={store.id}
+                        label={`${store.name} - ${store.location}`}
+                      />
+                    ))}
+                  </ScrollView>
+                </Select.Content>
+              </Select.Portal>
+            </Select>
+
             <Pressable
               onPress={() => router.push("/add-store")}
               accessibilityRole="button"
@@ -144,9 +170,7 @@ const AddProductListing = observer(() => {
             placeholder="URL"
             returnKeyType="done"
             onSubmitEditing={Keyboard.dismiss}
-            onChangeText={(text) =>
-              productModel$.productDetailsDraft.url.set(text.trim())
-            }
+            onChangeText={(text) => productModel$.productDetailsDraft.url.set(text.trim())}
           />
         </View>
         <View>

@@ -17,6 +17,11 @@ import { convert } from "@/src/utils/units";
 
 import { appModel } from "../AppState/App.model";
 
+type ProductUnitOption = {
+  label: string;
+  value: string;
+};
+
 export class AddProductListingModel {
   product;
   units;
@@ -24,11 +29,12 @@ export class AddProductListingModel {
 
   constructor() {
     this.product = observable<Partial<SelectProduct>>({});
-    this.units = observable<string[]>([]);
+    this.units = observable<ProductUnitOption[]>([]);
     this.productDetailsDraft = observable<Partial<InsertProductListing>>({});
   }
 
   getProductById = async (id: string) => {
+    console.log("Fetching product details for ID:", id);
     const product = await Effect.runPromise(findProductById({ id }));
     this.product.set(product[0]);
     this.productDetailsDraft.productId.set(id);
@@ -42,21 +48,34 @@ export class AddProductListingModel {
 
   addUnitsForProduct = () => {
     const defaultUnit = this.product.defaultUnitCategory.peek();
-    const unitsList = convert().possibilities(defaultUnit);
+    if (!defaultUnit) {
+      this.units.set([]);
+      return;
+    }
+
+    const unitsList = convert().list(defaultUnit).map((unit) => ({
+      label: `${unit.plural} (${unit.abbr})`,
+      value: unit.abbr,
+    }));
+    console.log("Available units for product:", unitsList);
     this.units.set(unitsList);
   };
 
   addProductDetails = async () => {
     try {
       const productListing = this.productDetailsDraft.peek();
+      console.log("Adding product listing with details:", productListing);
       // TODO: Change INR to currency from user settings
       productListing.price = Currency.toSmallestSubunit(
         productListing.price ?? 0,
         appModel.obs.currency.code.peek(),
       ) as number;
 
-      const validationResult =
-        insertProductListingSchema.safeParse(productListing);
+      const validationResult = insertProductListingSchema.safeParse(
+        productListing,
+      );
+
+      console.log("Validation result for product listing:", validationResult);
 
       if (!validationResult.success) {
         Burnt.toast({ title: "Invalid product details" });
@@ -64,7 +83,7 @@ export class AddProductListingModel {
       }
 
       const [createdProductListing] = await Effect.runPromise(
-        addProductListing(validationResult.data as InsertProductListing),
+        addProductListing(validationResult.data),
       );
       await Effect.runPromise(
         addProductListingsHistory({
@@ -85,5 +104,6 @@ export class AddProductListingModel {
 
   reset = () => {
     this.product.set({});
+    this.units.set([]);
   };
 }
