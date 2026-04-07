@@ -1,5 +1,5 @@
 import { observer } from "@legendapp/state/react";
-import * as Application from "expo-application";
+import Constants from "expo-constants";
 import { Link, router } from "expo-router";
 import { ChevronRight, SunMoon, User, Check } from "lucide-react-native";
 import { Fragment } from "react";
@@ -166,7 +166,7 @@ const Settings = observer(() => {
         {/* Version */}
         <SettingsItem
           title="Version"
-          subTitle={Application.nativeApplicationVersion ?? undefined}
+          subTitle={Constants.expoConfig?.version ?? undefined}
         />
       </View>
     </SafeAreaView>

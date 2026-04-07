@@ -1,10 +1,10 @@
 import { Effect } from "effect";
-import { File } from "expo-file-system";
-import { zip } from "react-native-zip-archive";
+import { Platform } from "react-native";
 
 import { expoDb } from "@/db/client";
 
 export const listDatabaseTables = Effect.promise<{ name: string }[]>(() => {
+  if (Platform.OS === "web") return Promise.resolve([]);
   return expoDb.getAllAsync(
     `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`,
     [],
@@ -18,7 +18,9 @@ export const saveTableToCsv = async ({
   tableName: string;
   fileUri: string;
 }) => {
+  if (Platform.OS === "web") return;
   try {
+    const { File } = await import("expo-file-system");
     const result: { name: string }[] = await expoDb.getAllAsync(
       `PRAGMA table_info(${tableName});`,
     );
@@ -73,7 +75,9 @@ export const createZipArchive = async ({
   sourceDir: string;
   destZipFile: string;
 }) => {
+  if (Platform.OS === "web") return;
   try {
+    const { zip } = await import("react-native-zip-archive");
     await zip(sourceDir, destZipFile);
   } catch (error) {
     throw new Error(

@@ -4,6 +4,8 @@ import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
+import type React from "react";
+import { Platform } from "react-native";
 
 import { expoDb } from "@/db/client";
 import { Splash } from "@/src/Components/Splash";
@@ -71,11 +73,19 @@ const useProtectedRoute = () => {
   }, [isAuthenticated, isAuthLoading, router, segments, setupStatus]);
 };
 
+let WebToaster: React.ComponentType = () => null;
+if (Platform.OS === "web") {
+  // Loaded only on web to avoid bundling sonner on native
+  const { Toaster } = require("sonner");
+  WebToaster = () => <Toaster richColors position="top-right" />;
+}
+
 const RootLayoutNav = observer(() => {
   useProtectedRoute();
 
   return (
     <RootProvider>
+      {Platform.OS === "web" && <WebToaster />}
       <Stack screenOptions={{ statusBarStyle: "auto" }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />

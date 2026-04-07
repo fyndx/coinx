@@ -1,4 +1,3 @@
-import { WINDOW_HEIGHT } from "@gorhom/bottom-sheet";
 import { observer } from "@legendapp/state/react";
 import { FlashList } from "@shopify/flash-list";
 import { Link, useFocusEffect, useRouter } from "expo-router";
@@ -10,8 +9,10 @@ import {
   Trash2,
 } from "lucide-react-native";
 import { useCallback } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 import type { SelectProduct } from "@/db/schema";
 
