@@ -1,10 +1,11 @@
 import { observable } from "@legendapp/state";
-import { MMKV } from "react-native-mmkv";
 import { Uniwind } from "uniwind";
+
+import { createKVStorage } from "@/src/storage/kvStorage";
 
 export type ThemeMode = "light" | "dark" | "system";
 
-const storage = new MMKV({ id: "theme-storage" });
+const storage = createKVStorage("theme-storage");
 
 const isThemeMode = (value?: string): value is ThemeMode =>
   value === "light" || value === "dark" || value === "system";

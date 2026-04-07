@@ -3,7 +3,7 @@ import {
   type ObservableArray,
   observable,
 } from "@legendapp/state";
-import * as Burnt from "burnt";
+import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -43,13 +43,13 @@ export class StoreModel {
     this.isSubmitting.set(true);
     Effect.runPromise(addStore(this.storeDraft.peek()))
       .then((_result) => {
-        Burnt.toast({ title: "Store added successfully" });
+        showToast({ title: "Store added successfully" });
         analytics.logEvent("store_created");
         this.getStoresList();
         router.back();
       })
       .catch((error) => {
-        Burnt.toast({
+        showToast({
           title: "Failed to add store",
           message: error.message,
         });
@@ -65,12 +65,12 @@ export class StoreModel {
       this.isSubmitting.set(true);
       Effect.runPromise(editStore({ name, location }, id))
         .then((_result) => {
-          Burnt.toast({ title: "Store updated successfully" });
+          showToast({ title: "Store updated successfully" });
           this.getStoresList();
           router.back();
         })
         .catch((error) => {
-          Burnt.toast({
+          showToast({
             title: "Failed to update store",
             message: error.message,
           });
@@ -90,11 +90,11 @@ export class StoreModel {
     this.isSubmitting.set(true);
     Effect.runPromise(deleteStoreById(id))
       .then((_result) => {
-        Burnt.toast({ title: "Store deleted successfully" });
+        showToast({ title: "Store deleted successfully" });
         this.getStoresList();
       })
       .catch((error) => {
-        Burnt.toast({
+        showToast({
           title: "Failed to delete store",
           message: error.message,
         });

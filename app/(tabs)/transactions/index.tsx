@@ -1,7 +1,7 @@
-import type { NativeActionEvent } from "@react-native-menu/menu";
+import type { PlatformMenuEvent } from "@/src/Components/PlatformMenu";
 
 import { observer, useMount } from "@legendapp/state/react";
-import { MenuView } from "@react-native-menu/menu";
+import { PlatformMenu } from "@/src/Components/PlatformMenu";
 import { Link, useFocusEffect } from "expo-router";
 import { Button } from "heroui-native";
 import { PlusCircle } from "lucide-react-native";
@@ -59,7 +59,7 @@ const SpentMenuComponent = observer(
   }: {
     transactionsScreenModel$: TransactionsScreenModel;
   }) => {
-    const handleOptionChange = ({ nativeEvent }: NativeActionEvent) => {
+    const handleOptionChange = ({ nativeEvent }: PlatformMenuEvent) => {
       transactionsScreenModel$.obs.duration.set(
         nativeEvent.event as DurationOptions,
       );
@@ -69,11 +69,11 @@ const SpentMenuComponent = observer(
       <View className="py-6">
         <View className="flex-row items-center justify-center">
           <Text>{"Spent "}</Text>
-          <MenuView actions={ACTIONS} onPressAction={handleOptionChange}>
+          <PlatformMenu actions={ACTIONS} onPressAction={handleOptionChange}>
             <Button size="sm" variant="secondary">
               <Text>{transactionsScreenModel$.obs.duration.get()}</Text>
             </Button>
-          </MenuView>
+          </PlatformMenu>
         </View>
         <View className="flex-row items-center justify-center">
           <Text className="text-3xl font-bold">
