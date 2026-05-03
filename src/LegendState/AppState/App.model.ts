@@ -4,9 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { loadAsync } from "expo-font";
 import { getLocales } from "expo-localization";
+import { Platform } from "react-native";
 
 import { LatoRegular } from "@/assets/fonts";
-import { db, expoDb } from "@/db/client";
+import { db } from "@/db/client";
 import migrations from "@/drizzle/migrations";
 import { analytics } from "@/src/services/analytics";
 import { AppStorage } from "@/src/storage/mmkv";
@@ -32,6 +33,11 @@ export class AppModel {
 
   runDatabaseMigrations = async () => {
     try {
+      // On web, the DB needs async initialisation before we can use it
+      if (Platform.OS === "web") {
+        const { initDb } = await import("@/db/client");
+        await initDb();
+      }
       await migrate(db, migrations);
       console.log("Database migrations ran successfully");
     } catch (error) {

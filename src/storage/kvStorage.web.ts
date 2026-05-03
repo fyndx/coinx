@@ -6,29 +6,40 @@ export interface IKVStorage {
   getAllKeys(): string[];
 }
 
+// Safe accessor — returns undefined/no-ops when localStorage is not available
+// (e.g. during SSR or Metro server-side rendering on web).
+function getStorage(): Storage | null {
+  if (typeof localStorage !== "undefined") {
+    return localStorage;
+  }
+  return null;
+}
+
 export function createKVStorage(id: string): IKVStorage {
   const prefix = `${id}:`;
 
   return {
     getString(key: string): string | undefined {
-      const val = localStorage.getItem(prefix + key);
+      const val = getStorage()?.getItem(prefix + key) ?? null;
       return val === null ? undefined : val;
     },
     getBoolean(key: string): boolean | undefined {
-      const val = localStorage.getItem(prefix + key);
+      const val = getStorage()?.getItem(prefix + key) ?? null;
       if (val === null) return undefined;
       return val === "true";
     },
     set(key: string, value: string | boolean): void {
-      localStorage.setItem(prefix + key, String(value));
+      getStorage()?.setItem(prefix + key, String(value));
     },
     delete(key: string): void {
-      localStorage.removeItem(prefix + key);
+      getStorage()?.removeItem(prefix + key);
     },
     getAllKeys(): string[] {
+      const storage = getStorage();
+      if (!storage) return [];
       const keys: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
+      for (let i = 0; i < storage.length; i++) {
+        const k = storage.key(i);
         if (k?.startsWith(prefix)) {
           keys.push(k.slice(prefix.length));
         }
