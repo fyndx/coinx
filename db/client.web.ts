@@ -32,7 +32,8 @@ async function _init() {
       const isLockError =
         err instanceof Error &&
         (err.message.includes("NoModificationAllowedError") ||
-          err.message.includes("createSyncAccessHandle"));
+          err.message.includes("createSyncAccessHandle") ||
+          err.message.includes("Invalid VFS state"));
       if (!isLockError) throw err;
       // Wait before retrying (50 ms, 150 ms, 450 ms, …)
       await new Promise((res) => setTimeout(res, 50 * 3 ** attempt));
