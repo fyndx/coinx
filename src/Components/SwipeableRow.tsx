@@ -1,5 +1,6 @@
 import React, { Component, type PropsWithChildren } from "react";
 import {
+  Platform,
   Pressable,
   type StyleProp,
   StyleSheet,
@@ -121,6 +122,11 @@ export class SwipeableRow extends Component<
 
   render() {
     const { children, leftActions = [], rightActions = [] } = this.props;
+
+    if (Platform.OS === "web") {
+      return children;
+    }
+
     return (
       <Swipeable
         ref={this.swipeableRowRef}

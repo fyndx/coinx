@@ -92,6 +92,9 @@
     "@shopify/react-native-skia",
     "@sentry/cli",
   ],
+  "patchedDependencies": {
+    "expo-sqlite@55.0.10": "patches/expo-sqlite@55.0.10.patch",
+  },
   "overrides": {
     "@react-navigation/bottom-tabs": "^7.10.1",
     "@react-navigation/core": "^7.16.1",

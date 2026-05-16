@@ -128,5 +128,8 @@
   "trustedDependencies": [
     "@sentry/cli",
     "@shopify/react-native-skia"
-  ]
+  ],
+  "patchedDependencies": {
+    "expo-sqlite@55.0.10": "patches/expo-sqlite@55.0.10.patch"
+  }
 }
