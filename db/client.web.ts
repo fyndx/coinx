@@ -16,6 +16,42 @@ let _expoDb: Awaited<ReturnType<typeof openDatabaseAsync>> | null = null;
 let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 let _initPromise: Promise<void> | null = null;
 
+/**
+ * Detects transient lock errors from expo-sqlite on web.
+ * Expected error formats:
+ * - Chrome/Edge: DOMException with name "NoModificationAllowedError"
+ * - Safari: Error mentioning "createSyncAccessHandle" or "Invalid VFS state"
+ * - Expo-sqlite wrapper: Error messages containing OPFS lock indicators
+ */
+function isTransientLockError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+
+  // Check canonical error properties first (DOMException, etc.)
+  const domErr = err as DOMException & { name?: string; code?: number };
+  if (domErr.name === "NoModificationAllowedError") {
+    console.warn(
+      "[db.web] Detected OPFS lock error (NoModificationAllowedError):",
+      err.message,
+      err.stack,
+    );
+    return true;
+  }
+
+  // Fall back to conservative regex on err.message when canonical properties unavailable
+  const lockPatterns =
+    /NoModificationAllowedError|createSyncAccessHandle|Invalid VFS state/i;
+  if (lockPatterns.test(err.message)) {
+    console.warn(
+      "[db.web] Detected OPFS lock error via message pattern:",
+      err.message,
+      err.stack,
+    );
+    return true;
+  }
+
+  return false;
+}
+
 async function _init() {
   // expo-sqlite on web uses OPFS (Origin Private File System) with a sync access
   // handle that only allows one holder at a time. During HMR reloads or when
@@ -29,12 +65,7 @@ async function _init() {
       return;
     } catch (err) {
       lastError = err;
-      const isLockError =
-        err instanceof Error &&
-        (err.message.includes("NoModificationAllowedError") ||
-          err.message.includes("createSyncAccessHandle") ||
-          err.message.includes("Invalid VFS state"));
-      if (!isLockError) throw err;
+      if (!isTransientLockError(err)) throw err;
       // Wait before retrying (50 ms, 150 ms, 450 ms, …)
       await new Promise((res) => setTimeout(res, 50 * 3 ** attempt));
     }

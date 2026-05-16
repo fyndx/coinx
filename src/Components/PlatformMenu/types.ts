@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactElement } from "react";
 
 export interface PlatformMenuAction {
   id: string;
@@ -12,5 +12,5 @@ export interface PlatformMenuEvent {
 export interface PlatformMenuProps {
   actions: PlatformMenuAction[];
   onPressAction: (event: PlatformMenuEvent) => void;
-  children: ReactNode;
+  children: ReactElement;
 }
