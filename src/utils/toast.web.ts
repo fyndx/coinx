@@ -7,9 +7,19 @@ interface ToastOptions {
 }
 
 export function showToast({ title, message, preset }: ToastOptions): void {
-  if (preset === "error") {
-    toast.error(title, { description: message });
-  } else {
-    toast.success(title, { description: message });
+  switch (preset) {
+    case "error":
+      toast.error(title, { description: message });
+      break;
+    case "done":
+      toast.success(title, { description: message });
+      break;
+    case "spinner":
+      toast.loading(title, { description: message });
+      break;
+    case "none":
+    default:
+      toast(title, { description: message });
+      break;
   }
 }

@@ -7,11 +7,18 @@ const config = getSentryExpoConfig(__dirname);
 config.resolver.assetExts.push('wasm');
 
 // Add COEP and COOP headers to support SharedArrayBuffer
+const originalEnhanceMiddleware = config.server.enhanceMiddleware;
 config.server.enhanceMiddleware = (middleware) => {
+  // First, apply any existing middleware wrapper (e.g., from Sentry/Expo)
+  const wrappedMiddleware = originalEnhanceMiddleware
+    ? originalEnhanceMiddleware(middleware)
+    : middleware;
+
+  // Then add our headers on top
   return (req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-    middleware(req, res, next);
+    wrappedMiddleware(req, res, next);
   };
 };
 

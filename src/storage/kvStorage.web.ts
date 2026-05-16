@@ -20,19 +20,45 @@ export function createKVStorage(id: string): IKVStorage {
 
   return {
     getString(key: string): string | undefined {
-      const val = getStorage()?.getItem(prefix + key) ?? null;
-      return val === null ? undefined : val;
+      const storage = getStorage();
+      if (!storage) return undefined;
+      try {
+        const val = storage.getItem(prefix + key);
+        return val === null ? undefined : val;
+      } catch {
+        return undefined;
+      }
     },
     getBoolean(key: string): boolean | undefined {
-      const val = getStorage()?.getItem(prefix + key) ?? null;
-      if (val === null) return undefined;
-      return val === "true";
+      const storage = getStorage();
+      if (!storage) return undefined;
+      try {
+        const val = storage.getItem(prefix + key);
+        if (val === null) return undefined;
+        if (val === "true") return true;
+        if (val === "false") return false;
+        return undefined;
+      } catch {
+        return undefined;
+      }
     },
     set(key: string, value: string | boolean): void {
-      getStorage()?.setItem(prefix + key, String(value));
+      const storage = getStorage();
+      if (!storage) return;
+      try {
+        storage.setItem(prefix + key, String(value));
+      } catch {
+        // No-op
+      }
     },
     delete(key: string): void {
-      getStorage()?.removeItem(prefix + key);
+      const storage = getStorage();
+      if (!storage) return;
+      try {
+        storage.removeItem(prefix + key);
+      } catch {
+        // No-op
+      }
     },
     getAllKeys(): string[] {
       const storage = getStorage();

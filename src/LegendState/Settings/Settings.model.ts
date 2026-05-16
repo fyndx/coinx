@@ -56,12 +56,13 @@ export const exportDataToCsv = async () => {
     console.warn("exportDataToCsv is not supported on web");
     return;
   }
-  const { Directory, File, Paths } = await import("expo-file-system");
-  const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
-  const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
-  console.log("Exporting data to CSV", CSV_EXPORTS_FOLDER);
 
   try {
+    const { Directory, File, Paths } = await import("expo-file-system");
+    const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
+    const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
+    console.log("Exporting data to CSV", CSV_EXPORTS_FOLDER);
+
     const result = await Effect.runPromise(listDatabaseTables);
     const tableNames = result
       .map((row) => row.name)
@@ -92,13 +93,21 @@ export const exportDataToCsv = async () => {
   } catch (error) {
     console.error("Error exporting data to CSV", error);
   } finally {
-    const zipFile = new File(ZIP_FILE);
-    if (zipFile.exists) {
-      zipFile.delete();
-    }
-    const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
-    if (exportsDir.exists) {
-      exportsDir.delete();
+    try {
+      const { Directory, File, Paths } = await import("expo-file-system");
+      const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
+      const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
+
+      const zipFile = new File(ZIP_FILE);
+      if (zipFile.exists) {
+        zipFile.delete();
+      }
+      const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
+      if (exportsDir.exists) {
+        exportsDir.delete();
+      }
+    } catch {
+      // Cleanup failed, ignore
     }
   }
 };

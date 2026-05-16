@@ -23,11 +23,22 @@ const ACTIONS = [
   },
 ];
 
+const ALLOWED_DURATION_TYPES = new Set(["week", "month", "year"]);
+
+function isValidDurationType(
+  value: string,
+): value is "week" | "month" | "year" {
+  return ALLOWED_DURATION_TYPES.has(value);
+}
+
 export const InsightsHeader = observer(
   ({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
     const handleOptionChange = ({ nativeEvent }: PlatformMenuEvent) => {
+      const durationType = nativeEvent.event;
+      if (!isValidDurationType(durationType)) return;
+
       insightsModel$.actions.setDurationType({
-        durationType: nativeEvent.event as "week" | "month" | "year",
+        durationType,
       });
     };
     return (

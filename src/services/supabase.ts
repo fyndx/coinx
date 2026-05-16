@@ -12,7 +12,11 @@ const SecureStoreAdapter = {
   getItem: async (key: string): Promise<string | null> => {
     if (Platform.OS === "web") {
       if (typeof localStorage !== "undefined") {
-        return localStorage.getItem(key);
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          return null;
+        }
       }
       return null;
     }
@@ -21,7 +25,11 @@ const SecureStoreAdapter = {
   setItem: async (key: string, value: string): Promise<void> => {
     if (Platform.OS === "web") {
       if (typeof localStorage !== "undefined") {
-        localStorage.setItem(key, value);
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          // Treat as no-op
+        }
       }
       return;
     }
@@ -30,7 +38,11 @@ const SecureStoreAdapter = {
   removeItem: async (key: string): Promise<void> => {
     if (Platform.OS === "web") {
       if (typeof localStorage !== "undefined") {
-        localStorage.removeItem(key);
+        try {
+          localStorage.removeItem(key);
+        } catch {
+          // Treat as no-op
+        }
       }
       return;
     }
