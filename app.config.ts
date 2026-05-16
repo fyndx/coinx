@@ -38,7 +38,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   web: {
     favicon: "./assets/favicon.png",
     bundler: "metro",
-    output: "static",
+    output: "server",
   },
   plugins: [
     "expo-router",

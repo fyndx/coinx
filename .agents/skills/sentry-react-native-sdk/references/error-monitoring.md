@@ -37,7 +37,6 @@ React Native is unique: errors can originate from three different layers — the
 ## 1. Core Capture APIs
 
 Three fundamental data concepts:
-
 - **Event** — a single submission to Sentry (exception, message, or raw event)
 - **Issue** — a group of similar events clustered by Sentry
 - **Capturing** — the act of reporting an event
@@ -113,21 +112,20 @@ Sentry.captureEvent({
 
 ### Error Levels
 
-| Level     | Use Case                               |
-| --------- | -------------------------------------- |
-| `fatal`   | App crash, total loss of functionality |
-| `error`   | Feature broken, user action failed     |
-| `warning` | Degraded state, non-critical failure   |
-| `info`    | Informational, noteworthy events       |
-| `log`     | Low-priority operational logs          |
-| `debug`   | Development diagnostics                |
+| Level | Use Case |
+|-------|----------|
+| `fatal` | App crash, total loss of functionality |
+| `error` | Feature broken, user action failed |
+| `warning` | Degraded state, non-critical failure |
+| `info` | Informational, noteworthy events |
+| `log` | Low-priority operational logs |
+| `debug` | Development diagnostics |
 
 ---
 
 ## 2. Native Crash Handling — iOS & Android
 
 The React Native SDK delegates to two native SDKs for platform-level crash capture:
-
 - **iOS/tvOS/macOS** — `sentry-cocoa`
 - **Android** — `sentry-android` (Java/Kotlin + NDK for C/C++)
 
@@ -179,10 +177,10 @@ Sentry.init({
 
 ### Offline Caching Behavior
 
-| Platform    | Offline Behavior                                                   |
-| ----------- | ------------------------------------------------------------------ |
-| **Android** | Events cached on device; transmitted on **app restart**            |
-| **iOS**     | Events cached on device; transmitted when the **next event fires** |
+| Platform | Offline Behavior |
+|----------|-----------------|
+| **Android** | Events cached on device; transmitted on **app restart** |
+| **iOS** | Events cached on device; transmitted when the **next event fires** |
 
 ### Linked Errors (Chained `.cause`)
 
@@ -198,6 +196,38 @@ try {
 }
 ```
 
+### Native SDK Log Forwarding
+
+The SDK can forward native SDK internal log messages (from iOS and Android native layers) to the JavaScript console. This is a **debugging tool** — it surfaces native SDK diagnostics in Metro without requiring Xcode or Logcat.
+
+**Requirements:** `debug: true` must be enabled in `Sentry.init`.
+
+```typescript
+import * as Sentry from "@sentry/react-native";
+
+Sentry.init({
+  dsn: "YOUR_DSN",
+  debug: true, // required — native logs are only forwarded when debug is enabled
+
+  onNativeLog: ({ level, component, message }) => {
+    // Use consoleSandbox to avoid feedback loops with Sentry's console integration
+    Sentry.consoleSandbox(() => {
+      console.log(`[Sentry Native] [${level.toUpperCase()}] [${component}] ${message}`);
+    });
+  },
+});
+```
+
+| Parameter | Type | Values |
+|-----------|------|--------|
+| `level` | `string` | `"debug"`, `"info"`, `"warning"`, `"error"`, `"fatal"` |
+| `component` | `string` | Native module name (e.g., `"Sentry"`) |
+| `message` | `string` | The log message from the native SDK |
+
+> **Always use `Sentry.consoleSandbox()`** inside the callback. Without it, your `console.log` call may be intercepted by the Sentry `Breadcrumbs` integration, which creates a breadcrumb that triggers another log event — an infinite loop.
+
+> **Never enable `debug: true` in production.** Native log forwarding is for local development and CI debugging only.
+
 ---
 
 ## 3. ANR / App Hang Detection
@@ -205,7 +235,6 @@ try {
 ### Android — Application Not Responding (ANR)
 
 ANR detection is handled by the native `sentry-android` SDK. Android's OS flags an ANR when:
-
 - An **activity doesn't respond to user input within 5 seconds**
 - A **broadcast receiver doesn't complete within 10 seconds**
 
@@ -281,12 +310,12 @@ AppRegistry.registerComponent(appName, () => Sentry.wrap(App));
 
 **What `Sentry.wrap` does:**
 
-| Capability                      | Description                                                  |
-| ------------------------------- | ------------------------------------------------------------ |
-| **React render error boundary** | Catches errors thrown during component rendering             |
-| **UI interaction tracking**     | Records touch events as `ui.click` breadcrumbs automatically |
-| **User Feedback Widget**        | `Sentry.showFeedbackWidget()` requires this wrapper          |
-| **Session Replay buffering**    | Buffers pre-error session data for the feedback widget       |
+| Capability | Description |
+|------------|-------------|
+| **React render error boundary** | Catches errors thrown during component rendering |
+| **UI interaction tracking** | Records touch events as `ui.click` breadcrumbs automatically |
+| **User Feedback Widget** | `Sentry.showFeedbackWidget()` requires this wrapper |
+| **Session Replay buffering** | Buffers pre-error session data for the feedback widget |
 
 ---
 
@@ -332,7 +361,6 @@ function App() {
 ```
 
 The fallback function receives:
-
 - `error` — the thrown error object
 - `componentStack` — React's component stack trace string
 - `resetError` — function to clear error state and re-render children
@@ -386,15 +414,15 @@ Nesting error boundaries allows granular isolation: an error in `Sidebar` won't 
 
 ### Full Props Reference
 
-| Prop            | Type                                                                | Description                                                  |
-| --------------- | ------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `fallback`      | `ReactNode \| ({ error, componentStack, resetError }) => ReactNode` | UI rendered when an error is caught                          |
-| `showDialog`    | `boolean`                                                           | Open User Feedback widget on error                           |
-| `dialogOptions` | `object`                                                            | Options passed to the feedback dialog                        |
-| `onError`       | `(error, componentStack, eventId) => void`                          | Called when an error is caught; useful for state propagation |
-| `beforeCapture` | `(scope, error, componentStack) => void`                            | Called before sending to Sentry; add tags/context here       |
-| `onMount`       | `() => void`                                                        | Called on `componentDidMount`                                |
-| `onUnmount`     | `() => void`                                                        | Called on `componentWillUnmount`                             |
+| Prop | Type | Description |
+|------|------|-------------|
+| `fallback` | `ReactNode \| ({ error, componentStack, resetError }) => ReactNode` | UI rendered when an error is caught |
+| `showDialog` | `boolean` | Open User Feedback widget on error |
+| `dialogOptions` | `object` | Options passed to the feedback dialog |
+| `onError` | `(error, componentStack, eventId) => void` | Called when an error is caught; useful for state propagation |
+| `beforeCapture` | `(scope, error, componentStack) => void` | Called before sending to Sentry; add tags/context here |
+| `onMount` | `() => void` | Called on `componentDidMount` |
+| `onUnmount` | `() => void` | Called on `componentWillUnmount` |
 
 ### Manual Error Boundary (Class Component)
 
@@ -435,7 +463,6 @@ Scopes hold contextual data (tags, user, breadcrumbs, contexts) that is merged i
 ### Three Scope Types
 
 #### Global Scope
-
 Applied to **every event** regardless of origin. Used for low-level environmental data.
 
 ```typescript
@@ -445,7 +472,6 @@ globalScope.setContext("runtime", { name: "Hermes", version: "0.11.0" });
 ```
 
 #### Isolation Scope
-
 Separates events from each other (per-session in mobile). All `Sentry.setXXX()` convenience methods write here.
 
 ```typescript
@@ -458,7 +484,6 @@ Sentry.setUser({ id: "42", email: "user@example.com" });
 ```
 
 #### Current Scope
-
 The locally active scope. Best accessed via `withScope()`.
 
 ### Scope Data Precedence
@@ -467,10 +492,7 @@ Scopes merge in order: **global → isolation → current**. A key on the curren
 
 ```typescript
 Sentry.getGlobalScope().setExtras({ shared: "global", global: "data" });
-Sentry.getIsolationScope().setExtras({
-  shared: "isolation",
-  isolation: "data",
-});
+Sentry.getIsolationScope().setExtras({ shared: "isolation", isolation: "data" });
 Sentry.getCurrentScope().setExtras({ shared: "current", current: "data" });
 
 // Resulting event extras: { shared: "current", global: "data", isolation: "data", current: "data" }
@@ -500,13 +522,13 @@ Sentry.withScope((scope) => {
 ### Convenience Methods (All Write to Isolation Scope)
 
 ```typescript
-Sentry.setTag(key, value);
-Sentry.setTags({ key: value });
-Sentry.setUser({ id, email, username });
-Sentry.setContext(name, object);
-Sentry.setExtra(key, value);
-Sentry.setExtras({ key: value });
-Sentry.addBreadcrumb(breadcrumb);
+Sentry.setTag(key, value)
+Sentry.setTags({ key: value })
+Sentry.setUser({ id, email, username })
+Sentry.setContext(name, object)
+Sentry.setExtra(key, value)
+Sentry.setExtras({ key: value })
+Sentry.addBreadcrumb(breadcrumb)
 ```
 
 ---
@@ -525,12 +547,12 @@ Sentry.setTag("user_plan", "enterprise");
 
 **Tag constraints:**
 
-| Property               | Constraint                          |
-| ---------------------- | ----------------------------------- |
-| Key max length         | 32 characters                       |
+| Property | Constraint |
+|----------|-----------|
+| Key max length | 32 characters |
 | Key allowed characters | `a-zA-Z`, `0-9`, `_`, `.`, `:`, `-` |
-| Value max length       | 200 characters                      |
-| Value forbidden        | Newline `\n` characters             |
+| Value max length | 200 characters |
+| Value forbidden | Newline `\n` characters |
 
 ### User Identity
 
@@ -570,7 +592,6 @@ Sentry.setContext("order", {
 ```
 
 > **Notes:**
->
 > - The key `"type"` is reserved by Sentry — do not use it
 > - Context nesting is normalized to **3 levels** by default (configurable via `normalizeDepth`)
 > - Avoid sending entire app state blobs; exceeding max payload size triggers HTTP `413`
@@ -654,27 +675,27 @@ Sentry.addBreadcrumb({
 
 **Breadcrumb properties:**
 
-| Property    | Description                                                                   |
-| ----------- | ----------------------------------------------------------------------------- |
-| `type`      | `"default"`, `"http"`, `"navigation"`, `"user"`                               |
-| `category`  | Dot-separated string (e.g., `"ui.click"`, `"http"`, `"auth"`)                 |
-| `message`   | Human-readable description                                                    |
-| `level`     | `"fatal"`, `"critical"`, `"error"`, `"warning"`, `"log"`, `"info"`, `"debug"` |
-| `timestamp` | Unix timestamp (auto-set if omitted)                                          |
-| `data`      | Arbitrary `{ key: value }` metadata                                           |
+| Property | Description |
+|----------|-------------|
+| `type` | `"default"`, `"http"`, `"navigation"`, `"user"` |
+| `category` | Dot-separated string (e.g., `"ui.click"`, `"http"`, `"auth"`) |
+| `message` | Human-readable description |
+| `level` | `"fatal"`, `"critical"`, `"error"`, `"warning"`, `"log"`, `"info"`, `"debug"` |
+| `timestamp` | Unix timestamp (auto-set if omitted) |
+| `data` | Arbitrary `{ key: value }` metadata |
 
 > **Warning:** Unknown keys beyond those above are silently dropped during processing.
 
 ### Automatic Breadcrumbs
 
-| Source             | Category       | How                                                       |
-| ------------------ | -------------- | --------------------------------------------------------- |
-| Touch interactions | `ui.click`     | Via `Sentry.wrap` on root component                       |
-| HTTP requests      | `http`         | Fetch/XHR patching (default)                              |
-| Console output     | `console`      | `console.log/warn/error` patching (default)               |
-| Navigation         | `navigation`   | Via navigation integrations                               |
-| Redux actions      | `redux.action` | Via `Sentry.createReduxEnhancer`                          |
-| Native lifecycle   | various        | From native SDKs (connectivity changes, lifecycle events) |
+| Source | Category | How |
+|--------|----------|-----|
+| Touch interactions | `ui.click` | Via `Sentry.wrap` on root component |
+| HTTP requests | `http` | Fetch/XHR patching (default) |
+| Console output | `console` | `console.log/warn/error` patching (default) |
+| Navigation | `navigation` | Via navigation integrations |
+| Redux actions | `redux.action` | Via `Sentry.createReduxEnhancer` |
+| Native lifecycle | various | From native SDKs (connectivity changes, lifecycle events) |
 
 ### `beforeBreadcrumb` Hook
 
@@ -690,7 +711,7 @@ Sentry.init({
     if (breadcrumb.category === "http" && breadcrumb.data?.url) {
       breadcrumb.data.url = breadcrumb.data.url.replace(
         /token=[^&]*/,
-        "token=REDACTED",
+        "token=REDACTED"
       );
     }
 
@@ -787,7 +808,10 @@ Sentry.init({
     "Non-Error exception captured",
     /^Script error\.?$/,
   ],
-  ignoreTransactions: ["/healthcheck", /^\/admin\/internal\//],
+  ignoreTransactions: [
+    "/healthcheck",
+    /^\/admin\/internal\//,
+  ],
 });
 ```
 
@@ -827,16 +851,16 @@ Sentry.init({
 
 ### Fingerprint Variables
 
-| Variable               | Resolves to                    |
-| ---------------------- | ------------------------------ |
-| `{{ default }}`        | Sentry's default grouping hash |
-| `{{ error.type }}`     | Exception class name           |
-| `{{ error.value }}`    | Exception message text         |
-| `{{ transaction }}`    | Current transaction name       |
-| `{{ level }}`          | Event severity level           |
-| `{{ message }}`        | Captured message               |
-| `{{ stack.function }}` | Top stack frame function name  |
-| `{{ stack.module }}`   | Top stack frame module         |
+| Variable | Resolves to |
+|----------|-------------|
+| `{{ default }}` | Sentry's default grouping hash |
+| `{{ error.type }}` | Exception class name |
+| `{{ error.value }}` | Exception message text |
+| `{{ transaction }}` | Current transaction name |
+| `{{ level }}` | Event severity level |
+| `{{ message }}` | Captured message |
+| `{{ stack.function }}` | Top stack frame function name |
+| `{{ stack.module }}` | Top stack frame module |
 
 ### Server-Side Fingerprint Rules (Project Settings)
 
@@ -863,7 +887,6 @@ logger:my.package.* level:error -> error-logger, {{ logger }} title="Error from 
 ## 12. Event Processors
 
 Event processors run on **every event** before transmission. They differ from `beforeSend` in two key ways:
-
 1. `beforeSend` always runs **last**, after all event processors
 2. Processors added to a scope only apply to events **within that scope**
 
@@ -966,7 +989,7 @@ Sentry.captureException(err, {
     },
     {
       filename: "debug.log",
-      data: logFileContents, // string or Uint8Array
+      data: logFileContents,         // string or Uint8Array
       contentType: "text/plain",
     },
     {
@@ -1023,7 +1046,7 @@ const store = createStore(
       userPlan: state.user.plan,
       cartItemCount: state.cart.items.length,
     }),
-  }),
+  })
 );
 ```
 
@@ -1043,7 +1066,7 @@ const store = configureStore({
           if (action.type.startsWith("auth/")) return null;
           return action;
         },
-      }),
+      })
     ),
 });
 ```
@@ -1058,14 +1081,38 @@ The SDK automatically attaches rich device context to every event — no configu
 
 ### Automatic Context (No Setup Needed)
 
-| Context Section  | Fields                                                                                                 | Source     |
-| ---------------- | ------------------------------------------------------------------------------------------------------ | ---------- |
-| **Device**       | Model, manufacturer, brand, screen resolution, orientation, free memory, battery level, charging state | Native SDK |
-| **OS**           | Name (`iOS`/`Android`), version, build number, kernel version                                          | Native SDK |
-| **App**          | App ID, version name, version code, build type                                                         | Native SDK |
-| **React Native** | RN version, JS engine (Hermes/JSC), architecture                                                       | JS SDK     |
+| Context Section | Fields | Source |
+|-----------------|--------|--------|
+| **Device** | Model, manufacturer, brand, screen resolution, orientation, free memory, battery level, charging state | Native SDK |
+| **OS** | Name (`iOS`/`Android`), version, build number, kernel version | Native SDK |
+| **App** | App ID, version name, version code, build type | Native SDK |
+| **React Native** | RN version, JS engine (Hermes/JSC), architecture | JS SDK |
+| **Expo Constants** | Execution environment, app name/slug/version, Expo SDK version, EAS project ID, session ID, debug mode | `expoConstantsIntegration` (Expo only) |
 
-These appear in Sentry under the **"Device"**, **"Operating System"**, and **"App"** sections of any event.
+These appear in Sentry under the **"Device"**, **"Operating System"**, **"App"**, and (for Expo apps) **"expo_constants"** sections of any event.
+
+### Expo Constants Context
+
+When running in an Expo app, the `expoConstantsIntegration` is enabled automatically and attaches an `expo_constants` context to every event. No configuration is required.
+
+The context includes the following fields (only non-empty values are set):
+
+| Field | Type | Source |
+|-------|------|--------|
+| `execution_environment` | `string` | `'bare'`, `'standalone'`, or `'storeClient'` |
+| `app_ownership` | `string` | `'expo'` in Expo Go, otherwise absent |
+| `debug_mode` | `boolean` | Whether the app is in debug mode |
+| `expo_version` | `string` | Expo Go client version |
+| `expo_runtime_version` | `string` | EAS Update runtime version |
+| `session_id` | `string` | Unique per app session |
+| `status_bar_height` | `number` | Device status bar height in points |
+| `app_name` | `string` | `expoConfig.name` from `app.json` |
+| `app_slug` | `string` | `expoConfig.slug` from `app.json` |
+| `app_version` | `string` | `expoConfig.version` from `app.json` |
+| `expo_sdk_version` | `string` | Expo SDK version from `app.json` |
+| `eas_project_id` | `string` | EAS project ID from `easConfig.projectId` |
+
+To view the context in Sentry, open any event from an Expo app and look for the `expo_constants` section in the event detail page.
 
 ### Overriding or Extending Device Context
 
@@ -1112,8 +1159,8 @@ A session begins when the app comes to the foreground and ends when it goes to b
 ```typescript
 Sentry.init({
   release: "com.myapp@3.2.1+421",
-  autoSessionTracking: true, // default: true
-  sessionTrackingIntervalMillis: 30000, // default: 30s background threshold
+  autoSessionTracking: true,                    // default: true
+  sessionTrackingIntervalMillis: 30000,          // default: 30s background threshold
 });
 ```
 
@@ -1132,10 +1179,10 @@ Sentry.init({
 });
 ```
 
-| Platform | Cache Location                | Transmission Trigger |
-| -------- | ----------------------------- | -------------------- |
-| Android  | Internal app storage          | App restart          |
-| iOS      | App sandbox `Library/Caches/` | Next event fires     |
+| Platform | Cache Location | Transmission Trigger |
+|----------|---------------|----------------------|
+| Android | Internal app storage | App restart |
+| iOS | App sandbox `Library/Caches/` | Next event fires |
 
 Offline caching works for both JS-layer events and native crash reports.
 
@@ -1145,15 +1192,16 @@ Offline caching works for both JS-layer events and native crash reports.
 
 The following integrations are enabled automatically:
 
-| Integration            | Purpose                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------- |
-| **InboundFilters**     | Drops events matching `ignoreErrors`, `denyUrls`, `allowUrls`. Default-ignores `"Script error"` |
-| **FunctionToString**   | Preserves original function names even when SDK wraps handlers                                  |
-| **Breadcrumbs**        | Patches `console`, `fetch`, `XHR` to auto-capture breadcrumbs                                   |
-| **NativeLinkedErrors** | Reads `.cause` chains up to 5 levels deep                                                       |
-| **HttpContext**        | Attaches URL, user-agent, referrer to events                                                    |
-| **Dedupe**             | Prevents duplicate consecutive events from being reported                                       |
-| **UnhandledRejection** | Auto-captures unhandled promise rejections                                                      |
+| Integration | Purpose |
+|-------------|---------|
+| **InboundFilters** | Drops events matching `ignoreErrors`, `denyUrls`, `allowUrls`. Default-ignores `"Script error"` |
+| **FunctionToString** | Preserves original function names even when SDK wraps handlers |
+| **Breadcrumbs** | Patches `console`, `fetch`, `XHR` to auto-capture breadcrumbs |
+| **NativeLinkedErrors** | Reads `.cause` chains up to 5 levels deep |
+| **HttpContext** | Attaches URL, user-agent, referrer to events |
+| **Dedupe** | Prevents duplicate consecutive events from being reported |
+| **UnhandledRejection** | Auto-captures unhandled promise rejections |
+| **ExpoConstants** | Attaches `expo_constants` context (execution environment, app name, EAS project ID, etc.) to every event. Active only when running in an Expo app |
 
 ### Customizing Default Integrations
 
@@ -1165,7 +1213,7 @@ Sentry.init({ defaultIntegrations: false });
 Sentry.init({
   integrations: [
     Sentry.breadcrumbsIntegration({
-      console: false, // disable console breadcrumbs
+      console: false,  // disable console breadcrumbs
       fetch: true,
       xhr: true,
       sentry: true,
@@ -1210,12 +1258,12 @@ import * as Sentry from "@sentry/react-native";
 Sentry.init({
   // ── Core ──────────────────────────────────────────────────────────
   dsn: "https://examplePublicKey@o0.ingest.sentry.io/0",
-  enabled: true, // false disables all SDK transmission
-  debug: false, // log SDK internals to console
+  enabled: true,              // false disables all SDK transmission
+  debug: false,               // log SDK internals to console
   release: "com.myapp@3.2.1+421",
-  dist: "421", // distinguishes builds within a release
+  dist: "421",                // distinguishes builds within a release
   environment: "production",
-  sampleRate: 1.0, // 0.0–1.0; fraction of error events to send
+  sampleRate: 1.0,            // 0.0–1.0; fraction of error events to send
 
   // ── Filtering ─────────────────────────────────────────────────────
   ignoreErrors: ["Script error", /^Non-Error/],
@@ -1225,11 +1273,11 @@ Sentry.init({
   // denyUrls: ["chrome-extension://", /extensions\//i],
   // allowUrls: ["https://myapp.com"],
   maxBreadcrumbs: 100,
-  maxValueLength: 250, // max length of string values in events
+  maxValueLength: 250,        // max length of string values in events
 
   // ── Normalization ─────────────────────────────────────────────────
-  normalizeDepth: 3, // depth to normalize context objects
-  normalizeMaxBreadth: 1000, // max number of object properties
+  normalizeDepth: 3,          // depth to normalize context objects
+  normalizeMaxBreadth: 1000,  // max number of object properties
 
   // ── Hooks ─────────────────────────────────────────────────────────
   beforeSend(event, hint) {
@@ -1244,14 +1292,14 @@ Sentry.init({
   },
 
   // ── Attachments ───────────────────────────────────────────────────
-  attachStacktrace: true, // stack traces on captureMessage calls
-  attachScreenshot: false, // auto-screenshot on error (v4.11.0+)
-  attachViewHierarchy: false, // native view hierarchy JSON on error
-  sendDefaultPii: false, // allow integrations to send PII
+  attachStacktrace: true,          // stack traces on captureMessage calls
+  attachScreenshot: false,         // auto-screenshot on error (v4.11.0+)
+  attachViewHierarchy: false,      // native view hierarchy JSON on error
+  sendDefaultPii: false,           // allow integrations to send PII
 
   // ── Transport ─────────────────────────────────────────────────────
-  maxCacheItems: 30, // max envelopes cached offline
-  shutdownTimeout: 2000, // ms to wait for queue drain on shutdown
+  maxCacheItems: 30,               // max envelopes cached offline
+  shutdownTimeout: 2000,           // ms to wait for queue drain on shutdown
 
   // ── Sessions ──────────────────────────────────────────────────────
   autoSessionTracking: true,
@@ -1271,21 +1319,25 @@ Sentry.init({
   enableNative: true,
   enableNativeCrashHandling: true,
   autoInitializeNativeSdk: true,
-  enableNdkScopeSync: true, // sync Java scope to NDK (Android)
-  enableTombstone: true, // Android 12+ ApplicationExitInfo (default: false)
-  attachThreads: false, // all threads on Android events
-  enableNativeNagger: true, // warn if native init fails
+  enableNdkScopeSync: true,            // sync Java scope to NDK (Android)
+  enableTombstone: true,               // Android 12+ ApplicationExitInfo (default: false)
+  attachThreads: false,                // all threads on Android events
+  enableNativeNagger: true,            // warn if native init fails
   enableWatchdogTerminationTracking: true, // iOS OOM tracking
 
   // ── ANR / App Hang ────────────────────────────────────────────────
-  enableAppHangTracking: true, // Apple platforms only
-  appHangTimeoutInterval: 2, // Apple platforms only, seconds
+  enableAppHangTracking: true,         // Apple platforms only
+  appHangTimeoutInterval: 2,           // Apple platforms only, seconds
 
   // ── HTTP Client ───────────────────────────────────────────────────
-  enableCaptureFailedRequests: false, // auto-capture HTTP errors (v5.3.0+)
+  enableCaptureFailedRequests: false,  // auto-capture HTTP errors (v5.3.0+)
 
   // ── Callbacks ─────────────────────────────────────────────────────
   onReady: () => console.log("Sentry native SDKs initialized"),
+  onNativeLog: ({ level, component, message }) => {
+    // Forward native SDK logs to JS console (debug: true required)
+    // Use consoleSandbox to prevent breadcrumb feedback loops
+  },
 
   // ── Integrations ──────────────────────────────────────────────────
   integrations: [
@@ -1294,7 +1346,7 @@ Sentry.init({
     }),
     Sentry.httpClientIntegration(),
   ],
-  defaultIntegrations: true, // false disables all built-in integrations
+  defaultIntegrations: true,  // false disables all built-in integrations
 });
 ```
 
@@ -1348,19 +1400,19 @@ Sentry.addEventProcessor((event) => { event.extra = { foo: "bar" }; return event
 
 ## 21. Troubleshooting
 
-| Issue                                     | Solution                                                                                                                                              |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Events not appearing in Sentry            | Check DSN is correct; set `debug: true` to see SDK logs; verify `enabled: true`; check for `beforeSend` returning `null`                              |
-| Native crashes not reported               | Ensure `enableNative: true` and `enableNativeCrashHandling: true`; check that native SDKs initialized (look for `onReady` callback firing)            |
-| ANR/hang events not appearing             | Android ANR is always on; for iOS, verify `enableAppHangTracking: true` and try lowering `appHangTimeoutInterval`                                     |
-| `Sentry.wrap` not working                 | Confirm it wraps the **root component** registered with `AppRegistry` (not an inner component)                                                        |
-| `showFeedbackWidget()` crashes            | App must be wrapped with `Sentry.wrap(App)`; ensure Fabric (new arch) requires RN ≥ 0.71                                                              |
-| Screenshots are blank                     | Screenshot capture may be blocked on certain Android versions; ensure `attachScreenshot: true`                                                        |
+| Issue | Solution |
+|-------|----------|
+| Events not appearing in Sentry | Check DSN is correct; set `debug: true` to see SDK logs; verify `enabled: true`; check for `beforeSend` returning `null` |
+| Native crashes not reported | Ensure `enableNative: true` and `enableNativeCrashHandling: true`; check that native SDKs initialized (look for `onReady` callback firing) |
+| ANR/hang events not appearing | Android ANR is always on; for iOS, verify `enableAppHangTracking: true` and try lowering `appHangTimeoutInterval` |
+| `Sentry.wrap` not working | Confirm it wraps the **root component** registered with `AppRegistry` (not an inner component) |
+| `showFeedbackWidget()` crashes | App must be wrapped with `Sentry.wrap(App)`; ensure Fabric (new arch) requires RN ≥ 0.71 |
+| Screenshots are blank | Screenshot capture may be blocked on certain Android versions; ensure `attachScreenshot: true` |
 | `beforeSend` not filtering native crashes | `beforeSend` only filters JS-layer events; native crashes bypass it — use `enableNativeCrashHandling: false` to disable native crash capture entirely |
-| Duplicate events appearing                | Check for multiple `Sentry.init()` calls; `Dedupe` integration handles sequential duplicates but not concurrent ones                                  |
-| Too many breadcrumbs / events             | Reduce `maxBreadcrumbs`; use `beforeBreadcrumb` to filter; use `sampleRate` to reduce event volume                                                    |
-| HTTP errors not captured                  | Add `enableCaptureFailedRequests: true` (v5.3.0+) or configure `httpClientIntegration()`                                                              |
-| Missing stack frames (minified)           | Upload source maps via Sentry CLI or the Metro plugin; check `dist` and `release` match the build                                                     |
-| `setContext` data not appearing           | Verify key `"type"` is not used (reserved); check `normalizeDepth` isn't truncating nested data                                                       |
-| Event payload rejected with 413           | Attachment or context too large; use `stateTransformer` in Redux enhancer; limit attachment sizes                                                     |
-| Offline events not sent                   | Events are sent on next app launch (Android) or next event fire (iOS); check `maxCacheItems` isn't set too low                                        |
+| Duplicate events appearing | Check for multiple `Sentry.init()` calls; `Dedupe` integration handles sequential duplicates but not concurrent ones |
+| Too many breadcrumbs / events | Reduce `maxBreadcrumbs`; use `beforeBreadcrumb` to filter; use `sampleRate` to reduce event volume |
+| HTTP errors not captured | Add `enableCaptureFailedRequests: true` (v5.3.0+) or configure `httpClientIntegration()` |
+| Missing stack frames (minified) | Upload source maps via Sentry CLI or the Metro plugin; check `dist` and `release` match the build |
+| `setContext` data not appearing | Verify key `"type"` is not used (reserved); check `normalizeDepth` isn't truncating nested data |
+| Event payload rejected with 413 | Attachment or context too large; use `stateTransformer` in Redux enhancer; limit attachment sizes |
+| Offline events not sent | Events are sent on next app launch (Android) or next event fire (iOS); check `maxCacheItems` isn't set too low |

@@ -1,0 +1,13 @@
+node_modules
+.git
+.expo
+android
+ios
+dist
+.vscode
+*.log
+.env
+.env.*
+.agent
+.agents
+.claude
