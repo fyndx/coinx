@@ -7,6 +7,10 @@ export const COINX_DATABASE_NAME = "coinx.db";
 export const expoDb = openDatabaseSync(COINX_DATABASE_NAME);
 export const db = drizzle(expoDb, { schema });
 
+/** No-op on native — the DB is synchronously opened above. */
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function initDb(): Promise<void> {}
+
 /**
  * Wipe all user-generated local data while preserving schema and migrations.
  * Child tables are deleted first to satisfy foreign-key constraints.

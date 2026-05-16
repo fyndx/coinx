@@ -36,7 +36,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: env.EXPO_PUBLIC_PACKAGE
   },
   web: {
-    favicon: "./assets/favicon.png"
+    favicon: "./assets/favicon.png",
+    bundler: "metro",
+    output: "server",
   },
   plugins: [
     "expo-router",

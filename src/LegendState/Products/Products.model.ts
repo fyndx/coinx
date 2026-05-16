@@ -3,7 +3,7 @@ import {
   type ObservableArray,
   observable,
 } from "@legendapp/state";
-import * as Burnt from "burnt";
+import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 
 import type { SelectProduct } from "@/db/schema";
@@ -31,7 +31,7 @@ export class ProductsModel {
       const products = await Effect.runPromise(getProducts());
       this.products.set(products);
     } catch (error) {
-      Burnt.toast({
+      showToast({
         title: "Failed to fetch products",
         message: error instanceof Error ? error.message : "Unknown error",
       });
@@ -46,7 +46,7 @@ export class ProductsModel {
       .peek()
       .filter((product) => product.id !== id);
     this.products.set(updatedProducts);
-    Burnt.toast({ title: "Product deleted successfully" });
+    showToast({ title: "Product deleted successfully" });
   };
 
   createRandomProducts = async (count = 10) => {
@@ -56,9 +56,9 @@ export class ProductsModel {
       await Promise.all(
         products.map((product) => Effect.runPromise(addProduct(product))),
       );
-      Burnt.toast({ title: "Products created successfully" });
+      showToast({ title: "Products created successfully" });
     } catch (error) {
-      Burnt.toast({
+      showToast({
         title: "Failed to create products",
         message: error instanceof Error ? error.message : "Unknown error",
       });
@@ -72,9 +72,9 @@ export class ProductsModel {
     try {
       await Effect.runPromise(deleteAllProducts());
       this.products.set([]);
-      Burnt.toast({ title: "All products deleted successfully" });
+      showToast({ title: "All products deleted successfully" });
     } catch (error) {
-      Burnt.toast({
+      showToast({
         title: "Failed to delete products",
         message: error instanceof Error ? error.message : "Unknown error",
       });

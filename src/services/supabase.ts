@@ -10,15 +10,42 @@ import { env } from "./env";
  */
 const SecureStoreAdapter = {
   getItem: async (key: string): Promise<string | null> => {
-    if (Platform.OS === "web") return null;
+    if (Platform.OS === "web") {
+      if (typeof localStorage !== "undefined") {
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    }
     return SecureStore.getItemAsync(key);
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    if (Platform.OS === "web") return;
+    if (Platform.OS === "web") {
+      if (typeof localStorage !== "undefined") {
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          // Treat as no-op
+        }
+      }
+      return;
+    }
     await SecureStore.setItemAsync(key, value);
   },
   removeItem: async (key: string): Promise<void> => {
-    if (Platform.OS === "web") return;
+    if (Platform.OS === "web") {
+      if (typeof localStorage !== "undefined") {
+        try {
+          localStorage.removeItem(key);
+        } catch {
+          // Treat as no-op
+        }
+      }
+      return;
+    }
     await SecureStore.deleteItemAsync(key);
   },
 };

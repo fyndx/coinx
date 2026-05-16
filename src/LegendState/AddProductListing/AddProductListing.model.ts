@@ -1,6 +1,5 @@
 import Currency from "@coinify/currency";
 import { observable } from "@legendapp/state";
-import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -14,6 +13,7 @@ import { addProductListingsHistory } from "@/src/database/Products/ProductListin
 import { addProductListing } from "@/src/database/Products/ProductsListingsRepo";
 import { findProductById } from "@/src/database/Products/ProductsRepo";
 import { syncManager } from "@/src/services/sync";
+import { showToast } from "@/src/utils/toast";
 import { convert } from "@/src/utils/units";
 
 import { appModel } from "../AppState/App.model";
@@ -80,7 +80,7 @@ export class AddProductListingModel {
       console.log("Validation result for product listing:", validationResult);
 
       if (!validationResult.success) {
-        Burnt.toast({ title: "Invalid product details" });
+        showToast({ title: "Invalid product details" });
         return;
       }
 
@@ -95,11 +95,11 @@ export class AddProductListingModel {
         }),
       );
       syncManager.scheduleSyncAfterChange();
-      Burnt.toast({ title: "Product added successfully" });
+      showToast({ title: "Product added successfully" });
       router.back();
     } catch (error) {
       console.error("Failed to add product listing:", error);
-      Burnt.toast({
+      showToast({
         title: "Failed to add product",
       });
     }

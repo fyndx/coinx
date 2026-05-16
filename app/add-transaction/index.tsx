@@ -68,7 +68,7 @@ const NumberButton = ({
 }) => {
   return (
     <Pressable
-      onPress={(event) => onPress(event, text)}
+      onPressIn={(event) => onPress(event, text)}
       className="w-24 h-16 bg-accent justify-center items-center rounded-md"
     >
       <Text className="text-white text-xl font-bold">{String(text)}</Text>
@@ -79,7 +79,7 @@ const NumberButton = ({
 const SubmitButton = ({ onPress }: { onPress: () => void }) => {
   return (
     <Pressable
-      onPress={onPress}
+      onPressIn={onPress}
       className="w-24 h-16 bg-accent justify-center items-center rounded-md"
     >
       <CheckSquare size={24} color="white" />

@@ -1,5 +1,3 @@
-import { MMKV } from "react-native-mmkv";
+import { createKVStorage } from "@/src/storage/kvStorage";
 
-export const AppStorage = new MMKV({
-  id: "app_storage",
-});
+export const AppStorage = createKVStorage("app_storage");

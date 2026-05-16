@@ -1,6 +1,6 @@
 import Currency from "@coinify/currency";
 import { computed, observable } from "@legendapp/state";
-import * as Burnt from "burnt";
+import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -73,7 +73,7 @@ export class EditProductListing {
     } else {
       // Handle not found case
       this.productListing.set({ status: "error", data: undefined });
-      Burnt.toast({ title: "Product listing not found" });
+      showToast({ title: "Product listing not found" });
     }
   };
 
@@ -120,14 +120,14 @@ export class EditProductListing {
       );
       syncManager.scheduleSyncAfterChange();
       this.editProductDraft.status.set("success");
-      Burnt.toast({
+      showToast({
         title: "Price Updated Successfully",
       });
       router.back();
     } catch (error) {
       console.log({ error });
       this.editProductDraft.status.set("error");
-      Burnt.toast({
+      showToast({
         title: "Failed to update price",
       });
     } finally {

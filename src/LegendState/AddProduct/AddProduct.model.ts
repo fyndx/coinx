@@ -1,5 +1,5 @@
 import { observable } from "@legendapp/state";
-import * as Burnt from "burnt";
+import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -61,7 +61,7 @@ export class AddProductScreenModel {
     // product object checks
     const validationError = this.validateProduct(product);
     if (validationError) {
-      Burnt.toast({ title: validationError });
+      showToast({ title: validationError });
       return;
     }
 
@@ -75,7 +75,7 @@ export class AddProductScreenModel {
 
       if (existingProduct.length > 0) {
         // Product already exists
-        Burnt.toast({ title: "Product already exists" });
+        showToast({ title: "Product already exists" });
         return;
       }
 
@@ -88,7 +88,7 @@ export class AddProductScreenModel {
 
       if (createdProduct.length > 0) {
         syncManager.scheduleSyncAfterChange();
-        Burnt.toast({ title: "Product added successfully" });
+        showToast({ title: "Product added successfully" });
         analytics.logEvent("product_added");
         this.product.set({
           name: "",
@@ -98,7 +98,7 @@ export class AddProductScreenModel {
       }
     } catch (error) {
       console.log("error", error);
-      Burnt.toast({
+      showToast({
         title: "An error occurred",
         message: error instanceof Error ? error.message : "Unknown error",
       });
@@ -114,12 +114,12 @@ export class AddProductScreenModel {
     // product object checks
     const validationError = this.validateProduct(product);
     if (validationError) {
-      Burnt.toast({ title: validationError });
+      showToast({ title: validationError });
       return;
     }
 
     if (!product.id) {
-      Burnt.toast({ title: "Product ID is required for update" });
+      showToast({ title: "Product ID is required for update" });
       return;
     }
 
@@ -128,12 +128,12 @@ export class AddProductScreenModel {
     Effect.runPromise(updateProduct({ ...product, id: product.id }))
       .then((_result) => {
         syncManager.scheduleSyncAfterChange();
-        Burnt.toast({ title: "Product updated successfully" });
+        showToast({ title: "Product updated successfully" });
         this.resetProduct();
         router.back();
       })
       .catch((error) => {
-        Burnt.toast({
+        showToast({
           title: "Failed to update product",
           message: error instanceof Error ? error.message : "Unknown error",
         });

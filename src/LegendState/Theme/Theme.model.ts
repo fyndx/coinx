@@ -1,10 +1,19 @@
 import { observable } from "@legendapp/state";
-import { MMKV } from "react-native-mmkv";
 import { Uniwind } from "uniwind";
+
+import type { IKVStorage } from "@/src/storage/kvStorage";
+import { createKVStorage } from "@/src/storage/kvStorage";
 
 export type ThemeMode = "light" | "dark" | "system";
 
-const storage = new MMKV({ id: "theme-storage" });
+let _storage: IKVStorage | null = null;
+
+function getThemeStorage(): IKVStorage {
+  if (!_storage) {
+    _storage = createKVStorage("theme-storage");
+  }
+  return _storage;
+}
 
 const isThemeMode = (value?: string): value is ThemeMode =>
   value === "light" || value === "dark" || value === "system";
@@ -13,20 +22,20 @@ export class ThemeModel {
   obs;
 
   constructor() {
-    const stored = storage.getString("themeMode");
+    const stored = getThemeStorage().getString("themeMode");
     this.obs = observable({
       mode: isThemeMode(stored) ? stored : ("system" as ThemeMode),
     });
   }
 
   setTheme = (mode: ThemeMode) => {
-    storage.set("themeMode", mode);
+    getThemeStorage().set("themeMode", mode);
     this.obs.mode.set(mode);
     Uniwind.setTheme(mode);
   };
 
   initTheme = () => {
-    const stored = storage.getString("themeMode");
+    const stored = getThemeStorage().getString("themeMode");
     const mode = isThemeMode(stored) ? stored : "system";
     Uniwind.setTheme(mode);
   };

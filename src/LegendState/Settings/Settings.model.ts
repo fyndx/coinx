@@ -1,8 +1,6 @@
 import { observable } from "@legendapp/state";
 import { Effect } from "effect";
-import { Directory, File, Paths } from "expo-file-system";
-import * as Sharing from "expo-sharing";
-import { defaultDatabaseDirectory } from "expo-sqlite";
+import { Platform } from "react-native";
 
 import { COINX_DATABASE_NAME } from "@/db/client";
 
@@ -15,7 +13,12 @@ import {
 export const SettingsModel = observable({});
 
 export const shareData = async ({ path }: { path: string }) => {
+  if (Platform.OS === "web") {
+    console.warn("shareData is not supported on web");
+    return;
+  }
   try {
+    const Sharing = await import("expo-sharing");
     await Sharing.shareAsync(path, {
       mimeType: "application/octet-stream",
       dialogTitle: "Exported Data",
@@ -28,12 +31,17 @@ export const shareData = async ({ path }: { path: string }) => {
 };
 
 export const exportData = async () => {
+  if (Platform.OS === "web") {
+    console.warn("exportData is not supported on web");
+    return;
+  }
   try {
+    const { File, Paths } = await import("expo-file-system");
+    const { defaultDatabaseDirectory } = await import("expo-sqlite");
     const coinxDatabaseUri = `${defaultDatabaseDirectory}/${COINX_DATABASE_NAME}`;
     const dbDumpUri = `${Paths.document.uri}${COINX_DATABASE_NAME}`;
     console.log("Exporting data from", coinxDatabaseUri);
     console.log("Exporting data to", dbDumpUri);
-
     const coinxFile = new File(coinxDatabaseUri);
     await coinxFile.copy(new File(dbDumpUri));
     await shareData({ path: dbDumpUri });
@@ -44,20 +52,23 @@ export const exportData = async () => {
 };
 
 export const exportDataToCsv = async () => {
-  const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
-  const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
-  console.log("Exporting data to CSV", CSV_EXPORTS_FOLDER);
+  if (Platform.OS === "web") {
+    console.warn("exportDataToCsv is not supported on web");
+    return;
+  }
 
   try {
-    // Step 1: Fetch all table names
-    const result = await Effect.runPromise(listDatabaseTables);
+    const { Directory, File, Paths } = await import("expo-file-system");
+    const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
+    const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
+    console.log("Exporting data to CSV", CSV_EXPORTS_FOLDER);
 
+    const result = await Effect.runPromise(listDatabaseTables);
     const tableNames = result
       .map((row) => row.name)
       .filter((name) => name.includes("coinx"));
     console.log({ tableNames });
 
-    // Step 2: Save each table to CSV
     const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
     if (exportsDir.exists) {
       exportsDir.delete();
@@ -68,13 +79,12 @@ export const exportDataToCsv = async () => {
       tableNames,
     });
 
-    // Create Zip
     await createZipArchive({
       sourceDir: CSV_EXPORTS_FOLDER,
       destZipFile: ZIP_FILE,
     });
 
-    // Share File
+    const Sharing = await import("expo-sharing");
     await Sharing.shareAsync(ZIP_FILE, {
       mimeType: "application/octet-stream",
       dialogTitle: "Exported Data",
@@ -83,15 +93,21 @@ export const exportDataToCsv = async () => {
   } catch (error) {
     console.error("Error exporting data to CSV", error);
   } finally {
-    // Cleanup
-    const zipFile = new File(ZIP_FILE);
-    if (zipFile.exists) {
-      zipFile.delete();
-    }
+    try {
+      const { Directory, File, Paths } = await import("expo-file-system");
+      const CSV_EXPORTS_FOLDER = `${Paths.document.uri}csv_exports/`;
+      const ZIP_FILE = `${Paths.document.uri}csv_exports.zip`;
 
-    const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
-    if (exportsDir.exists) {
-      exportsDir.delete();
+      const zipFile = new File(ZIP_FILE);
+      if (zipFile.exists) {
+        zipFile.delete();
+      }
+      const exportsDir = new Directory(CSV_EXPORTS_FOLDER);
+      if (exportsDir.exists) {
+        exportsDir.delete();
+      }
+    } catch {
+      // Cleanup failed, ignore
     }
   }
 };

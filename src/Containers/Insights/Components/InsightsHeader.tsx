@@ -1,10 +1,11 @@
 import { observer } from "@legendapp/state/react";
-import { MenuView, type NativeActionEvent } from "@react-native-menu/menu";
 import { Button } from "heroui-native";
 import { View } from "react-native";
 
 import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
+import type { PlatformMenuEvent } from "@/src/Components/PlatformMenu";
 
+import { PlatformMenu } from "@/src/Components/PlatformMenu";
 import { Text } from "@/src/Components/ui/Text";
 
 const ACTIONS = [
@@ -22,21 +23,32 @@ const ACTIONS = [
   },
 ];
 
+const ALLOWED_DURATION_TYPES = new Set(["week", "month", "year"]);
+
+function isValidDurationType(
+  value: string,
+): value is "week" | "month" | "year" {
+  return ALLOWED_DURATION_TYPES.has(value);
+}
+
 export const InsightsHeader = observer(
   ({ insightsModel$ }: { insightsModel$: InsightsModel }) => {
-    const handleOptionChange = ({ nativeEvent }: NativeActionEvent) => {
+    const handleOptionChange = ({ nativeEvent }: PlatformMenuEvent) => {
+      const durationType = nativeEvent.event;
+      if (!isValidDurationType(durationType)) return;
+
       insightsModel$.actions.setDurationType({
-        durationType: nativeEvent.event as "week" | "month" | "year",
+        durationType,
       });
     };
     return (
       <View className="flex-row justify-between items-center">
         <Text className="text-3xl font-bold">Insights</Text>
-        <MenuView actions={ACTIONS} onPressAction={handleOptionChange}>
+        <PlatformMenu actions={ACTIONS} onPressAction={handleOptionChange}>
           <Button size="sm" variant="secondary">
             <Text>{insightsModel$.obs.durationType.get()}</Text>
           </Button>
-        </MenuView>
+        </PlatformMenu>
       </View>
     );
   },

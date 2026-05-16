@@ -91,9 +91,9 @@ export class SetupModel {
     };
   };
 
-  private createDefaultSeedData = () => {
-    db.transaction((tx) => {
-      tx.insert(categories).values(
+  private createDefaultSeedData = async () => {
+    await db.transaction(async (tx) => {
+      await tx.insert(categories).values(
         DEFAULT_CATEGORIES.map((category) => ({
           ...category,
           id: generateUUID(),
@@ -101,7 +101,7 @@ export class SetupModel {
         })),
       );
 
-      tx.insert(products).values(
+      await tx.insert(products).values(
         DEFAULT_PRODUCTS.map((product) => ({
           ...product,
           id: generateUUID(),
@@ -109,7 +109,7 @@ export class SetupModel {
         })),
       );
 
-      tx.insert(stores).values(
+      await tx.insert(stores).values(
         DEFAULT_STORES.map((store) => ({
           ...store,
           id: generateUUID(),

@@ -32,7 +32,7 @@ const SetupScreen = observer(() => {
     if (setupStatus === "needsSetup") {
       setupModel.actions.run().then((result) => {
         if (result.success) {
-          router.replace("/(tabs)" as const as "/");
+          router.replace("/(tabs)/transactions");
         }
       });
       return;

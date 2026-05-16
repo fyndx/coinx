@@ -1,6 +1,5 @@
 import Currency from "@coinify/currency";
 import { type Observable, computed, observable } from "@legendapp/state";
-import * as Burnt from "burnt";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -15,6 +14,7 @@ import {
   getProductListingsByProductId,
   getProductsListings,
 } from "@/src/database/Products/ProductsListingsRepo";
+import { showToast } from "@/src/utils/toast";
 
 import { generateRandomProductListings } from "../database/seeds/ProductListingSeeds";
 import { appModel } from "./AppState/App.model";
@@ -52,8 +52,7 @@ export class ProductsListingsModel {
       const productListings = await Effect.runPromise(
         getProductListingsByProductId(productId),
       );
-      const updatedProductListings = productListings.map((productListing) => {
-        return {
+      const updatedProductListings = productListings.map((productListing) => {        return {
           ...productListing,
           price: Currency.fromSmallestSubunit(
             productListing.price,
@@ -67,7 +66,7 @@ export class ProductsListingsModel {
       );
     } catch (error) {
       console.error("[ProductsListings] Failed to fetch listings:", error);
-      Burnt.toast({
+      showToast({
         title: "Error fetching product listings",
         message:
           error instanceof Error ? error.message : "Unknown error occurred",
@@ -83,7 +82,7 @@ export class ProductsListingsModel {
     await Effect.runPromise(deleteProductListingById(id));
     // Get the updated product listings
     await this.getProductListingsByProductId(this.productId.peek());
-    Burnt.toast({ title: "Product listing deleted successfully" });
+    showToast({ title: "Product listing deleted successfully" });
   };
 
   reset = () => {
@@ -93,7 +92,7 @@ export class ProductsListingsModel {
 
   deleteAllProductListings = async () => {
     await Effect.runPromise(deleteAllProductListings());
-    Burnt.toast({ title: "All product listings deleted successfully" });
+    showToast({ title: "All product listings deleted successfully" });
   };
 
   createRandomProductListings = async () => {
