@@ -3,10 +3,11 @@ import {
   type ObservableArray,
   observable,
 } from "@legendapp/state";
-import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 
 import type { SelectProduct } from "@/db/schema";
+
+import { showToast } from "@/src/utils/toast";
 
 import {
   addProduct,

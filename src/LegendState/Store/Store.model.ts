@@ -3,7 +3,6 @@ import {
   type ObservableArray,
   observable,
 } from "@legendapp/state";
-import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -16,6 +15,7 @@ import {
   getStores,
 } from "@/src/database/Stores/StoresRepo";
 import { analytics } from "@/src/services/analytics";
+import { showToast } from "@/src/utils/toast";
 
 import { DEFAULT_STORES } from "./stores-list";
 

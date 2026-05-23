@@ -2,8 +2,8 @@ import { observer } from "@legendapp/state/react";
 import { Button } from "heroui-native";
 import { View } from "react-native";
 
-import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 import type { PlatformMenuEvent } from "@/src/Components/PlatformMenu";
+import type { InsightsModel } from "@/src/LegendState/Insights/Insights.model";
 
 import { PlatformMenu } from "@/src/Components/PlatformMenu";
 import { Text } from "@/src/Components/ui/Text";

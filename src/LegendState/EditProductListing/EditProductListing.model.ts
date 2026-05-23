@@ -1,6 +1,5 @@
 import Currency from "@coinify/currency";
 import { computed, observable } from "@legendapp/state";
-import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -16,6 +15,7 @@ import {
   updateProductListingById,
 } from "@/src/database/Products/ProductsListingsRepo";
 import { syncManager } from "@/src/services/sync";
+import { showToast } from "@/src/utils/toast";
 
 import { appModel } from "../AppState/App.model";
 

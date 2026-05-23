@@ -52,7 +52,8 @@ export class ProductsListingsModel {
       const productListings = await Effect.runPromise(
         getProductListingsByProductId(productId),
       );
-      const updatedProductListings = productListings.map((productListing) => {        return {
+      const updatedProductListings = productListings.map((productListing) => {
+        return {
           ...productListing,
           price: Currency.fromSmallestSubunit(
             productListing.price,

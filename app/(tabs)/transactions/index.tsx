@@ -1,7 +1,4 @@
-import type { PlatformMenuEvent } from "@/src/Components/PlatformMenu";
-
 import { observer, useMount } from "@legendapp/state/react";
-import { PlatformMenu } from "@/src/Components/PlatformMenu";
 import { Link, useFocusEffect } from "expo-router";
 import { Button } from "heroui-native";
 import { PlusCircle } from "lucide-react-native";
@@ -14,12 +11,14 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
+import type { PlatformMenuEvent } from "@/src/Components/PlatformMenu";
 import type {
   DurationOptions,
   TransactionsScreenModel,
 } from "@/src/LegendState/TransactionsScreen.model";
 
 import { MonthYearPicker } from "@/src/Components/MonthYearPicker";
+import { PlatformMenu } from "@/src/Components/PlatformMenu";
 import { SafeAreaView } from "@/src/Components/ui/SafeAreaView";
 import { Text } from "@/src/Components/ui/Text";
 import { TransactionsList } from "@/src/Containers/Transactions/TransactionsList";

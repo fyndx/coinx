@@ -27,9 +27,19 @@ export const ProductListingGraph = observer(
 
     return (
       <View style={{ height: 300, padding: 12 }}>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 8,
+            marginBottom: 8,
+          }}
+        >
           {extractedProducts.map((key) => (
-            <View key={key} style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <View
+              key={key}
+              style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+            >
               <View
                 style={{
                   width: 12,
@@ -42,7 +52,9 @@ export const ProductListingGraph = observer(
             </View>
           ))}
         </View>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <Text className="text-muted-foreground text-sm">
             Interactive price chart available on the mobile app
           </Text>

@@ -1,5 +1,4 @@
 import { observable } from "@legendapp/state";
-import { showToast } from "@/src/utils/toast";
 import { Effect } from "effect";
 import { router } from "expo-router";
 
@@ -12,6 +11,7 @@ import {
 } from "@/src/database/Products/ProductsRepo";
 import { analytics } from "@/src/services/analytics";
 import { syncManager } from "@/src/services/sync";
+import { showToast } from "@/src/utils/toast";
 import { type MeasurementUnits, isValidUnitCategory } from "@/src/utils/units";
 
 // Draft type for product form (id is optional for new products)

@@ -9,7 +9,13 @@ import {
   Trash2,
 } from "lucide-react-native";
 import { useCallback } from "react";
-import { ActivityIndicator, Dimensions, Pressable, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const WINDOW_HEIGHT = Dimensions.get("window").height;

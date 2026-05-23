@@ -19,10 +19,7 @@ export function PlatformMenu({
   return (
     <Dropdown>
       <DropdownTrigger>{children}</DropdownTrigger>
-      <DropdownMenu
-        aria-label="Actions"
-        onAction={handleAction}
-      >
+      <DropdownMenu aria-label="Actions" onAction={handleAction}>
         {actions.map((action) => (
           <DropdownItem key={action.id}>{action.title}</DropdownItem>
         ))}
