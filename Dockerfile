@@ -4,7 +4,7 @@ FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 
 # Copy dependency files and patches first for layer caching
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches ./patches
 
 # Set CI=true so package.json conditional skips lefthook install
@@ -52,6 +52,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server.js ./
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/pnpm-workspace.yaml ./
 
 # Install pnpm and only production dependencies
 RUN npm install -g pnpm@11.2.2
