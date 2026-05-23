@@ -24,4 +24,4 @@ jobs:
         uses: oxc-project/oxlint-action@v1
 
       - name: 🏃‍♂️ Run Oxfmt
-        run: pnpm run format -- --check
+        run: pnpm exec oxfmt src app --check

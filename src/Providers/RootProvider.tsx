@@ -26,7 +26,11 @@ export const RootProvider = ({ children }: { children: ReactNode }) => {
       className={theme.dark ? darkClass : undefined}
     >
       <StatusBar />
-      {Platform.OS === "web" ? inner : <KeyboardProvider>{inner}</KeyboardProvider>}
+      {Platform.OS === "web" ? (
+        inner
+      ) : (
+        <KeyboardProvider>{inner}</KeyboardProvider>
+      )}
     </GestureHandlerRootView>
   );
 };
