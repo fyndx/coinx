@@ -32,6 +32,8 @@ const SetupScreen = observer(() => {
   }, [setupStatus]);
 
   const retrySetup = async () => {
+    // reset("needsSetup") clears the error and restarts the setup flow,
+    // which triggers the useEffect above to call run() again.
     setupModel.actions.reset("needsSetup");
   };
 

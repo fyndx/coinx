@@ -85,12 +85,15 @@ export class AuthModel {
    * (works for both local dev and production). On native, use the deep-link
    * scheme so the app is opened directly.
    */
-  private getEmailRedirectTo = (): string => {
+  private getEmailRedirectTo = (): string | undefined => {
     if (Platform.OS === "web") {
       if (typeof window !== "undefined") {
         return window.location.origin;
       }
-      return "";
+      // SSR context — signUp is always a user-triggered client action,
+      // so this branch is not reached in practice. Return undefined to
+      // let Supabase fall back to the project's configured Site URL.
+      return undefined;
     }
     return `${env.EXPO_PUBLIC_SCHEME}://`;
   };

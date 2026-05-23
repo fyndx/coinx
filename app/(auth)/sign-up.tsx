@@ -65,12 +65,16 @@ const SignUp = observer(() => {
               </Text>
             </View>
             <View className="w-full gap-3 mt-2">
-              <Button onPress={() => router.replace("/(auth)/sign-in")}>
+              <Button
+                onPress={() => router.replace("/(auth)/sign-in")}
+                accessibilityLabel="Go to sign in page"
+              >
                 Go to Sign In
               </Button>
               <Button
                 variant="outline"
                 onPress={() => setConfirmationSent(false)}
+                accessibilityLabel="Return to sign up to use a different email"
               >
                 Use a different email
               </Button>
