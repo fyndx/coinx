@@ -2,7 +2,6 @@ import { observer } from "@legendapp/state/react";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -18,6 +17,7 @@ const SignUp = observer(() => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const isLoading = authModel.obs.isLoading.get();
   const error = authModel.obs.error.get();
 
@@ -38,16 +38,48 @@ const SignUp = observer(() => {
     const result = await authModel.actions.signUp(email.trim(), password);
     if (result.success) {
       if (result.needsConfirmation) {
-        Alert.alert(
-          "Check your email",
-          "We sent you a confirmation link. Please verify your email to sign in.",
-          [{ text: "OK", onPress: () => router.replace("/(auth)/sign-in") }],
-        );
+        setConfirmationSent(true);
       } else {
         router.replace("/setup");
       }
     }
   };
+
+  if (confirmationSent) {
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1 bg-background"
+      >
+        <View className="flex-1 justify-center px-6">
+          <View className="bg-card rounded-2xl p-6 gap-4 items-center">
+            <Text className="text-4xl">📧</Text>
+            <View className="gap-2">
+              <Text className="text-2xl font-bold text-center">
+                Check your email
+              </Text>
+              <Text className="text-muted-foreground text-center">
+                We sent a confirmation link to{" "}
+                <Text className="font-medium text-foreground">{email}</Text>.
+                Please verify your email address before signing in.
+              </Text>
+            </View>
+            <View className="w-full gap-3 mt-2">
+              <Button onPress={() => router.replace("/(auth)/sign-in")}>
+                Go to Sign In
+              </Button>
+              <Button
+                variant="outline"
+                onPress={() => setConfirmationSent(false)}
+              >
+                Use a different email
+              </Button>
+            </View>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
