@@ -58,7 +58,10 @@ export const supabase = createClient(
       storage: SecureStoreAdapter,
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: false,
+      // On web, detect auth tokens/codes in the URL so email confirmation
+      // callbacks are handled automatically. On native, session comes from
+      // deep links / SecureStore, so URL detection is not needed.
+      detectSessionInUrl: Platform.OS === "web",
     },
   },
 );

@@ -2,10 +2,12 @@ import type { Session, User } from "@supabase/supabase-js";
 
 import { observable } from "@legendapp/state";
 import { Effect } from "effect";
+import { Platform } from "react-native";
 
 import { clearLocalDatabase } from "@/db/client";
 import { setupModel } from "@/src/LegendState/Setup/Setup.model";
 import { analytics } from "@/src/services/analytics";
+import { env } from "@/src/services/env";
 import { supabase } from "@/src/services/supabase";
 import { syncManager } from "@/src/services/sync";
 
@@ -78,6 +80,25 @@ export class AuthModel {
   };
 
   /**
+   * Returns the URL that Supabase should redirect to after email confirmation.
+   * On web, use the current origin so the link always matches the deployment
+   * (works for both local dev and production). On native, use the deep-link
+   * scheme so the app is opened directly.
+   */
+  private getEmailRedirectTo = (): string | undefined => {
+    if (Platform.OS === "web") {
+      if (typeof window !== "undefined") {
+        return window.location.origin;
+      }
+      // SSR context — signUp is always a user-triggered client action,
+      // so this branch is not reached in practice. Return undefined to
+      // let Supabase fall back to the project's configured Site URL.
+      return undefined;
+    }
+    return `${env.EXPO_PUBLIC_SCHEME}://`;
+  };
+
+  /**
    * Sign up with email and password.
    * On success, upserts profile on the backend.
    */
@@ -89,6 +110,9 @@ export class AuthModel {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: this.getEmailRedirectTo(),
+        },
       });
 
       if (error) {

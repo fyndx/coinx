@@ -18,37 +18,23 @@ const STEP_LABELS: Record<string, string> = {
 };
 
 const SetupScreen = observer(() => {
-  const isAuthenticated = authModel.obs.isAuthenticated.get();
   const setupStatus = setupModel.obs.status.get();
   const setupStep = setupModel.obs.step.get();
   const setupError = setupModel.obs.error.get();
 
+  // Start setup automatically when the status indicates it's needed.
+  // Navigation away from this screen is handled exclusively by
+  // useProtectedRoute in _layout.tsx to avoid competing redirects.
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace("/(auth)/sign-in");
-      return;
-    }
-
     if (setupStatus === "needsSetup") {
-      setupModel.actions.run().then((result) => {
-        if (result.success) {
-          router.replace("/(tabs)/transactions");
-        }
-      });
-      return;
+      setupModel.actions.run();
     }
-
-    if (setupStatus === "success") {
-      router.replace("/(tabs)/transactions");
-    }
-  }, [isAuthenticated, setupStatus]);
+  }, [setupStatus]);
 
   const retrySetup = async () => {
-    setupModel.actions.clearError();
-    const result = await setupModel.actions.run();
-    if (result.success) {
-      router.replace("/(tabs)/transactions");
-    }
+    // reset("needsSetup") clears the error and restarts the setup flow,
+    // which triggers the useEffect above to call run() again.
+    setupModel.actions.reset("needsSetup");
   };
 
   const isRunning = setupStatus === "running" || setupStatus === "needsSetup";
