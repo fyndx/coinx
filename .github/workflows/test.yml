@@ -1,19 +1,20 @@
-name: Web Export Validation
+name: Tests
 
 on:
   push:
     branches:
       - main
   pull_request:
-    paths-ignore:
-      - "**.md"
+    branches:
+      - main
 
 jobs:
-  export-web:
-    name: Export Web
+  test:
+    name: Jest
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: 📦 Checkout project repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -21,5 +22,5 @@ jobs:
       - name: 📦 Setup Node + pnpm + Install Dependencies
         uses: ./.github/actions/setup-node-pnpm-install
 
-      - name: Export Web
-        run: pnpm run export:web
+      - name: 🧪 Run Jest
+        run: pnpm test -- --runInBand
