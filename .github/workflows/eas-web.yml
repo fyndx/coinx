@@ -23,3 +23,9 @@ jobs:
 
       - name: Export Web
         run: pnpm run export:web
+        env:
+          EXPO_PUBLIC_APP_ENV: preview
+          EXPO_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: web-export-validation
+          EXPO_PUBLIC_BACKEND_URL: https://example.com
+          EXPO_PUBLIC_SENTRY_DSN: https://public@example.com/1
