@@ -10,6 +10,8 @@ services:
         EXPO_PUBLIC_SENTRY_DSN: ${EXPO_PUBLIC_SENTRY_DSN:-}
         SENTRY_ORG: ${SENTRY_ORG:-}
         SENTRY_PROJECT: ${SENTRY_PROJECT:-}
+    init: true
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:

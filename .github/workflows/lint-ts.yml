@@ -17,11 +17,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📦 Setup Node + Bun + Install Dependencies
-        uses: ./.github/actions/setup-node-bun-install
+      - name: 📦 Setup Node + pnpm + Install Dependencies
+        uses: ./.github/actions/setup-node-pnpm-install
 
       - name: 🏃‍♂️ Run Oxlint
         uses: oxc-project/oxlint-action@v1
 
       - name: 🏃‍♂️ Run Oxfmt
-        run: bun run format --check
+        run: pnpm run format -- --check

@@ -33,8 +33,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📦 Setup Node + Bun + Install Dependencies
-        uses: ./.github/actions/setup-node-bun-install
+      - name: 📦 Setup Node + pnpm + Install Dependencies
+        uses: ./.github/actions/setup-node-pnpm-install
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8

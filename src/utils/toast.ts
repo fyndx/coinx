@@ -1,9 +1,11 @@
 import * as Burnt from "burnt";
 
+type NativeToastPreset = "done" | "error" | "none";
+
 interface ToastOptions {
   title: string;
   message?: string;
-  preset?: "error" | "done" | "none" | "spinner";
+  preset?: NativeToastPreset;
 }
 
 export function showToast({ title, message, preset }: ToastOptions): void {

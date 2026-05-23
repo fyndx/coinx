@@ -1,0 +1,6 @@
+allowBuilds:
+  "@sentry/cli": true
+  "@shopify/react-native-skia": true
+  esbuild: true
+  lefthook: true
+  sharp: true

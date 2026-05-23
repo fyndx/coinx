@@ -7,11 +7,11 @@ on:
       - master
     paths:
       - "package.json"
-      - "bun.lockb"
+      - "pnpm-lock.yaml"
   pull_request:
     paths:
       - "package.json"
-      - "bun.lockb"
+      - "pnpm-lock.yaml"
 
 jobs:
   doctor:
@@ -24,8 +24,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📦 Setup Node + Bun + Install Dependencies
-        uses: ./.github/actions/setup-node-bun-install
+      - name: 📦 Setup Node + pnpm + Install Dependencies
+        uses: ./.github/actions/setup-node-pnpm-install
 
       - name: 🚑 Run Doctor Checks
         run: npx expo-doctor@latest

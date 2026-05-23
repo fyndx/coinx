@@ -10,6 +10,7 @@ import {
   transactions as transactionsRepo,
 } from "@/db/schema";
 import { getTransactions } from "@/src/database/Transactions/TransactionsRepo";
+import { parseOptionalNumber } from "@/src/utils/parseOptionalNumber";
 
 export interface TransactionItem extends SelectTransaction {
   category_id: string;
@@ -157,8 +158,8 @@ export class TransactionsScreenModel {
         ),
       );
 
-    const incomeParsed = Number(totalIncome?.[0]?.total) ?? 0;
-    const expenseParsed = Number(totalExpense?.[0]?.total) ?? 0;
+    const incomeParsed = parseOptionalNumber(totalIncome[0]?.total);
+    const expenseParsed = parseOptionalNumber(totalExpense[0]?.total);
     this.obs.insights.set({
       totalIncome: incomeParsed,
       totalExpense: expenseParsed,

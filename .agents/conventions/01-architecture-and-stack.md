@@ -10,7 +10,7 @@
 - **Effect-TS** - Functional programming patterns and robust error handling
 - **Supabase** - Auth and backend services
 - **MMKV** - Encrypted local storage
-- **Bun** - Package manager and script runner
+- **Node.js + pnpm** - Runtime and package manager
 
 ## Core Patterns
 - **Local-First Architecture:** All data is stored in SQLite on-device. App works 100% offline. Sync is for authenticated users with a pro plan.

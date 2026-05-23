@@ -1,10 +1,10 @@
 # ---- Stage 1: Build ----
-FROM oven/bun:1 AS builder
+FROM node:24-bookworm-slim AS builder
 
 WORKDIR /app
 
 # Copy dependency files and patches first for layer caching
-COPY package.json bun.lock ./
+COPY package.json pnpm-lock.yaml ./
 COPY patches ./patches
 
 # Set CI=true so package.json conditional skips lefthook install
@@ -27,17 +27,18 @@ ENV EXPO_PUBLIC_APP_ENV=$EXPO_PUBLIC_APP_ENV \
     SENTRY_ORG=$SENTRY_ORG \
     SENTRY_PROJECT=$SENTRY_PROJECT
 
-# Install ALL dependencies (dev deps needed for expo export)
-RUN bun install
+# Install pnpm and all dependencies (dev deps needed for expo export)
+RUN npm install -g pnpm@11.2.2
+RUN pnpm install --frozen-lockfile
 
 # Copy full source
 COPY . .
 
 # Export Expo web app with server output
-RUN bunx expo export --platform web
+RUN pnpm exec expo export --platform web
 
 # ---- Stage 2: Production runner ----
-FROM oven/bun:1-alpine AS runner
+FROM node:24-alpine AS runner
 
 WORKDIR /app
 
@@ -48,14 +49,14 @@ ENV PORT=3000
 COPY --from=builder /app/dist ./dist
 
 # Copy server entrypoint and package files
-COPY --from=builder /app/server.ts ./
+COPY --from=builder /app/server.js ./
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/bun.lock ./
-COPY --from=builder /app/patches ./patches
+COPY --from=builder /app/pnpm-lock.yaml ./
 
-# Install only production dependencies using bun
-RUN CI=true bun install --production
+# Install pnpm and only production dependencies
+RUN npm install -g pnpm@11.2.2
+RUN CI=true pnpm install --prod --frozen-lockfile
 
 EXPOSE 3000
 
-CMD ["bun", "server.ts"]
+CMD ["node", "server.js"]

@@ -13,7 +13,7 @@ Quick reference for Claude Code sessions working on CoinX.
 - **Effect-TS** - Functional programming patterns and robust error handling
 - **Supabase** - Auth and backend services
 - **MMKV** - Encrypted, fast local storage
-- **Bun** - Package manager and script runner
+- **Node.js + pnpm** - Runtime and package manager
 
 ## What: Project Structure
 
@@ -38,13 +38,14 @@ src/
 **Essential Commands:**
 
 ```bash
-bun start               # Start dev server
-bun run ios             # Run on iOS simulator
-bun run android         # Run on Android emulator
-bun run lint            # Run linter
-bun run type-check      # TypeScript validation
-bun run db:generate     # Generate Drizzle migrations
-bun run db:push         # Push migrations to local DB
+pnpm install            # Install dependencies
+pnpm start              # Start dev server
+pnpm ios                # Run on iOS simulator
+pnpm android            # Run on Android emulator
+pnpm lint               # Run linter
+pnpm type-check         # TypeScript validation
+pnpm db:generate        # Generate Drizzle migrations
+pnpm db:push            # Push migrations to local DB
 ```
 
 **Testing Checklist (Before PR):**

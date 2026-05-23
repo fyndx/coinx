@@ -96,15 +96,15 @@ function getDb() {
 export const expoDb = new Proxy(
   {} as Awaited<ReturnType<typeof openDatabaseAsync>>,
   {
-    get(_target, prop) {
-      return (getExpoDb() as Record<string | symbol, unknown>)[prop];
+    get(_target, prop, receiver) {
+      return Reflect.get(getExpoDb(), prop, receiver);
     },
   },
 );
 
 export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
-  get(_target, prop) {
-    return (getDb() as Record<string | symbol, unknown>)[prop];
+  get(_target, prop, receiver) {
+    return Reflect.get(getDb(), prop, receiver);
   },
 });
 

@@ -19,6 +19,7 @@ import {
   getTransactions,
 } from "@/src/database/Transactions/TransactionsRepo";
 import { dayjsRange } from "@/src/utils/date";
+import { parseOptionalNumber } from "@/src/utils/parseOptionalNumber";
 
 type InsightsDurationType = "week" | "month" | "year";
 
@@ -186,8 +187,8 @@ export class InsightsModel {
       }),
     );
 
-    const incomeParsed = Number(totalIncomeResult?.[0]?.total) ?? 0;
-    const expenseParsed = Number(totalExpenseResult?.[0]?.total) ?? 0;
+    const incomeParsed = parseOptionalNumber(totalIncomeResult[0]?.total);
+    const expenseParsed = parseOptionalNumber(totalExpenseResult[0]?.total);
 
     this.obs.insights.set({
       totalIncome: incomeParsed,

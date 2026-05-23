@@ -2,11 +2,14 @@
   "name": "coinx",
   "version": "1.0.0",
   "main": "./index",
+  "packageManager": "pnpm@11.2.2",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "serve:web": "node server.js",
+    "export:web": "expo export --platform web",
     "prebuild": "expo prebuild",
     "db:generate": "drizzle-kit generate",
     "prepare": "test \"$CI\" = \"true\" || lefthook install",
@@ -15,6 +18,9 @@
     "format": "oxfmt",
     "test": "jest",
     "test:watch": "jest --watch"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   },
   "dependencies": {
     "@coinify/currency": "^1.4.2",
